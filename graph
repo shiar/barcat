@@ -26,13 +26,13 @@ my @values = map { s/^\h* ( -? [0-9]* (?:\.[0-9]+)? )//x and $1 } @lines;
 my @order  = sort { $b <=> $a } grep { length } @values;
 if ($opt{trim}) {
 	my $trimpos = abs $opt{trim};
-	length > 1 + $trimpos and substr($_, $trimpos) = '…' for @lines;
+	length > $trimpos and substr($_, $trimpos - 1) = '…' for @lines;
 }
 
 my $maxval = $order[0];
 my $minval = min $order[-1], 0;
 my $lenval = max map { length } @order;
-my $len    = defined $opt{trim} && $opt{trim} < 0 ? -$opt{trim} + 2 :
+my $len    = defined $opt{trim} && $opt{trim} < 0 ? -$opt{trim} + 1 :
 	1 + max map { length } @lines;  # left padding
 my $size   = ($maxval - $minval) &&
 	($opt{width} - $lenval - $len) / ($maxval - $minval);  # bar multiplication
