@@ -16,6 +16,7 @@ my $size   = ($width - $lenval - $len) / $order[0];  # bar multiplication
 sub orderpos { ($order[$_[0]] + $order[$_[0] + .5]) / 2 * $size }
 my @barmark;
 $barmark[ orderpos($#order / 2) ] = '+';  # mean
+defined and $_ = "\e[36m$_\e[0m" for @barmark;
 
 for my $nr (0 .. $#lines) {
 	my $val = $values[$nr];
