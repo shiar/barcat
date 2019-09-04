@@ -21,15 +21,19 @@ my @lines = readline or exit;
 chomp for @lines;
 my @values = map { s/^\h* ( -? [0-9]* (?:\.[0-9]+)? )//x and $1 } @lines;
 my @order  = sort { $b <=> $a } grep { length } @values;
-my $maxval = max $order[0], -$order[-1];
+my $maxval = $order[0];
+my $minval = min $order[-1], 0;
+
 my $lenval = max map { length } @order;
 my $len    = 1 + max map { length } @lines;  # left padding
-my $size   = $maxval && ($opt{width} - $lenval - $len) / $maxval;  # bar multiplication
+my $size   = ($maxval - $minval) &&
+	($opt{width} - $lenval - $len) / ($maxval - $minval);  # bar multiplication
 
-sub orderpos { ($order[$_[0]] + $order[$_[0] + .5]) / 2 * $size }
+sub orderpos { (($order[$_[0]] + $order[$_[0] + .5]) / 2 - $minval) * $size }
 my @barmark;
-$barmark[ sum(@order) / @order * $size ] = '=';  # average
+$barmark[ (sum(@order) / @order - $minval) * $size ] = '=';  # average
 $barmark[ orderpos($#order / 2) ] = '+';  # mean
+$barmark[ -$minval * $size ] = '|' if $minval < 0;  # zero
 defined and $opt{color} and $_ = "\e[36m$_\e[0m" for @barmark;
 
 for my $nr (0 .. $#lines) {
@@ -44,7 +48,7 @@ for my $nr (0 .. $#lines) {
 		print "\e[0m" if $color;
 	}
 	printf '%-*s', $len, $lines[$nr];
-	print $barmark[$_] // '-' for 1 .. abs($val || 0) * $size;
+	print $barmark[$_] // '-' for 1 .. (($val || 0) - $minval) * $size;
 	say '';
 }
 
