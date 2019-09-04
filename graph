@@ -19,11 +19,12 @@ $opt{color} //= 1;
 
 my @lines = readline or exit;
 chomp for @lines;
-my @values = map { s/^\h*([0-9]*)// and $1 } @lines;
+my @values = map { s/^\h*(-?[0-9]*)// and $1 } @lines;
 my @order  = sort { $b <=> $a } @values;
-my $lenval = 1 + int log($order[0]) / log 10;  # max string length
+my $maxval = max $order[0], -$order[-1];
+my $lenval = 1 + ($order[-1] < 0) + int log($maxval || 1) / log 10;  # max string length
 my $len    = 1 + max map { length } @lines;  # left padding
-my $size   = ($opt{width} - $lenval - $len) / $order[0];  # bar multiplication
+my $size   = ($opt{width} - $lenval - $len) / $maxval;  # bar multiplication
 
 sub orderpos { ($order[$_[0]] + $order[$_[0] + .5]) / 2 * $size }
 my @barmark;
@@ -41,7 +42,7 @@ for my $nr (0 .. $#lines) {
 	printf "%*s", $lenval, $val;
 	print "\e[0m" if $color;
 	printf '%-*s', $len, $lines[$nr];
-	print $barmark[$_] // '-' for 1 .. $val * $size;
+	print $barmark[$_] // '-' for 1 .. abs $val * $size;
 	say '';
 }
 
