@@ -1,6 +1,18 @@
-#!/usr/bin/perl -l
-use List::Util 'max';
-chomp for my @r = <>;
-my $len = 1 + max map length, @r;
-my $size = (80 - $len) / max @r;
-print $_, ' 'x($len-length), '#'x($_*$size) for @r;
+#!/usr/bin/env perl
+use 5.014;
+use warnings;
+use List::Util qw( max );
+
+my $width = $ENV{COLUMNS} || 80;
+
+my @lines = readline;
+chomp for @lines;
+my @values = map { /^\h*([0-9]*)/ } @lines;
+my $maxval = max @values;
+my $len    = 1 + max map { length } @lines;  # left padding
+my $size   = ($width - $len) / $maxval;  # bar multiplication
+
+for (@lines) {
+	my $val = shift @values;
+	say $_, ' ' x ($len - length), '#' x ($val * $size);
+}
