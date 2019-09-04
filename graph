@@ -18,6 +18,7 @@ for my $nr (0 .. $#lines) {
 	my $color =
 		$val == $order[0] ? 32 : # max
 		$val == $order[-1] ? 31 : # min
+		$val == $order[$#order >> 1] ? 1 : # median
 		90;
 	printf "\e[%sm", $color if $color;
 	printf "%*s", $lenval, $val;
