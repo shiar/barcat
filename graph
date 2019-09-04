@@ -3,13 +3,15 @@ use 5.014;
 use warnings;
 use List::Util qw( max sum );
 
-use Getopt::Long;
+our $VERSION = '1.00';
+
+use Getopt::Long '2.33';
 GetOptions(\my %opt,
 	'width|w=i',
 ) or exit 64;  # EX_USAGE
 $opt{width} ||= $ENV{COLUMNS} || 80;
 
-my @lines = readline;
+my @lines = readline or exit;
 chomp for @lines;
 my @values = map { s/^\h*([0-9]*)// and $1 } @lines;
 my @order  = sort { $b <=> $a } @values;
@@ -36,3 +38,38 @@ for my $nr (0 .. $#lines) {
 	print $barmark[$_] // '-' for 1 .. $val * $size;
 	say '';
 }
+
+__END__
+
+=head1 NAME
+
+graph - append bar chart to input numbers
+
+=head1 SYNOPSIS
+
+B<graph> [<options>] [<input>]
+
+cat ... | uniq -c | graph
+
+=head1 DESCRIPTION
+
+Each line starting with a number is given a bar to visualise relative sizes.
+
+=head1 OPTIONS
+
+=over
+
+=item -w, --width=<columns>
+
+Override the maximum number of columns to use.
+Appended graphics will extend to fill up the entire screen.
+
+=back
+
+=head1 AUTHOR
+
+Mischa POSLAWSKY <perl@shiar.org>
+
+=head1 LICENSE
+
+GPL3+.
