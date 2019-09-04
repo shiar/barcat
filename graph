@@ -19,18 +19,20 @@ GetOptions(\my %opt,
 ) or exit 64;  # EX_USAGE
 $opt{width} ||= $ENV{COLUMNS} || 80;
 $opt{color} //= 1;
-$opt{trim} //= 0;
 
 my @lines = readline or exit;
 chomp for @lines;
 my @values = map { s/^\h* ( -? [0-9]* (?:\.[0-9]+)? )//x and $1 } @lines;
 my @order  = sort { $b <=> $a } grep { length } @values;
-length > $opt{trim} + 1 and substr($_, $opt{trim}) = '…' for @lines;
+if ($opt{trim}) {
+	my $trimpos = abs $opt{trim};
+	length > 1 + $trimpos and substr($_, $trimpos) = '…' for @lines;
+}
 
 my $maxval = $order[0];
 my $minval = min $order[-1], 0;
 my $lenval = max map { length } @order;
-my $len    = $opt{trim} ? $opt{trim} + 2 :
+my $len    = defined $opt{trim} && $opt{trim} < 0 ? -$opt{trim} + 2 :
 	1 + max map { length } @lines;  # left padding
 my $size   = ($maxval - $minval) &&
 	($opt{width} - $lenval - $len) / ($maxval - $minval);  # bar multiplication
@@ -82,11 +84,14 @@ Each line starting with a number is given a bar to visualise relative sizes.
 
 Disable colored output of values and bar markers.
 
-=item -l, --length=<size>
+=item -l, --length=[-]<size>
 
 Trim line contents (between number and bars)
 to a maximum number of characters.
 The exceeding part is replaced by an abbreviation sign.
+
+Prepend a dash (i.e. make negative) to enforce padding
+regardless of encountered contents.
 
 =item -m, --markers=
 
