@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 use 5.014;
 use warnings;
-use List::Util qw( max );
+use List::Util qw( max sum );
 
 my $width = $ENV{COLUMNS} || 80;
 
@@ -15,6 +15,7 @@ my $size   = ($width - $lenval - $len) / $order[0];  # bar multiplication
 
 sub orderpos { ($order[$_[0]] + $order[$_[0] + .5]) / 2 * $size }
 my @barmark;
+$barmark[ sum(@values) / @values * $size ] = '=';  # average
 $barmark[ orderpos($#order / 2) ] = '+';  # mean
 defined and $_ = "\e[36m$_\e[0m" for @barmark;
 
