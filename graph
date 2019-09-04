@@ -7,12 +7,17 @@ my $width = $ENV{COLUMNS} || 80;
 
 my @lines = readline;
 chomp for @lines;
-my @values = map { /^\h*([0-9]*)/ } @lines;
+my @values = map { s/^\h*([0-9]*)// and $1 } @lines;
 my $maxval = max @values;
+my $lenval = 1 + int log($maxval) / log 10;  # max string length
 my $len    = 1 + max map { length } @lines;  # left padding
-my $size   = ($width - $len) / $maxval;  # bar multiplication
+my $size   = ($width - $lenval - $len) / $maxval;  # bar multiplication
 
-for (@lines) {
-	my $val = shift @values;
-	say $_, ' ' x ($len - length), '#' x ($val * $size);
+for my $nr (0 .. $#lines) {
+	my $val = $values[$nr];
+	printf "\e[90m";
+	printf "%*s", $lenval, $val;
+	print "\e[0m";
+	printf '%-*s', $len, $lines[$nr];
+	say '-' x ($val * $size);
 }
