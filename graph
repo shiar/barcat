@@ -12,7 +12,10 @@ my @order  = sort { $b <=> $a } @values;
 my $lenval = 1 + int log($order[0]) / log 10;  # max string length
 my $len    = 1 + max map { length } @lines;  # left padding
 my $size   = ($width - $lenval - $len) / $order[0];  # bar multiplication
+
+my @barmark;
 my $mean   = ($order[$#order / 2] + $order[$#order / 2 + .5]) / 2;
+$barmark[ $mean * $size ] = '+';  # mean
 
 for my $nr (0 .. $#lines) {
 	my $val = $values[$nr];
@@ -24,7 +27,6 @@ for my $nr (0 .. $#lines) {
 	printf "%*s", $lenval, $val;
 	print "\e[0m" if $color;
 	printf '%-*s', $len, $lines[$nr];
-	my $bar = '-' x ($val * $size);
-	substr $bar, int($mean * $size) - 1, 1, "\e[36m+\e[0m" if $val >= $mean;
-	say $bar;
+	print $barmark[$_] // '-' for 1 .. $val * $size;
+	say '';
 }
