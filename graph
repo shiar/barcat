@@ -13,9 +13,9 @@ my $lenval = 1 + int log($order[0]) / log 10;  # max string length
 my $len    = 1 + max map { length } @lines;  # left padding
 my $size   = ($width - $lenval - $len) / $order[0];  # bar multiplication
 
+sub orderpos { ($order[$_[0]] + $order[$_[0] + .5]) / 2 * $size }
 my @barmark;
-my $mean   = ($order[$#order / 2] + $order[$#order / 2 + .5]) / 2;
-$barmark[ $mean * $size ] = '+';  # mean
+$barmark[ orderpos($#order / 2) ] = '+';  # mean
 
 for my $nr (0 .. $#lines) {
 	my $val = $values[$nr];
