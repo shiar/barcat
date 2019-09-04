@@ -2,6 +2,7 @@
 use 5.014;
 use warnings;
 use List::Util qw( max sum );
+use open qw( :std :utf8 );
 
 our $VERSION = '1.00';
 
