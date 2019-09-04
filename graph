@@ -8,16 +8,20 @@ my $width = $ENV{COLUMNS} || 80;
 my @lines = readline;
 chomp for @lines;
 my @values = map { s/^\h*([0-9]*)// and $1 } @lines;
-my $maxval = max @values;
-my $lenval = 1 + int log($maxval) / log 10;  # max string length
+my @order  = sort { $b <=> $a } @values;
+my $lenval = 1 + int log($order[0]) / log 10;  # max string length
 my $len    = 1 + max map { length } @lines;  # left padding
-my $size   = ($width - $lenval - $len) / $maxval;  # bar multiplication
+my $size   = ($width - $lenval - $len) / $order[0];  # bar multiplication
 
 for my $nr (0 .. $#lines) {
 	my $val = $values[$nr];
-	printf "\e[90m";
+	my $color =
+		$val == $order[0] ? 32 : # max
+		$val == $order[-1] ? 31 : # min
+		90;
+	printf "\e[%sm", $color if $color;
 	printf "%*s", $lenval, $val;
-	print "\e[0m";
+	print "\e[0m" if $color;
 	printf '%-*s', $len, $lines[$nr];
 	say '-' x ($val * $size);
 }
