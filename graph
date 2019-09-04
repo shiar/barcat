@@ -24,16 +24,16 @@ my @lines = readline or exit;
 chomp for @lines;
 my @values = map { s/^\h* ( -? [0-9]* (?:\.[0-9]+)? )//x and $1 } @lines;
 my @order  = sort { $b <=> $a } grep { length } @values;
-if ($opt{trim}) {
+if (defined $opt{trim}) {
 	my $trimpos = abs $opt{trim};
-	$trimpos == 1 ? ($_ = substr($_, 0, 1)) :
+	$trimpos <= 1 ? ($_ = substr($_, 0, 1)) :
 	(length > $trimpos and substr($_, $trimpos - 1) = '…') for @lines;
 }
 
 my $maxval = $order[0];
 my $minval = min $order[-1], 0;
 my $lenval = max map { length } @order;
-my $len    = defined $opt{trim} && $opt{trim} < 0 ? -$opt{trim} + 1 :
+my $len    = defined $opt{trim} && $opt{trim} <= 0 ? -$opt{trim} + 1 :
 	1 + max map { length } @lines;  # left padding
 my $size   = ($maxval - $minval) &&
 	($opt{width} - $lenval - $len) / ($maxval - $minval);  # bar multiplication
@@ -89,7 +89,8 @@ Disable colored output of values and bar markers.
 
 Trim line contents (between number and bars)
 to a maximum number of characters.
-The exceeding part is replaced by an abbreviation sign.
+The exceeding part is replaced by an abbreviation sign,
+unless C<--length=0>.
 
 Prepend a dash (i.e. make negative) to enforce padding
 regardless of encountered contents.
