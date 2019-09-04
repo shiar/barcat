@@ -3,7 +3,11 @@ use 5.014;
 use warnings;
 use List::Util qw( max sum );
 
-my $width = $ENV{COLUMNS} || 80;
+use Getopt::Long;
+GetOptions(\my %opt,
+	'width|w=i',
+) or exit 64;  # EX_USAGE
+$opt{width} ||= $ENV{COLUMNS} || 80;
 
 my @lines = readline;
 chomp for @lines;
@@ -11,7 +15,7 @@ my @values = map { s/^\h*([0-9]*)// and $1 } @lines;
 my @order  = sort { $b <=> $a } @values;
 my $lenval = 1 + int log($order[0]) / log 10;  # max string length
 my $len    = 1 + max map { length } @lines;  # left padding
-my $size   = ($width - $lenval - $len) / $order[0];  # bar multiplication
+my $size   = ($opt{width} - $lenval - $len) / $order[0];  # bar multiplication
 
 sub orderpos { ($order[$_[0]] + $order[$_[0] + .5]) / 2 * $size }
 my @barmark;
