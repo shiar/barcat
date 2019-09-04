@@ -39,7 +39,7 @@ my $size   = ($maxval - $minval) &&
 	($opt{width} - $lenval - $len) / ($maxval - $minval);  # bar multiplication
 
 my @barmark;
-if ($opt{markers} // 1) {
+if ($opt{markers} // 1 and $size > 0) {
 	sub orderpos { (($order[$_[0]] + $order[$_[0] + .5]) / 2 - $minval) * $size }
 	$barmark[ (sum(@order) / @order - $minval) * $size ] = '=';  # average
 	$barmark[ orderpos($#order / 2) ] = '+';  # mean
