@@ -52,8 +52,6 @@ graph - append bar chart to input numbers
 
 B<graph> [<options>] [<input>]
 
-cat ... | uniq -c | graph
-
 =head1 DESCRIPTION
 
 Each line starting with a number is given a bar to visualise relative sizes.
@@ -68,6 +66,43 @@ Override the maximum number of columns to use.
 Appended graphics will extend to fill up the entire screen.
 
 =back
+
+=head1 EXAMPLES
+
+Commonly used after counting, such as users on the current server:
+
+    users | sed 's/ /\n/g' | sort | uniq -c | graph
+
+Letter frequencies in text files:
+
+    cat /usr/share/games/fortunes/*.u8 |
+    perl -CO -nE 'say for grep length, split /\PL*/, uc' |
+    sort | uniq -c | graph
+
+Memory usage of user processes:
+
+    ps xo %mem,pid,cmd | graph -l40
+
+Sizes (in megabytes) of all root files and directories:
+
+    du -d0 -m * | graph
+
+Number of HTTP requests per day:
+
+    cat log/access.log | cut -d\  -f4 | cut -d: -f1 | uniq -c | graph
+
+Any kind of database query with leading counts:
+
+    echo 'SELECT count(*),schemaname FROM pg_tables GROUP BY 2' |
+    psql -t | graph
+
+Git statistics, such commit count by year:
+
+    git log --pretty=%ci | cut -b-4 | uniq -c | graph
+
+Or the most frequent authors:
+
+    git shortlog -sn | graph | head -3
 
 =head1 AUTHOR
 
