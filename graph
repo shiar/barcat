@@ -8,11 +8,13 @@ our $VERSION = '1.00';
 use Getopt::Long '2.33';
 sub podexit { require Pod::Usage; Pod::Usage::pod2usage(-exitval => 0, @_) }
 GetOptions(\my %opt,
+	'color|c!',
 	'width|w=i',
 	'usage|h' => sub { podexit() },
 	'help'    => sub { podexit(-verbose => 2) },
 ) or exit 64;  # EX_USAGE
 $opt{width} ||= $ENV{COLUMNS} || 80;
+$opt{color} //= 1;
 
 my @lines = readline or exit;
 chomp for @lines;
@@ -26,11 +28,11 @@ sub orderpos { ($order[$_[0]] + $order[$_[0] + .5]) / 2 * $size }
 my @barmark;
 $barmark[ sum(@values) / @values * $size ] = '=';  # average
 $barmark[ orderpos($#order / 2) ] = '+';  # mean
-defined and $_ = "\e[36m$_\e[0m" for @barmark;
+defined and $opt{color} and $_ = "\e[36m$_\e[0m" for @barmark;
 
 for my $nr (0 .. $#lines) {
 	my $val = $values[$nr];
-	my $color =
+	my $color = !$opt{color} ? 0 :
 		$val == $order[0] ? 32 : # max
 		$val == $order[-1] ? 31 : # min
 		90;
@@ -59,6 +61,10 @@ Each line starting with a number is given a bar to visualise relative sizes.
 =head1 OPTIONS
 
 =over
+
+=item --no-color
+
+Disable colored output of values and bar markers.
 
 =item -w, --width=<columns>
 
