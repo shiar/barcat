@@ -1,9 +1,10 @@
 #!/usr/bin/env perl
-use 5.014;
+use 5.018;
 use warnings;
 use utf8;
 use List::Util qw( min max sum );
 use open qw( :std :utf8 );
+use experimental qw( lexical_subs );
 
 our $VERSION = '1.02';
 
