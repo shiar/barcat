@@ -42,6 +42,8 @@ my @barmark;
 if ($opt{markers} // 1 and $size > 0) {
 	sub orderpos { (($order[$_[0]] + $order[$_[0] + .5]) / 2 - $minval) * $size }
 	$barmark[ (sum(@order) / @order - $minval) * $size ] = '=';  # average
+	$barmark[ orderpos($#order * .31731) ] = '>';
+	$barmark[ orderpos($#order * .68269) ] = '<';
 	$barmark[ orderpos($#order / 2) ] = '+';  # mean
 	$barmark[ -$minval * $size ] = '|' if $minval < 0;  # zero
 	defined and $opt{color} and $_ = "\e[36m$_\e[0m" for @barmark;
@@ -112,8 +114,19 @@ the sum of all values divided by the number of counted lines.
 
 =item B<+>
 
-Median:
+Mean, median:
 the middle value or average between middle values.
+
+=item B<<>
+
+Standard deviation left of the mean.
+Only 16% of all values are lower.
+
+=item B<< > >>
+
+Standard deviation right of the mean.
+The part between B<< <--> >> encompass all I<normal> results,
+or 68% of all entries.
 
 =back
 
