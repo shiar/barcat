@@ -54,6 +54,8 @@ $SIG{INT} = 'DEFAULT';
 
 sub show_lines {
 
+state $nr = 0;
+
 my @order  = sort { $b <=> $a } grep { length } @values;
 my $maxval = $order[0];
 my $minval = min $order[-1], 0;
@@ -72,9 +74,21 @@ if ($opt{markers} // 1 and $size > 0) {
 	$barmark[ orderpos($#order / 2) ] = '+';  # mean
 	$barmark[ -$minval * $size ] = '|' if $minval < 0;  # zero
 	defined and $opt{color} and $_ = "\e[36m$_\e[0m" for @barmark;
+
+	state $lastmax = $maxval;
+	if ($maxval > $lastmax) {
+		print ' ' x ($lenval + $len);
+		printf "\e[90m" if $opt{color};
+		printf '%-*s',
+			($lastmax - $minval) * $size + .5,
+			'-' x (($values[$nr - 1] - $minval) * $size);
+		print "\e[92m" if $opt{color};
+		say '+' x (($maxval - $lastmax - $minval) * $size + .5);
+		print "\e[0m" if $opt{color};
+		$lastmax = $maxval;
+	}
 }
 
-state $nr = 0;
 while ($nr <= $#lines) {
 	my $val = $values[$nr];
 	if (length $val) {
