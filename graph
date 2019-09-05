@@ -17,7 +17,7 @@ GetOptions(\my %opt,
 	'follow|f:i',
 	'trim|length|l=i',
 	'markers|m=s',
-	'unclean|u!',
+	'unmodified|u!',
 	'width|w=i',
 	'usage|h' => sub { podexit() },
 	'help'    => sub { podexit(-verbose => 2) },
@@ -40,7 +40,7 @@ $SIG{INT} = 'IGNORE';  # continue after assumed eof
 my (@lines, @values);
 while (readline) {
 	chomp;
-	s/^\h*// unless $opt{unclean};
+	s/^\h*// unless $opt{unmodified};
 	push @values, s/^ ( \h* -? [0-9]* \.? [0-9]+ |)//x && $1;
 	if (defined $opt{trim}) {
 		my $trimpos = abs $opt{trim};
@@ -185,7 +185,10 @@ or 68% of all entries.
 
 =back
 
-=item -u, --unclean
+=item -u, --unmodified
+
+Do not strip leading whitespace.
+Keep original value alignment, which may be significant in some programs.
 
 =item -w, --width=<columns>
 
