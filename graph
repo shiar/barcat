@@ -20,16 +20,24 @@ GetOptions(\my %opt,
 $opt{width} ||= $ENV{COLUMNS} || 80;
 $opt{color} //= 1;
 
-my @lines = readline or exit;
-chomp for @lines;
-my @values = map { s/^\h* ( -? [0-9]* (?:\.[0-9]+)? )//x and $1 } @lines;
-my @order  = sort { $b <=> $a } grep { length } @values;
-if (defined $opt{trim}) {
-	my $trimpos = abs $opt{trim};
-	$trimpos <= 1 ? ($_ = substr($_, 0, 1)) :
-	(length > $trimpos and substr($_, $trimpos - 1) = '…') for @lines;
+my (@lines, @values);
+while (readline) {
+	chomp;
+	push @values, s/^\h* ( -? [0-9]* (?:\.[0-9]+)? )//x && $1;
+	if (defined $opt{trim}) {
+		my $trimpos = abs $opt{trim};
+		if ($trimpos <= 1) {
+			$_ = substr $_, 0, 1;
+		}
+		elsif (length > $trimpos) {
+			substr($_, $trimpos - 1) = '…';
+		}
+	}
+	push @lines, $_;
 }
+@lines or exit;
 
+my @order  = sort { $b <=> $a } grep { length } @values;
 my $maxval = $order[0];
 my $minval = min $order[-1], 0;
 my $lenval = max map { length } @order;
