@@ -39,7 +39,7 @@ $SIG{INT} = 'IGNORE';  # continue after assumed eof
 
 my (@lines, @values);
 while (readline) {
-	chomp;
+	s/\r?\n\z//;
 	s/^\h*// unless $opt{unmodified};
 	push @values, s/^ ( \h* -? [0-9]* \.? [0-9]+ |)//x && $1;
 	if (defined $opt{trim}) {
