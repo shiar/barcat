@@ -6,8 +6,11 @@ use List::Util qw( max sum );
 our $VERSION = '1.00';
 
 use Getopt::Long '2.33';
+sub podexit { require Pod::Usage; Pod::Usage::pod2usage(-exitval => 0, @_) }
 GetOptions(\my %opt,
 	'width|w=i',
+	'usage|h' => sub { podexit() },
+	'help'    => sub { podexit(-verbose => 2) },
 ) or exit 64;  # EX_USAGE
 $opt{width} ||= $ENV{COLUMNS} || 80;
 
