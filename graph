@@ -17,6 +17,7 @@ GetOptions(\my %opt,
 	'follow|f:i',
 	'trim|length|l=i',
 	'markers|m=s',
+	'unclean|u!',
 	'width|w=i',
 	'usage|h' => sub { podexit() },
 	'help'    => sub { podexit(-verbose => 2) },
@@ -39,7 +40,8 @@ $SIG{INT} = 'IGNORE';  # continue after assumed eof
 my (@lines, @values);
 while (readline) {
 	chomp;
-	push @values, s/^\h* ( -? [0-9]* (?:\.[0-9]+)? )//x && $1;
+	s/^\h*// unless $opt{unclean};
+	push @values, s/^ ( \h* -? [0-9]* \.? [0-9]+ |)//x && $1;
 	if (defined $opt{trim}) {
 		my $trimpos = abs $opt{trim};
 		if ($trimpos <= 1) {
@@ -183,6 +185,8 @@ or 68% of all entries.
 
 =back
 
+=item -u, --unclean
+
 =item -w, --width=<columns>
 
 Override the maximum number of columns to use.
@@ -217,7 +221,7 @@ Number of HTTP requests per day:
 Any kind of database query with leading counts:
 
     echo 'SELECT count(*),schemaname FROM pg_tables GROUP BY 2' |
-    psql -t | graph
+    psql -t | graph -u
 
 Git statistics, such commit count by year:
 
