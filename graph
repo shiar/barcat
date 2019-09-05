@@ -53,13 +53,13 @@ while (readline) {
 	}
 	push @lines, $_;
 }
-@lines or exit;
 
 $SIG{INT} = 'DEFAULT';
 
 sub show_lines {
 
 state $nr = 0;
+@lines and @lines > $nr or return;
 
 my @order  = sort { $b <=> $a } grep { length } @values;
 my $maxval = $order[0];
