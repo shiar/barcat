@@ -31,6 +31,8 @@ if (defined $opt{follow}) {
 	alarm $opt{follow};
 }
 
+$SIG{INT} = 'IGNORE';  # continue after assumed eof
+
 my (@lines, @values);
 while (readline) {
 	chomp;
@@ -47,6 +49,8 @@ while (readline) {
 	push @lines, $_;
 }
 @lines or exit;
+
+$SIG{INT} = 'DEFAULT';
 
 sub show_lines {
 
