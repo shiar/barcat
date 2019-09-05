@@ -5,12 +5,13 @@ use utf8;
 use List::Util qw( min max sum );
 use open qw( :std :utf8 );
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 use Getopt::Long '2.33', qw( :config gnu_getopt );
 sub podexit { require Pod::Usage; Pod::Usage::pod2usage(-exitval => 0, @_) }
 GetOptions(\my %opt,
 	'color|c!',
+	'follow|f:i',
 	'trim|length|l=i',
 	'markers|m=s',
 	'width|w=i',
@@ -19,6 +20,15 @@ GetOptions(\my %opt,
 ) or exit 64;  # EX_USAGE
 $opt{width} ||= $ENV{COLUMNS} || 80;
 $opt{color} //= 1;
+
+if (defined $opt{follow}) {
+	$opt{follow} ||= 1;
+	$SIG{ALRM} = sub {
+		show_lines();
+		alarm $opt{follow};
+	};
+	alarm $opt{follow};
+}
 
 my (@lines, @values);
 while (readline) {
@@ -37,6 +47,8 @@ while (readline) {
 }
 @lines or exit;
 
+sub show_lines {
+
 my @order  = sort { $b <=> $a } grep { length } @values;
 my $maxval = $order[0];
 my $minval = min $order[-1], 0;
@@ -48,7 +60,7 @@ my $size   = ($maxval - $minval) &&
 
 my @barmark;
 if ($opt{markers} // 1 and $size > 0) {
-	sub orderpos { (($order[$_[0]] + $order[$_[0] + .5]) / 2 - $minval) * $size }
+	my sub orderpos { (($order[$_[0]] + $order[$_[0] + .5]) / 2 - $minval) * $size }
 	$barmark[ (sum(@order) / @order - $minval) * $size ] = '=';  # average
 	$barmark[ orderpos($#order * .31731) ] = '>';
 	$barmark[ orderpos($#order * .68269) ] = '<';
@@ -57,7 +69,8 @@ if ($opt{markers} // 1 and $size > 0) {
 	defined and $opt{color} and $_ = "\e[36m$_\e[0m" for @barmark;
 }
 
-for my $nr (0 .. $#lines) {
+state $nr = 0;
+while ($nr <= $#lines) {
 	my $val = $values[$nr];
 	if (length $val) {
 		my $color = !$opt{color} ? 0 :
@@ -71,7 +84,11 @@ for my $nr (0 .. $#lines) {
 	printf '%-*s', $len, $lines[$nr];
 	print $barmark[$_] // '-' for 1 .. $size && (($val || 0) - $minval) * $size;
 	say '';
+	$nr++;
 }
+
+}
+show_lines();
 
 __END__
 
@@ -94,6 +111,10 @@ Each line starting with a number is given a bar to visualise relative sizes.
 =item --no-color
 
 Disable colored output of values and bar markers.
+
+=item -f, --follow[=<seconds>]
+
+Interval to output partial progress.
 
 =item -l, --length=[-]<size>
 
@@ -181,6 +202,11 @@ Git statistics, such commit count by year:
 Or the most frequent authors:
 
     git shortlog -sn | graph | head -3
+
+Latency history:
+
+    ping google.com |
+    perl -pe '$|=1; print s/ time=(.*)// ? "$1 for " : "> "' | graph -f
 
 =head1 AUTHOR
 
