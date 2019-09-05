@@ -61,7 +61,7 @@ for my $nr (0 .. $#lines) {
 		print "\e[0m" if $color;
 	}
 	printf '%-*s', $len, $lines[$nr];
-	print $barmark[$_] // '-' for 1 .. (($val || 0) - $minval) * $size;
+	print $barmark[$_] // '-' for 1 .. $size && (($val || 0) - $minval) * $size;
 	say '';
 }
 
