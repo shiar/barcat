@@ -28,6 +28,7 @@ GetOptions(\%opt,
 		);
 		$opt{trim} = $optval;
 	},
+	'value-length=i',
 	'markers|m=s',
 	'unmodified|u!',
 	'width|w=i',
@@ -80,7 +81,7 @@ state $nr = 0;
 my @order  = sort { $b <=> $a } grep { length } @values;
 my $maxval = $order[0];
 my $minval = min $order[-1], 0;
-my $lenval = max map { length } @order;
+my $lenval = $opt{'value-length'} // max map { length } @order;
 my $len    = defined $opt{trim} && $opt{trim} <= 0 ? -$opt{trim} + 1 :
 	max map { length $values[$_] && length $lines[$_] } 0 .. $#lines;  # left padding
 my $size   = ($maxval - $minval) &&
@@ -220,6 +221,10 @@ or 68% of all entries.
 Do not strip leading whitespace.
 Keep original value alignment, which may be significant in some programs.
 
+=item --value-length=<size>
+
+Reserved space for numbers.
+
 =item -w, --width=<columns>
 
 Override the maximum number of columns to use.
@@ -260,7 +265,7 @@ Exchange rate USD/EUR history from CSV download provided by ECB:
 
     curl https://sdw.ecb.europa.eu/export.do \
          -Gd 'node=SEARCHRESULTS&q=EXR.D.USD.EUR.SP00.A&exportType=csv' |
-    grep '^[12]' | graph -f',\K'
+    grep '^[12]' | graph -f',\K' --value-length=7
 
 Total population history from the World Bank dataset (XML):
 
