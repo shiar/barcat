@@ -53,7 +53,7 @@ my (@lines, @values);
 while (readline) {
 	s/\r?\n\z//;
 	s/^\h*// unless $opt{unmodified};
-	push @values, s/^ ( \h* -? [0-9]* \.? [0-9]+ |)//x && $1;
+	push @values, s/^ ( \h* -? [0-9]* \.? [0-9]+ |)/\n/x && $1;
 	if (defined $opt{trim}) {
 		my $trimpos = abs $opt{trim};
 		if ($trimpos <= 1) {
@@ -78,7 +78,7 @@ my $maxval = $order[0];
 my $minval = min $order[-1], 0;
 my $lenval = max map { length } @order;
 my $len    = defined $opt{trim} && $opt{trim} <= 0 ? -$opt{trim} + 1 :
-	1 + max map { length $values[$_] && length $lines[$_] } 0 .. $#lines;  # left padding
+	max map { length $values[$_] && length $lines[$_] } 0 .. $#lines;  # left padding
 my $size   = ($maxval - $minval) &&
 	($opt{width} - $lenval - $len) / ($maxval - $minval);  # bar multiplication
 
@@ -113,12 +113,12 @@ while ($nr <= $#lines) {
 			$val == $order[0] ? 32 : # max
 			$val == $order[-1] ? 31 : # min
 			90;
-		printf "\e[%sm", $color if $color;
-		printf "%*s", $lenval, $val;
-		print "\e[0m" if $color;
+		$val = sprintf "%*s", $lenval, $val;
+		$val = "\e[${color}m$val\e[0m" if $color;
 	}
-	printf '%-*s', $len, $lines[$nr];
-	print $barmark[$_] // '-' for 1 .. $size && (($val || 0) - $minval) * $size;
+	$lines[$nr] =~ s/\n/$val/;
+	printf '%-*s', $len + length($val), $lines[$nr];
+	print $barmark[$_] // '-' for 1 .. $size && (($values[$nr] || 0) - $minval) * $size;
 	say '';
 	$nr++;
 }
