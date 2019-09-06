@@ -17,6 +17,7 @@ my %opt;
 GetOptions(\%opt,
 	'color|c!',
 	'C' => sub { $opt{color} = 0 },
+	'field|f=i',
 	'interval|t:i',
 	'trim|length|l=s' => sub {
 		my ($optname, $optval) = @_;
@@ -50,10 +51,11 @@ if (defined $opt{interval}) {
 $SIG{INT} = 'IGNORE';  # continue after assumed eof
 
 my (@lines, @values);
+my $anchor = $opt{field} ? qr/(?:\S*\h+){$opt{field}}\K/ : qr/^/;
 while (readline) {
 	s/\r?\n\z//;
 	s/^\h*// unless $opt{unmodified};
-	push @values, s/^ ( \h* -? [0-9]* \.? [0-9]+ |)/\n/x && $1;
+	push @values, s/$anchor ( \h* -? [0-9]* \.? [0-9]+ |)/\n/x && $1;
 	if (defined $opt{trim}) {
 		my $trimpos = abs $opt{trim};
 		if ($trimpos <= 1) {
@@ -138,7 +140,9 @@ B<graph> [<options>] [<input>]
 
 =head1 DESCRIPTION
 
-Each line starting with a number is given a bar to visualise relative sizes.
+Visualizes relative sizes of values read from input (file(s) or STDIN).
+Contents are concatenated similar to I<cat>,
+but numbers are reformatted and a bar graph is appended to each line.
 
 =head1 OPTIONS
 
@@ -149,6 +153,12 @@ Each line starting with a number is given a bar to visualise relative sizes.
 Force colored output of values and bar markers.
 Defaults on if output is a tty,
 disabled otherwise such as when piped or redirected.
+
+=item -f, --field=<number>
+
+Compare values after a given number of whitespace separators.
+Unspecified or I<-f0> means values are at the start of each line.
+With I<-f1> the second word is taken instead.
 
 =item -t, --interval[=<seconds>]
 
@@ -242,13 +252,13 @@ Exchange rate USD/EUR history from CSV download provided by ECB:
 
     curl https://sdw.ecb.europa.eu/export.do \
          -Gd 'node=SEARCHRESULTS&q=EXR.D.USD.EUR.SP00.A&exportType=csv' |
-    awk -F, '{RS="\r\n"} /^[12]/{print $2,$1}' | graph
+    awk -F, '{RS="\r\n"} /^[12]/{print $1,$2}' | graph -f1
 
 Total population history from the World Bank dataset (XML):
 
     curl http://api.worldbank.org/v2/country/1W/indicator/SP.POP.TOTL |
     xmllint --xpath '//*[local-name()="date" or local-name()="value"]' - |
-    awk -F'<[^>]+>' 'BEGIN {RS="</wb:value>"} {print $4,$2}' | graph
+    sed -r 's,</wb:value>,\n,g; s,(<[^>]+>)+, ,g' | graph -f1
 
 Movies per year from prepared JSON data:
 
