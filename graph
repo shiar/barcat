@@ -16,6 +16,7 @@ sub podexit {
 my %opt;
 GetOptions(\%opt,
 	'color|c!',
+	'C' => sub { $opt{color} = 0 },
 	'interval|t:i',
 	'trim|length|l=s' => sub {
 		my ($optname, $optval) = @_;
