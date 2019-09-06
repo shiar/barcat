@@ -123,7 +123,7 @@ while ($nr <= $#lines) {
 	}
 	my $line = $lines[$nr] =~ s/\n/$val/r;
 	printf '%-*s', $len + length($val), $line;
-	print $barmark[$_] // '-' for 1 .. $size && (($values[$nr] || 0) - $minval) * $size;
+	print $barmark[$_] // '-' for 1 .. $size && (($values[$nr] || 0) - $minval) * $size + .5;
 	say '';
 	$nr++;
 }
