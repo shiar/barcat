@@ -6,7 +6,7 @@ use List::Util qw( min max sum );
 use open qw( :std :utf8 );
 use experimental qw( lexical_subs );
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 use Getopt::Long '2.33', qw( :config gnu_getopt );
 sub podexit {
@@ -135,11 +135,11 @@ __END__
 
 =head1 NAME
 
-graph - append bar chart to input numbers
+barcat - graph to visualize input values
 
 =head1 SYNOPSIS
 
-B<graph> [<options>] [<input>]
+B<barcat> [<options>] [<input>]
 
 =head1 DESCRIPTION
 
@@ -236,64 +236,64 @@ Appended graphics will extend to fill up the entire screen.
 
 Commonly used after counting, such as users on the current server:
 
-    users | sed 's/ /\n/g' | sort | uniq -c | graph
+    users | sed 's/ /\n/g' | sort | uniq -c | barcat
 
 Letter frequencies in text files:
 
     cat /usr/share/games/fortunes/*.u8 |
     perl -CO -nE 'say for grep length, split /\PL*/, uc' |
-    sort | uniq -c | graph
+    sort | uniq -c | barcat
 
 Memory usage of user processes:
 
-    ps xo %mem,pid,cmd | graph -l40
+    ps xo %mem,pid,cmd | barcat -l40
 
 Sizes (in megabytes) of all root files and directories:
 
-    du -d0 -m * | graph
+    du -d0 -m * | barcat
 
 Number of HTTP requests per day:
 
-    cat log/access.log | cut -d\  -f4 | cut -d: -f1 | uniq -c | graph
+    cat log/access.log | cut -d\  -f4 | cut -d: -f1 | uniq -c | barcat
 
 Any kind of database query with leading counts:
 
     echo 'SELECT count(*),schemaname FROM pg_tables GROUP BY 2' |
-    psql -t | graph -u
+    psql -t | barcat -u
 
 Exchange rate USD/EUR history from CSV download provided by ECB:
 
     curl https://sdw.ecb.europa.eu/export.do \
          -Gd 'node=SEARCHRESULTS&q=EXR.D.USD.EUR.SP00.A&exportType=csv' |
-    grep '^[12]' | graph -f',\K' --value-length=7
+    grep '^[12]' | barcat -f',\K' --value-length=7
 
 Total population history from the World Bank dataset (XML):
 
     curl http://api.worldbank.org/v2/country/1W/indicator/SP.POP.TOTL |
     xmllint --xpath '//*[local-name()="date" or local-name()="value"]' - |
-    sed -r 's,</wb:value>,\n,g; s,(<[^>]+>)+, ,g' | graph -f1
+    sed -r 's,</wb:value>,\n,g; s,(<[^>]+>)+, ,g' | barcat -f1
 
 Movies per year from prepared JSON data:
 
     curl https://github.com/prust/wikipedia-movie-data/raw/master/movies.json |
-    jq '.[].year' | uniq -c | graph
+    jq '.[].year' | uniq -c | barcat
 
 Pokémon height comparison:
 
 	curl https://github.com/Biuni/PokemonGO-Pokedex/raw/master/pokedex.json |
-	jq -r '.pokemon[] | [.height,.num,.name] | join(" ")' | graph
+	jq -r '.pokemon[] | [.height,.num,.name] | join(" ")' | barcat
 
 Git statistics, such commit count by year:
 
-    git log --pretty=%ci | cut -b-4 | uniq -c | graph
+    git log --pretty=%ci | cut -b-4 | uniq -c | barcat
 
 Or the most frequent authors:
 
-    git shortlog -sn | graph | head -3
+    git shortlog -sn | barcat | head -3
 
 Latency history:
 
-    ping google.com | graph -f'time=\K' -t
+    ping google.com | barcat -f'time=\K' -t
 
 =head1 AUTHOR
 
