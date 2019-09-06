@@ -254,6 +254,11 @@ Movies per year from prepared JSON data:
     curl https://github.com/prust/wikipedia-movie-data/raw/master/movies.json |
     jq '.[].year' | uniq -c | graph
 
+Pokémon height comparison:
+
+	curl https://github.com/Biuni/PokemonGO-Pokedex/raw/master/pokedex.json |
+	jq -r '.pokemon[] | [.height,.num,.name] | join(" ")' | graph
+
 Git statistics, such commit count by year:
 
     git log --pretty=%ci | cut -b-4 | uniq -c | graph
