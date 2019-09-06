@@ -78,7 +78,7 @@ my $maxval = $order[0];
 my $minval = min $order[-1], 0;
 my $lenval = max map { length } @order;
 my $len    = defined $opt{trim} && $opt{trim} <= 0 ? -$opt{trim} + 1 :
-	1 + max map { length } @lines;  # left padding
+	1 + max map { length $values[$_] && length $lines[$_] } 0 .. $#lines;  # left padding
 my $size   = ($maxval - $minval) &&
 	($opt{width} - $lenval - $len) / ($maxval - $minval);  # bar multiplication
 
