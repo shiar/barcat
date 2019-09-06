@@ -118,8 +118,8 @@ while ($nr <= $#lines) {
 		$val = sprintf "%*s", $lenval, $val;
 		$val = "\e[${color}m$val\e[0m" if $color;
 	}
-	$lines[$nr] =~ s/\n/$val/;
-	printf '%-*s', $len + length($val), $lines[$nr];
+	my $line = $lines[$nr] =~ s/\n/$val/r;
+	printf '%-*s', $len + length($val), $line;
 	print $barmark[$_] // '-' for 1 .. $size && (($values[$nr] || 0) - $minval) * $size;
 	say '';
 	$nr++;
