@@ -237,6 +237,23 @@ Any kind of database query with leading counts:
     echo 'SELECT count(*),schemaname FROM pg_tables GROUP BY 2' |
     psql -t | graph -u
 
+Exchange rate USD/EUR history from CSV download provided by ECB:
+
+    curl https://sdw.ecb.europa.eu/export.do \
+         -Gd 'node=SEARCHRESULTS&q=EXR.D.USD.EUR.SP00.A&exportType=csv' |
+    awk -F, '{RS="\r\n"} /^[12]/{print $2,$1}' | graph
+
+Total population history from the World Bank dataset (XML):
+
+    curl http://api.worldbank.org/v2/country/1W/indicator/SP.POP.TOTL |
+    xmllint --xpath '//*[local-name()="date" or local-name()="value"]' - |
+    awk -F'<[^>]+>' 'BEGIN {RS="</wb:value>"} {print $4,$2}' | graph
+
+Movies per year from prepared JSON data:
+
+    curl https://github.com/prust/wikipedia-movie-data/raw/master/movies.json |
+    jq '.[].year' | uniq -c | graph
+
 Git statistics, such commit count by year:
 
     git log --pretty=%ci | cut -b-4 | uniq -c | graph
