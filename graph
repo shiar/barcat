@@ -16,7 +16,7 @@ sub podexit {
 my %opt;
 GetOptions(\%opt,
 	'color|c!',
-	'follow|f:i',
+	'interval|t:i',
 	'trim|length|l=s' => sub {
 		my ($optname, $optval) = @_;
 		$optval =~ s/%$// and $opt{trimpct}++;
@@ -37,13 +37,13 @@ $opt{width} ||= $ENV{COLUMNS} || 80;
 $opt{color} //= -t *STDOUT;  # enable on tty
 $opt{trim}   *= $opt{width} / 100 if $opt{trimpct};
 
-if (defined $opt{follow}) {
-	$opt{follow} ||= 1;
+if (defined $opt{interval}) {
+	$opt{interval} ||= 1;
 	$SIG{ALRM} = sub {
 		show_lines();
-		alarm $opt{follow};
+		alarm $opt{interval};
 	};
-	alarm $opt{follow};
+	alarm $opt{interval};
 }
 
 $SIG{INT} = 'IGNORE';  # continue after assumed eof
@@ -149,9 +149,9 @@ Force colored output of values and bar markers.
 Defaults on if output is a tty,
 disabled otherwise such as when piped or redirected.
 
-=item -f, --follow[=<seconds>]
+=item -t, --interval[=<seconds>]
 
-Interval to output partial progress.
+Interval time to output partial progress.
 
 =item -l, --length=[-]<size>[%]
 
@@ -270,7 +270,7 @@ Or the most frequent authors:
 Latency history:
 
     ping google.com |
-    perl -pe '$|=1; print s/ time=(.*)// ? "$1 for " : "> "' | graph -f
+    perl -pe '$|=1; print s/ time=(.*)// ? "$1 for " : "> "' | graph -t
 
 =head1 AUTHOR
 
