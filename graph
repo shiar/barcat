@@ -17,7 +17,7 @@ my %opt;
 GetOptions(\%opt,
 	'color|c!',
 	'C' => sub { $opt{color} = 0 },
-	'field|f=i',
+	'field|f=s',
 	'interval|t:i',
 	'trim|length|l=s' => sub {
 		my ($optname, $optval) = @_;
@@ -51,7 +51,9 @@ if (defined $opt{interval}) {
 $SIG{INT} = 'IGNORE';  # continue after assumed eof
 
 my (@lines, @values);
-my $anchor = $opt{field} ? qr/(?:\S*\h+){$opt{field}}\K/ : qr/^/;
+my $anchor = !defined $opt{field} ? qr/\A/ :
+	$opt{field} =~ /^[0-9]+$/ ? qr/(?:\S*\h+){$opt{field}}\K/ :
+	$opt{field};
 while (readline) {
 	s/\r?\n\z//;
 	s/^\h*// unless $opt{unmodified};
@@ -154,11 +156,17 @@ Force colored output of values and bar markers.
 Defaults on if output is a tty,
 disabled otherwise such as when piped or redirected.
 
-=item -f, --field=<number>
+=item -f, --field=(<number>|<regexp>)
 
-Compare values after a given number of whitespace separators.
+Compare values after a given number of whitespace separators,
+or matching a regular expression.
+
 Unspecified or I<-f0> means values are at the start of each line.
 With I<-f1> the second word is taken instead.
+A string can indicate the starting position of a value
+(such as I<-f:> if preceded by colons),
+or capture the numbers itself,
+for example I<-f'(\d+)'> for the first digits anywhere.
 
 =item -t, --interval[=<seconds>]
 
@@ -252,7 +260,7 @@ Exchange rate USD/EUR history from CSV download provided by ECB:
 
     curl https://sdw.ecb.europa.eu/export.do \
          -Gd 'node=SEARCHRESULTS&q=EXR.D.USD.EUR.SP00.A&exportType=csv' |
-    awk -F, '{RS="\r\n"} /^[12]/{print $1,$2}' | graph -f1
+    grep '^[12]' | graph -f',\K'
 
 Total population history from the World Bank dataset (XML):
 
@@ -280,8 +288,7 @@ Or the most frequent authors:
 
 Latency history:
 
-    ping google.com |
-    perl -pe '$|=1; print s/ time=(.*)// ? "$1 for " : "> "' | graph -t
+    ping google.com | graph -f'time=\K' -t
 
 =head1 AUTHOR
 
