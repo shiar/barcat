@@ -134,7 +134,7 @@ while ($nr <= $#lines) {
 			$val == $order[-1] ? 31 : # min
 			90;
 		$val = sprintf "%3.1f%1s", $val / 1000**$_, $opt{units}->[$_]
-			for $opt{units} ? int(log($val) / log(1000)) : ();
+			for $opt{units} ? int(log($val) / log(1000) - ($val < 1)) : ();
 		$val = sprintf "%*s", $lenval, $val;
 		$val = "\e[${color}m$val\e[0m" if $color;
 	}
