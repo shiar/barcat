@@ -29,7 +29,7 @@ GetOptions(\%opt,
 		$opt{trim} = $optval;
 	},
 	'value-length=i',
-	'limit|L=i',
+	'hidemax|limit|L=i',
 	'markers|m=s',
 	'unmodified|u!',
 	'width|w=i',
@@ -80,12 +80,12 @@ state $nr = 0;
 @lines and @lines > $nr or return;
 
 my @order  = sort { $b <=> $a } grep { length } @values;
-my $maxval = $opt{limit} ? max @values[0 .. $opt{limit} - 1] : $order[0];
+my $maxval = $opt{hidemax} ? max @values[0 .. $opt{hidemax} - 1] : $order[0];
 my $minval = min $order[-1], 0;
 my $lenval = $opt{'value-length'} // max map { length } @order;
 my $len    = defined $opt{trim} && $opt{trim} <= 0 ? -$opt{trim} + 1 :
 	max map { length $values[$_] && length $lines[$_] }
-		0 .. min $#lines, $opt{limit} || ();  # left padding
+		0 .. min $#lines, $opt{hidemax} || ();  # left padding
 my $size   = ($maxval - $minval) &&
 	($opt{width} - $lenval - $len) / ($maxval - $minval);  # bar multiplication
 
@@ -114,6 +114,7 @@ if ($opt{markers} // 1 and $size > 0) {
 }
 
 while ($nr <= $#lines) {
+	$nr >= $opt{hidemax} and last if $opt{hidemax};
 	my $val = $values[$nr];
 	if (length $val) {
 		my $color = !$opt{color} ? 0 :
@@ -129,7 +130,6 @@ while ($nr <= $#lines) {
 	say '';
 
 	$nr++;
-	$nr >= $opt{limit} and last if $opt{limit};
 }
 
 }
