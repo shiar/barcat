@@ -68,7 +68,7 @@ if (defined $opt{interval}) {
 $SIG{INT} = 'IGNORE';  # continue after assumed eof
 
 my (@lines, @values);
-my $valmatch = qr/$opt{anchor} ( \h* -? [0-9]* \.? [0-9]+ |)/x;
+my $valmatch = qr/$opt{anchor} ( \h* -? [0-9]* \.? [0-9]+ (?: e[+-]?[0-9]+ )? |)/x;
 while (readline) {
 	s/\r?\n\z//;
 	s/^\h*// unless $opt{unmodified};
@@ -196,6 +196,7 @@ for example I<-f'(\d+)'> for the first digits anywhere.
 
 Format values using SI unit prefixes,
 turning long numbers like I<12356789> into I<12.4M>.
+Also changes an exponent I<1.602176634e-19> to I<160.2z>.
 
 =item -t, --interval[=<seconds>]
 
