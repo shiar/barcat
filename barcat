@@ -29,6 +29,7 @@ GetOptions(\%opt,
 		$opt{trim} = $optval;
 	},
 	'value-length=i',
+	'limit|L=i',
 	'markers|m=s',
 	'unmodified|u!',
 	'width|w=i',
@@ -79,11 +80,12 @@ state $nr = 0;
 @lines and @lines > $nr or return;
 
 my @order  = sort { $b <=> $a } grep { length } @values;
-my $maxval = $order[0];
+my $maxval = $opt{limit} ? max @values[0 .. $opt{limit} - 1] : $order[0];
 my $minval = min $order[-1], 0;
 my $lenval = $opt{'value-length'} // max map { length } @order;
 my $len    = defined $opt{trim} && $opt{trim} <= 0 ? -$opt{trim} + 1 :
-	max map { length $values[$_] && length $lines[$_] } 0 .. $#lines;  # left padding
+	max map { length $values[$_] && length $lines[$_] }
+		0 .. min $#lines, $opt{limit} || ();  # left padding
 my $size   = ($maxval - $minval) &&
 	($opt{width} - $lenval - $len) / ($maxval - $minval);  # bar multiplication
 
@@ -125,7 +127,9 @@ while ($nr <= $#lines) {
 	printf '%-*s', $len + length($val), $line;
 	print $barmark[$_] // '-' for 1 .. $size && (($values[$nr] || 0) - $minval) * $size + .5;
 	say '';
+
 	$nr++;
+	$nr >= $opt{limit} and last if $opt{limit};
 }
 
 }
@@ -182,6 +186,12 @@ unless C<--length=0>.
 
 Prepend a dash (i.e. make negative) to enforce padding
 regardless of encountered contents.
+
+=item -L, --limit=<count>
+
+Stop output after a number of lines.
+All input is still counted and analyzed for statistics,
+but disregarded for padding and bar size.
 
 =item -m, --markers=
 
@@ -289,7 +299,7 @@ Git statistics, such commit count by year:
 
 Or the most frequent authors:
 
-    git shortlog -sn | barcat | head -3
+    git shortlog -sn | barcat -L3
 
 Latency history:
 
