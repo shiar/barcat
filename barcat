@@ -6,7 +6,7 @@ use List::Util qw( min max sum );
 use open qw( :std :utf8 );
 use experimental qw( lexical_subs );
 
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 
 use Getopt::Long '2.33', qw( :config gnu_getopt );
 sub podexit {
@@ -61,6 +61,8 @@ $opt{units}   = [split //, ' kMGTPEZYyzafpnμm'] if $opt{'human-readable'};
 $opt{anchor} //= qr/\A/;
 $opt{'value-length'} = 6 if $opt{units};
 
+my (@lines, @values, @order);
+
 if (defined $opt{interval}) {
 	$opt{interval} ||= 1;
 	$SIG{ALRM} = sub {
@@ -68,11 +70,15 @@ if (defined $opt{interval}) {
 		alarm $opt{interval};
 	};
 	alarm $opt{interval};
+
+	eval {
+		require Tie::Array::Sorted;
+		tie @order, 'Tie::Array::Sorted', sub { $_[1] <=> $_[0] };
+	} or warn $@, "Expect slowdown with large datasets!\n";
 }
 
 $SIG{INT} = 'IGNORE';  # continue after assumed eof
 
-my (@lines, @values, @order);
 my $valmatch = qr/$opt{anchor} ( \h* -? [0-9]* \.? [0-9]+ (?: e[+-]?[0-9]+ )? |)/x;
 while (readline) {
 	s/\r?\n\z//;
@@ -100,7 +106,7 @@ state $nr = $opt{hidemin} ? $opt{hidemin} - 1 : 0;
 @lines or return;
 @lines > $nr or return unless $opt{hidemin};
 
-@order = sort { $b <=> $a } @order;
+@order = sort { $b <=> $a } @order unless tied @order;
 my $maxval = ($opt{hidemax} ? max grep { length } @values[0 .. $opt{hidemax} - 1] : $order[0]) // 0;
 my $minval = min $order[-1] // (), 0;
 my $lenval = $opt{'value-length'} // max map { length } @order;
