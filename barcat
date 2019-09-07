@@ -102,8 +102,8 @@ state $nr = $opt{hidemin} ? $opt{hidemin} - 1 : 0;
 @lines > $nr or return unless $opt{hidemin};
 
 @order  = sort { $b <=> $a } grep { length } @values;
-my $maxval = $opt{hidemax} ? max @values[0 .. $opt{hidemax} - 1] : $order[0];
-my $minval = min $order[-1], 0;
+my $maxval = ($opt{hidemax} ? max grep { length } @values[0 .. $opt{hidemax} - 1] : $order[0]) // 0;
+my $minval = min $order[-1] // (), 0;
 my $lenval = $opt{'value-length'} // max map { length } @order;
 my $len    = defined $opt{trim} && $opt{trim} <= 0 ? -$opt{trim} + 1 :
 	max map { length $values[$_] && length $lines[$_] }
