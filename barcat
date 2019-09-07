@@ -17,7 +17,9 @@ my %opt;
 GetOptions(\%opt,
 	'color|c!',
 	'C' => sub { $opt{color} = 0 },
-	'field|f=s',
+	'field|f=s' => sub {
+		$opt{anchor} = /^[0-9]+$/ ? qr/(?:\S*\h+){$_}\K/ : $_ for $_[1];
+	},
 	'human-readable|H!',
 	'interval|t:i',
 	'trim|length|l=s' => sub {
@@ -52,6 +54,7 @@ $opt{width} ||= $ENV{COLUMNS} || 80;
 $opt{color} //= -t *STDOUT;  # enable on tty
 $opt{trim}   *= $opt{width} / 100 if $opt{trimpct};
 $opt{units}   = $opt{'human-readable'} && ['', qw( k M G T P E Z Y y z a f p n μ m )];
+$opt{anchor} //= qr/\A/;
 
 if (defined $opt{interval}) {
 	$opt{interval} ||= 1;
@@ -65,10 +68,7 @@ if (defined $opt{interval}) {
 $SIG{INT} = 'IGNORE';  # continue after assumed eof
 
 my (@lines, @values);
-my $anchor = !defined $opt{field} ? qr/\A/ :
-	$opt{field} =~ /^[0-9]+$/ ? qr/(?:\S*\h+){$opt{field}}\K/ :
-	$opt{field};
-my $valmatch = qr/$anchor ( \h* -? [0-9]* \.? [0-9]+ |)/x;
+my $valmatch = qr/$opt{anchor} ( \h* -? [0-9]* \.? [0-9]+ |)/x;
 while (readline) {
 	s/\r?\n\z//;
 	s/^\h*// unless $opt{unmodified};
