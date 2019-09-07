@@ -68,10 +68,11 @@ my (@lines, @values);
 my $anchor = !defined $opt{field} ? qr/\A/ :
 	$opt{field} =~ /^[0-9]+$/ ? qr/(?:\S*\h+){$opt{field}}\K/ :
 	$opt{field};
+my $valmatch = qr/$anchor ( \h* -? [0-9]* \.? [0-9]+ |)/x;
 while (readline) {
 	s/\r?\n\z//;
 	s/^\h*// unless $opt{unmodified};
-	push @values, s/$anchor ( \h* -? [0-9]* \.? [0-9]+ |)/\n/x && $1;
+	push @values, s/$valmatch/\n/ && $1;
 	if (defined $opt{trim}) {
 		my $trimpos = abs $opt{trim};
 		if ($trimpos <= 1) {
