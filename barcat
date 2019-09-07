@@ -171,6 +171,11 @@ while ($nr <= $#lines) {
 show_lines();
 
 if ($opt{stat}) {
+	if ($opt{hidemin} or $opt{hidemax}) {
+		$opt{hidemin} ||= 1;
+		$opt{hidemax} ||= @lines;
+		printf '%s of ', sum(@values[$opt{hidemin} - 1 .. $opt{hidemax} - 1]) // 0;
+	}
 	my $total = sum @order;
 	printf '%s total', $total;
 	printf ' in %d values', scalar @values;
