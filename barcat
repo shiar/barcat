@@ -125,6 +125,11 @@ if ($opt{markers} // 1 and $size > 0) {
 	}
 }
 
+sub sival {
+	my $unit = int(log($_[0]) / log(1000) - ($_[0] < 1));
+	sprintf "%3.1f%1s", $_[0] / 1000 ** $unit, $opt{units}->[$unit];
+}
+
 while ($nr <= $#lines) {
 	$nr >= $opt{hidemax} and last if $opt{hidemax};
 	my $val = $values[$nr];
@@ -133,9 +138,7 @@ while ($nr <= $#lines) {
 			$val == $order[0] ? 32 : # max
 			$val == $order[-1] ? 31 : # min
 			90;
-		$val = sprintf "%3.1f%1s", $val / 1000**$_, $opt{units}->[$_]
-			for $opt{units} ? int(log($val) / log(1000) - ($val < 1)) : ();
-		$val = sprintf "%*s", $lenval, $val;
+		$val = $opt{units} ? sival($val) : sprintf "%*s", $lenval, $val;
 		$val = "\e[${color}m$val\e[0m" if $color;
 	}
 	my $line = $lines[$nr] =~ s/\n/$val/r;
