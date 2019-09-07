@@ -30,8 +30,15 @@ GetOptions(\%opt,
 	},
 	'value-length=i',
 	'hidemin=i',
-	'hidemax|limit|L=i' => sub {
-		$opt{$_[1] < 0 ? 'hidemin' : 'hidemax'} = abs $_[1];
+	'hidemax=i',
+	'limit|L=s' => sub {
+		my ($optname, $optval) = @_;
+		$optval ||= 0;
+		($opt{hidemin}, $opt{hidemax}) =
+		$optval =~ m/\A (?: ([0-9]+)? - )? ([0-9]+)? \z/x or die(
+			"Value \"$optval\" invalid for option limit",
+			" (range expected)\n"
+		);
 	},
 	'markers|m=s',
 	'unmodified|u!',
@@ -190,7 +197,7 @@ unless C<--length=0>.
 Prepend a dash (i.e. make negative) to enforce padding
 regardless of encountered contents.
 
-=item -L, --limit=[-]<count>
+=item -L, --limit=(<count>|<start>-[<end>])
 
 Stop output after a number of lines.
 All input is still counted and analyzed for statistics,
