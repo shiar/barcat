@@ -51,7 +51,7 @@ GetOptions(\%opt,
 $opt{width} ||= $ENV{COLUMNS} || 80;
 $opt{color} //= -t *STDOUT;  # enable on tty
 $opt{trim}   *= $opt{width} / 100 if $opt{trimpct};
-$opt{units}   = $opt{'human-readable'} && ['', qw( k M G T <> n μ m )];
+$opt{units}   = $opt{'human-readable'} && ['', qw( k M G T P E Z Y y z a f p n μ m )];
 
 if (defined $opt{interval}) {
 	$opt{interval} ||= 1;
@@ -127,7 +127,8 @@ if ($opt{markers} // 1 and $size > 0) {
 
 sub sival {
 	my $unit = int(log($_[0]) / log(1000) - ($_[0] < 1));
-	sprintf "%3.1f%1s", $_[0] / 1000 ** $unit, $opt{units}->[$unit];
+	sprintf "%3.1f%1s", $_[0] / 1000 ** $unit,
+		$#{$opt{units}} >> 1 < abs $unit ? "e$unit" : $opt{units}->[$unit];
 }
 
 while ($nr <= $#lines) {
