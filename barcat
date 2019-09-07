@@ -21,7 +21,7 @@ GetOptions(\%opt,
 		eval {
 			local $_ = $_[1];
 			$opt{anchor} = /^[0-9]+$/ ? qr/(?:\S*\h+){$_}\K/ : qr/$_/;
-		} or die "$@ for option $_[0]\n";
+		} or die $@ =~ s/(?: at .+)?$/ for option $_[0]/r;
 	},
 	'human-readable|H!',
 	'interval|t:i',
