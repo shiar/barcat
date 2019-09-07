@@ -18,7 +18,10 @@ GetOptions(\%opt,
 	'color|c!',
 	'C' => sub { $opt{color} = 0 },
 	'field|f=s' => sub {
-		$opt{anchor} = /^[0-9]+$/ ? qr/(?:\S*\h+){$_}\K/ : $_ for $_[1];
+		eval {
+			local $_ = $_[1];
+			$opt{anchor} = /^[0-9]+$/ ? qr/(?:\S*\h+){$_}\K/ : qr/$_/;
+		} or die "$@ for option $_[0]\n";
 	},
 	'human-readable|H!',
 	'interval|t:i',
