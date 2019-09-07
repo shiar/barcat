@@ -181,11 +181,13 @@ if ($opt{stat}) {
 		$opt{hidemax} ||= @lines;
 		printf '%s of ', sum(@values[$opt{hidemin} - 1 .. $opt{hidemax} - 1]) // 0;
 	}
-	my $total = sum @order;
-	printf '%s total', $total;
-	printf ' in %d values', scalar @values;
-	printf ' (%s min, %*.*f avg, %s max)',
-		$order[-1], 0, 2, $total / @order, $order[0];
+	if (@order) {
+		my $total = sum @order;
+		printf '%s total', $total;
+		printf ' in %d values', scalar @values;
+		printf ' (%s min, %*.*f avg, %s max)',
+			$order[-1], 0, 2, $total / @order, $order[0];
+	}
 	say '';
 }
 
