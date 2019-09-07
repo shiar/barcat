@@ -18,6 +18,7 @@ GetOptions(\%opt,
 	'color|c!',
 	'C' => sub { $opt{color} = 0 },
 	'field|f=s',
+	'human-readable|H!',
 	'interval|t:i',
 	'trim|length|l=s' => sub {
 		my ($optname, $optval) = @_;
@@ -50,6 +51,7 @@ GetOptions(\%opt,
 $opt{width} ||= $ENV{COLUMNS} || 80;
 $opt{color} //= -t *STDOUT;  # enable on tty
 $opt{trim}   *= $opt{width} / 100 if $opt{trimpct};
+$opt{units}   = $opt{'human-readable'} && ['', qw( k M G T <> n μ m )];
 
 if (defined $opt{interval}) {
 	$opt{interval} ||= 1;
@@ -131,6 +133,8 @@ while ($nr <= $#lines) {
 			$val == $order[0] ? 32 : # max
 			$val == $order[-1] ? 31 : # min
 			90;
+		$val = sprintf "%3.1f%1s", $val / 1000**$_, $opt{units}->[$_]
+			for $opt{units} ? int(log($val) / log(1000)) : ();
 		$val = sprintf "%*s", $lenval, $val;
 		$val = "\e[${color}m$val\e[0m" if $color;
 	}
@@ -182,6 +186,11 @@ A string can indicate the starting position of a value
 (such as I<-f:> if preceded by colons),
 or capture the numbers itself,
 for example I<-f'(\d+)'> for the first digits anywhere.
+
+=item -H, --human-readable
+
+Format values using SI unit prefixes,
+turning long numbers like I<12356789> into I<12.4M>.
 
 =item -t, --interval[=<seconds>]
 
@@ -291,7 +300,7 @@ Total population history from the World Bank dataset (XML):
 
     curl http://api.worldbank.org/v2/country/1W/indicator/SP.POP.TOTL |
     xmllint --xpath '//*[local-name()="date" or local-name()="value"]' - |
-    sed -r 's,</wb:value>,\n,g; s,(<[^>]+>)+, ,g' | barcat -f1
+    sed -r 's,</wb:value>,\n,g; s,(<[^>]+>)+, ,g' | barcat -f1 -H
 
 Movies per year from prepared JSON data:
 
