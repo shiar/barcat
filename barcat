@@ -85,7 +85,7 @@ while (readline) {
 	s/^\h*// unless $opt{unmodified};
 	push @values, s/$valmatch/\n/ && $1;
 	push @order, $1 if length $1;
-	if (defined $opt{trim}) {
+	if (defined $opt{trim} and defined $1) {
 		my $trimpos = abs $opt{trim};
 		if ($trimpos <= 1) {
 			$_ = substr $_, 0, 1;
