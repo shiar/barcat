@@ -58,6 +58,7 @@ $opt{color} //= -t *STDOUT;  # enable on tty
 $opt{trim}   *= $opt{width} / 100 if $opt{trimpct};
 $opt{units}   = $opt{'human-readable'} && ['', qw( k M G T P E Z Y y z a f p n μ m )];
 $opt{anchor} //= qr/\A/;
+$opt{'value-length'} = 6 if $opt{units};
 
 if (defined $opt{interval}) {
 	$opt{interval} ||= 1;
@@ -131,8 +132,13 @@ if ($opt{markers} // 1 and $size > 0) {
 
 sub sival {
 	my $unit = int(log($_[0]) / log(1000) - ($_[0] < 1));
-	sprintf "%3.1f%1s", $_[0] / 1000 ** $unit,
-		$#{$opt{units}} >> 1 < abs $unit ? "e$unit" : $opt{units}->[$unit];
+	my $float = $_[0] !~ /^ (?: 0*\.)? [0-9]{1,3} $/x;
+	sprintf('%*.*f%*s',
+		$float ? 5 : 3, $float,  # length and tenths
+		$_[0] / 1000 ** $unit,   # number
+		$float ? 1 : 3,          # unit size
+		$#{$opt{units}} >> 1 < abs $unit ? "e$unit" : $opt{units}->[$unit]
+	);
 }
 
 while ($nr <= $#lines) {
@@ -200,6 +206,7 @@ for example I<-f'(\d+)'> for the first digits anywhere.
 Format values using SI unit prefixes,
 turning long numbers like I<12356789> into I<12.4M>.
 Also changes an exponent I<1.602176634e-19> to I<160.2z>.
+Short integers are aligned but kept without decimal point.
 
 =item -t, --interval[=<seconds>]
 
