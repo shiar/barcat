@@ -92,6 +92,8 @@ while (readline) {
 
 $SIG{INT} = 'DEFAULT';
 
+my @order;
+
 sub show_lines {
 
 state $nr = $opt{hidemin} ? $opt{hidemin} - 1 : 0;
@@ -99,7 +101,7 @@ state $nr = $opt{hidemin} ? $opt{hidemin} - 1 : 0;
 @lines or return;
 @lines > $nr or return unless $opt{hidemin};
 
-my @order  = sort { $b <=> $a } grep { length } @values;
+@order  = sort { $b <=> $a } grep { length } @values;
 my $maxval = $opt{hidemax} ? max @values[0 .. $opt{hidemax} - 1] : $order[0];
 my $minval = min $order[-1], 0;
 my $lenval = $opt{'value-length'} // max map { length } @order;
@@ -169,7 +171,11 @@ while ($nr <= $#lines) {
 show_lines();
 
 if ($opt{stat}) {
-	printf '%d values', scalar @values;
+	my $total = sum @order;
+	printf '%s total', $total;
+	printf ' in %d values', scalar @values;
+	printf ' (%s min, %*.*f avg, %s max)',
+		$order[-1], 0, 2, $total / @order, $order[0];
 	say '';
 }
 
@@ -346,9 +352,9 @@ Git statistics, such commit count by year:
 
     git log --pretty=%ci | cut -b-4 | uniq -c | barcat
 
-Or the most frequent authors:
+Or the top 3 most frequent authors with statistics over all:
 
-    git shortlog -sn | barcat -L3
+    git shortlog -sn | barcat -L3 -s
 
 Latency history:
 
