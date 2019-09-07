@@ -29,7 +29,10 @@ GetOptions(\%opt,
 		$opt{trim} = $optval;
 	},
 	'value-length=i',
-	'hidemax|limit|L=i',
+	'hidemin=i',
+	'hidemax|limit|L=i' => sub {
+		$opt{$_[1] < 0 ? 'hidemin' : 'hidemax'} = abs $_[1];
+	},
 	'markers|m=s',
 	'unmodified|u!',
 	'width|w=i',
@@ -76,7 +79,7 @@ $SIG{INT} = 'DEFAULT';
 
 sub show_lines {
 
-state $nr = 0;
+state $nr = $opt{hidemin} ? $opt{hidemin} - 1 : 0;
 @lines and @lines > $nr or return;
 
 my @order  = sort { $b <=> $a } grep { length } @values;
@@ -187,7 +190,7 @@ unless C<--length=0>.
 Prepend a dash (i.e. make negative) to enforce padding
 regardless of encountered contents.
 
-=item -L, --limit=<count>
+=item -L, --limit=[-]<count>
 
 Stop output after a number of lines.
 All input is still counted and analyzed for statistics,
