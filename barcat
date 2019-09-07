@@ -72,12 +72,13 @@ if (defined $opt{interval}) {
 
 $SIG{INT} = 'IGNORE';  # continue after assumed eof
 
-my (@lines, @values);
+my (@lines, @values, @order);
 my $valmatch = qr/$opt{anchor} ( \h* -? [0-9]* \.? [0-9]+ (?: e[+-]?[0-9]+ )? |)/x;
 while (readline) {
 	s/\r?\n\z//;
 	s/^\h*// unless $opt{unmodified};
 	push @values, s/$valmatch/\n/ && $1;
+	push @order, $1 if length $1;
 	if (defined $opt{trim}) {
 		my $trimpos = abs $opt{trim};
 		if ($trimpos <= 1) {
@@ -92,8 +93,6 @@ while (readline) {
 
 $SIG{INT} = 'DEFAULT';
 
-my @order;
-
 sub show_lines {
 
 state $nr = $opt{hidemin} ? $opt{hidemin} - 1 : 0;
@@ -101,7 +100,7 @@ state $nr = $opt{hidemin} ? $opt{hidemin} - 1 : 0;
 @lines or return;
 @lines > $nr or return unless $opt{hidemin};
 
-@order  = sort { $b <=> $a } grep { length } @values;
+@order = sort { $b <=> $a } @order;
 my $maxval = ($opt{hidemax} ? max grep { length } @values[0 .. $opt{hidemax} - 1] : $order[0]) // 0;
 my $minval = min $order[-1] // (), 0;
 my $lenval = $opt{'value-length'} // max map { length } @order;
