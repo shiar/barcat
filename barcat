@@ -349,7 +349,10 @@ Any kind of database query with counts, preserving returned alignment:
 External datasets, like movies per year:
 
     curl https://github.com/prust/wikipedia-movie-data/raw/master/movies.json |
-    jq '.[].year' | uniq -c | barcat
+    perl -054 -nlE 'say if s/^"year"://' | uniq -c | barcat
+
+But please get I<jq> to process JSON
+and replace the manual selection by C<< jq '.[].year' >>.
 
 Pokémon height comparison:
 
