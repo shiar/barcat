@@ -143,7 +143,7 @@ if ($opt{markers} // 1 and $size > 0) {
 @lines > $nr or return if $opt{hidemin};
 
 sub sival {
-	my $unit = int(log($_[0]) / log(1000) - ($_[0] < 1) + 1e-15);
+	my $unit = int(log(abs $_[0] || 1) / log(1000) - ($_[0] < 1) + 1e-15);
 	my $float = sprintf '%e', $_[0] / 1000 ** $unit;  #TODO: or $_[0] =~ /\./
 	$float -= int($float);
 	sprintf('%*.*f%*s',
