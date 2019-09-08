@@ -354,7 +354,7 @@ External datasets, like movies per year:
 But please get I<jq> to process JSON
 and replace the manual selection by C<< jq '.[].year' >>.
 
-Pokémon height comparison:
+PokE<eacute>mon height comparison:
 
     curl https://github.com/Biuni/PokemonGO-Pokedex/raw/master/pokedex.json |
     jq -r '.pokemon[] | [.height,.num,.name] | join(" ")' | barcat
