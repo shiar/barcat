@@ -334,7 +334,7 @@ Commonly used after counting, for example users on the current server:
 Letter frequencies in text files:
 
     cat /usr/share/games/fortunes/*.u8 |
-    perl -CO -nE 'say for grep length, split /\PL*/, uc' |
+    perl -CS -nE 'say for grep length, split /\PL*/, uc' |
     sort | uniq -c | barcat
 
 Number of HTTP requests per day:
