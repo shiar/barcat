@@ -315,15 +315,15 @@ Draw a sine wave:
 
     seq 30 | awk '{print sin($1/10)}' | barcat
 
-Compare file sizes:
+Compare file sizes (with human-readable numbers):
 
-    du -d0 -m * | barcat
+    du -d0 -b * | barcat -H
 
-Memory usage of user processes:
+Memory usage of user processes with long names truncated:
 
     ps xo %mem,pid,cmd | barcat -l40
 
-Monitor network latency:
+Monitor network latency from prefixed results:
 
     ping google.com | barcat -f'time=\K' -t
 
@@ -341,7 +341,7 @@ Number of HTTP requests per day:
 
     cat log/access.log | cut -d\  -f4 | cut -d: -f1 | uniq -c | barcat
 
-Any kind of database query with leading counts:
+Any kind of database query with counts, preserving returned alignment:
 
     echo 'SELECT count(*),schemaname FROM pg_tables GROUP BY 2' |
     psql -t | barcat -u
