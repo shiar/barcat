@@ -63,6 +63,7 @@ $opt{trim}   *= $opt{width} / 100 if $opt{trimpct};
 $opt{units}   = [split //, ' kMGTPEZYyzafpnμm'] if $opt{'human-readable'};
 $opt{anchor} //= qr/\A/;
 $opt{'value-length'} = 6 if $opt{units};
+$opt{'value-length'} = 1 if $opt{unmodified};
 
 my (@lines, @values, @order);
 
@@ -93,6 +94,7 @@ while (readline) {
 	push @order, $1 if length $1;
 	if (defined $opt{trim} and defined $1) {
 		my $trimpos = abs $opt{trim};
+		$trimpos -= length $1 if $opt{unmodified};
 		if ($trimpos <= 1) {
 			$_ = substr $_, 0, 1;
 		}
@@ -315,7 +317,7 @@ Total statistics after all data.
 
 =item -u, --unmodified
 
-Do not strip leading whitespace.
+Do not reformat values, keeping leading whitespace.
 Keep original value alignment, which may be significant in some programs.
 
 =item --value-length=<size>
