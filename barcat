@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!/usr/bin/perl -CA
 use 5.018;
 use warnings;
 use utf8;
@@ -47,8 +47,8 @@ GetOptions(\%opt,
 		);
 	},
 	'markers|m=s',
-	'spark!' => sub {
-		$opt{spark} = [split //, '⎽▁▂▃▄▅▆▇█'];
+	'spark:s' => sub {
+		$opt{spark} = [split //, $_[1] || '⎽▁▂▃▄▅▆▇█'];
 	},
 	'stat|s!',
 	'unmodified|u!',
