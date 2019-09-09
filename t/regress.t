@@ -28,14 +28,15 @@ do
 
 	if test -n "$regenerate"
 	then
-		if test -e $file.out
+		if test -e $file.sh
 		then
-			echo "ok $test_count # skip existing $file.out"
+			echo "ok $test_count # skip $file.out"
 			continue
 		fi
 		$cmd >$file.out 2>&1
 	else
-		$cmd 2>&1 | $diffcmd "$file.out" -
+		if test -e $file.sh;  then $cmd 2>&1 | ./$file.sh; fi &&
+		if test -e $file.out; then $cmd 2>&1 | $diffcmd "$file.out" -; fi
 	fi
 
 	test 0 = $? || printf 'not '
