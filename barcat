@@ -389,7 +389,7 @@ Or the top 3 most frequent authors with statistics over all:
 
     git shortlog -sn | barcat -L3 -s
 
-Activity of the last days:
+Activity of the last days (substitute date C<-v-{}d> on BSD):
 
     ( git log --pretty=%ci --since=30day | cut -b-10
       seq 0 30 | xargs -i date +%F -d-{}day ) |
