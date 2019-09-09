@@ -6,11 +6,13 @@ test_count=0
 
 COLUMNS=40
 diffcmd='diff --unchanged-line-format= --old-line-format=<%L --new-line-format=>%L'
+regenerate=
 
 for option in "$@"
 do
 	case "$option" in
-	-*) echo "Usage: $0 [<files>...]"; exit 64;;
+	-G) regenerate=1 && shift;;
+	-*) echo "Usage: $0 [-G] [<files>...]"; exit 64;;
 	esac
 done
 
@@ -24,7 +26,19 @@ do
 	cmd="barcat $file.in"
 	case "$name" in *\ -*) cmd="$cmd -${name#* -}";; esac
 
-	$cmd 2>&1 | $diffcmd "$file.out" - || printf 'not '
+	if test -n "$regenerate"
+	then
+		if test -e $file.out
+		then
+			echo "ok $test_count # skip existing $file.out"
+			continue
+		fi
+		$cmd >$file.out 2>&1
+	else
+		$cmd 2>&1 | $diffcmd "$file.out" -
+	fi
+
+	test 0 = $? || printf 'not '
 	echo "ok $test_count - $name"
 done
 
