@@ -47,6 +47,9 @@ GetOptions(\%opt,
 		);
 	},
 	'markers|m=s',
+	'spark!' => sub {
+		$opt{spark} = [split //, '⎽▁▂▃▄▅▆▇█'];
+	},
 	'stat|s!',
 	'unmodified|u!',
 	'width|w=i',
@@ -164,6 +167,12 @@ sub sival {
 while ($nr <= $#lines) {
 	$nr >= $opt{hidemax} and last if defined $opt{hidemax};
 	my $val = $values[$nr];
+
+	if ($opt{spark}) {
+		print $opt{spark}->[ ($val - $minval) / $maxval * $#{$opt{spark}} ];
+		next;
+	}
+
 	if (length $val) {
 		my $color = !$opt{color} ? undef :
 			$val == $order[0] ? 32 : # max
@@ -176,9 +185,11 @@ while ($nr <= $#lines) {
 	printf '%-*s', $len + length($val), $line;
 	print $barmark[$_] // '-' for 1 .. $size && (($values[$nr] || 0) - $minval) * $size + .5;
 	say '';
-
+}
+continue {
 	$nr++;
 }
+say '' if $opt{spark};
 
 }
 show_lines();
@@ -398,7 +409,7 @@ Activity of the last days (substitute date C<-v-{}d> on BSD):
 
     ( git log --pretty=%ci --since=30day | cut -b-10
       seq 0 30 | xargs -i date +%F -d-{}day ) |
-    sort | uniq -c | awk '$1--' | graph
+    sort | uniq -c | awk '$1--' | graph --spark
 
 =head1 AUTHOR
 
