@@ -355,6 +355,11 @@ Any kind of database query with counts, preserving returned alignment:
     echo 'SELECT count(*),schemaname FROM pg_tables GROUP BY 2' |
     psql -t | barcat -u
 
+Earthquakes worldwide magnitude 1+ in the last 24 hours:
+
+    https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/1.0_day.csv |
+    column -tns, | graph -f4 -u -l80%
+
 External datasets, like movies per year:
 
     curl https://github.com/prust/wikipedia-movie-data/raw/master/movies.json |
