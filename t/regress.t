@@ -7,6 +7,13 @@ test_count=0
 COLUMNS=40
 diffcmd='diff --unchanged-line-format= --old-line-format=<%L --new-line-format=>%L'
 
+for option in "$@"
+do
+	case "$option" in
+	-*) echo "Usage: $0 [<files>...]"; exit 64;;
+	esac
+done
+
 for candidate in ${@:-t*.in}
 do
 	test_count=$((test_count+1))
