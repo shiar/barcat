@@ -389,6 +389,13 @@ Or the top 3 most frequent authors with statistics over all:
 
     git shortlog -sn | barcat -L3 -s
 
+Activity of the last days:
+
+    git log --pretty=%cd --date=format:%F --since=1month |
+    perl -MTime::Piece -pE
+        'for ($t //= localtime; $t->ymd gt $_; $t -= 24*60*60) {say $t->ymd}' |
+    sort | uniq -c | awk '$1--' | graph
+
 =head1 AUTHOR
 
 Mischa POSLAWSKY <perl@shiar.org>
