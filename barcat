@@ -391,9 +391,8 @@ Or the top 3 most frequent authors with statistics over all:
 
 Activity of the last days:
 
-    git log --pretty=%cd --date=format:%F --since=1month |
-    perl -MTime::Piece -pE
-        'for ($t //= localtime; $t->ymd gt $_; $t -= 24*60*60) {say $t->ymd}' |
+    ( git log --pretty=%ci --since=30day | cut -b-10
+      seq 0 30 | xargs -i date +%F -d-{}day ) |
     sort | uniq -c | awk '$1--' | graph
 
 =head1 AUTHOR
