@@ -100,8 +100,9 @@ while (readline) {
 $SIG{INT} = 'DEFAULT';
 
 sub color {
-	$opt{color} or return '';
-	return "\e[$_[0]m";
+	$opt{color} and defined $_[0] or return '';
+	return "\e[$_[0]m" if defined wantarray;
+	$_ = color(@_) . $_ . color(0) if defined;
 }
 
 sub show_lines {
@@ -129,7 +130,7 @@ if ($opt{markers} // 1 and $size > 0) {
 	$barmark[ orderpos($#order * .68269) ] = '<';
 	$barmark[ orderpos($#order / 2) ] = '+';  # mean
 	$barmark[ -$minval * $size ] = '|' if $minval < 0;  # zero
-	defined and $_ = color(36).$_.color(0) for @barmark;
+	color(36) for @barmark;
 
 	state $lastmax = $maxval;
 	if ($maxval > $lastmax) {
@@ -161,12 +162,12 @@ while ($nr <= $#lines) {
 	$nr >= $opt{hidemax} and last if defined $opt{hidemax};
 	my $val = $values[$nr];
 	if (length $val) {
-		my $color = !$opt{color} ? 0 :
+		my $color = !$opt{color} ? undef :
 			$val == $order[0] ? 32 : # max
 			$val == $order[-1] ? 31 : # min
 			90;
 		$val = $opt{units} ? sival($val) : sprintf "%*s", $lenval, $val;
-		$val = color($color).$val.color(0) if $color;
+		color($color) for $val;
 	}
 	my $line = $lines[$nr] =~ s/\n/$val/r;
 	printf '%-*s', $len + length($val), $line;
