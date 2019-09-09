@@ -99,6 +99,11 @@ while (readline) {
 
 $SIG{INT} = 'DEFAULT';
 
+sub color {
+	$opt{color} or return '';
+	return "\e[$_[0]m";
+}
+
 sub show_lines {
 
 state $nr = $opt{hidemin} ? $opt{hidemin} - 1 : 0;
@@ -124,18 +129,18 @@ if ($opt{markers} // 1 and $size > 0) {
 	$barmark[ orderpos($#order * .68269) ] = '<';
 	$barmark[ orderpos($#order / 2) ] = '+';  # mean
 	$barmark[ -$minval * $size ] = '|' if $minval < 0;  # zero
-	defined and $opt{color} and $_ = "\e[36m$_\e[0m" for @barmark;
+	defined and $_ = color(36).$_.color(0) for @barmark;
 
 	state $lastmax = $maxval;
 	if ($maxval > $lastmax) {
 		print ' ' x ($lenval + $len);
-		printf "\e[90m" if $opt{color};
+		printf color(90);
 		printf '%-*s',
 			($lastmax - $minval) * $size + .5,
 			'-' x (($values[$nr - 1] - $minval) * $size);
-		print "\e[92m" if $opt{color};
+		print color(92);
 		say '+' x (($maxval - $lastmax - $minval) * $size + .5);
-		print "\e[0m" if $opt{color};
+		print color(0);
 		$lastmax = $maxval;
 	}
 }
@@ -161,7 +166,7 @@ while ($nr <= $#lines) {
 			$val == $order[-1] ? 31 : # min
 			90;
 		$val = $opt{units} ? sival($val) : sprintf "%*s", $lenval, $val;
-		$val = "\e[${color}m$val\e[0m" if $color;
+		$val = color($color).$val.color(0) if $color;
 	}
 	my $line = $lines[$nr] =~ s/\n/$val/r;
 	printf '%-*s', $len + length($val), $line;
