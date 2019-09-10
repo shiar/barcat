@@ -3,6 +3,7 @@
 cd "${0%/*}" || exit 1
 
 test_count=0
+fail_count=0
 
 COLUMNS=40
 regenerate=
@@ -42,8 +43,13 @@ do
 		if test -e $file.out; then $cmd 2>&1 | diffcmd "$file.out" -; fi
 	fi
 
-	test 0 = $? || printf 'not '
+	if test 0 != $?
+	then
+		fail_count=$((fail_count+1))
+		printf 'not '
+	fi
 	echo "ok $test_count - $name"
 done
 
 echo "1..$test_count"
+exit $((fail_count>0))
