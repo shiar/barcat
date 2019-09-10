@@ -112,7 +112,7 @@ while (readline) {
 		my $trimpos = abs $opt{trim};
 		$trimpos -= length $1 if $opt{unmodified};
 		if ($trimpos <= 1) {
-			$_ = substr $_, 0, 1;
+			$_ = substr $_, 0, 2;
 		}
 		elsif (length > $trimpos) {
 			substr($_, $trimpos - 1) = '…';
