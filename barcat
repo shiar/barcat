@@ -220,10 +220,13 @@ if ($opt{stat}) {
 	}
 	if (@order) {
 		my $total = sum @order;
-		printf '%s total', $total;
+		printf '%s total', color(1) . $total . color(0);
 		printf ' in %d values', scalar @values;
-		printf ' (%s min, %*.*f avg, %s max)',
-			$order[-1], 0, 2, $total / @order, $order[0];
+		printf(' (%s min, %s avg, %s max)',
+			color(31) . $order[-1] . color(0),
+			color(36) . (sprintf '%*.*f', 0, 2, $total / @order) . color(0),
+			color(32) . $order[0] . color(0),
+		);
 	}
 	say '';
 }
