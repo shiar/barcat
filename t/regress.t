@@ -6,10 +6,16 @@ test_count=0
 fail_count=0
 
 COLUMNS=40
+colorize=
+test -t 1 && colorize=1
+color () {
+	test -n "$colorize" &&
+	printf '\e[%sm' $@
+}
 regenerate=
 diffcmd () {
 	comm --nocheck-order --output-delimiter=::: -3 $@ |
-	perl -pe'END{exit !!$.} s/^:::/>/ || s/^/</'
+	perl -pe"END{exit !!\$.} s/^:::/$(color 31)>/ || s/^/$(color 32)</"
 }
 
 for option in "$@"
@@ -46,10 +52,24 @@ do
 	if test 0 != $?
 	then
 		fail_count=$((fail_count+1))
+		color 1\;31
 		printf 'not '
 	fi
 	echo "ok $test_count - $name"
+	color 0
 done
 
+if test $fail_count = 0
+then
+	color 32
+	echo "# passed all $test_count test(s)"
+else
+	color 31
+	echo "# failed $fail_count among $test_count test(s)"
+	fail_count=1  # exit code
+fi
+
+color 0\;36
 echo "1..$test_count"
-exit $((fail_count>0))
+color 0
+exit $fail_count
