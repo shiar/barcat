@@ -1,0 +1,7 @@
+1                             -
+ 2 prepend                     --
+	3:   append                   --<
+         4    3   2  1 trailing space  --<+
+  010                             --<+=->---
+  10. more                       --<+=->---
+   5.0less                         --<+=
