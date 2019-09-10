@@ -53,7 +53,22 @@ GetOptions(\%opt,
 	'stat|s!',
 	'unmodified|u!',
 	'width|w=i',
-	'usage|h' => sub { podexit() },
+	'usage|h' => sub {
+		local $/;
+		my $pod = readline *DATA;
+		$pod =~ s/^=over\K/ 22/m;  # indent options list
+		$pod =~ s/^=item \N*\n\n\N*\n\K(?:(?:^=over.*?^=back\n)?(?!=)\N*\n)*/\n/msg;
+
+		require Pod::Usage;
+		my $parser = Pod::Usage->new;
+		$parser->select('SYNOPSIS', 'OPTIONS');
+		$parser->output_string(\my $contents);
+		$parser->parse_string_document($pod);
+
+		$contents =~ s/\n(?=\n\h)//msg;  # strip space between items
+		print $contents;
+		exit;
+	},
 	'help'    => sub { podexit(-verbose => 2) },
 ) or exit 64;  # EX_USAGE
 
