@@ -5,8 +5,11 @@ cd "${0%/*}" || exit 1
 test_count=0
 
 COLUMNS=40
-diffcmd='diff --unchanged-line-format= --old-line-format=<%L --new-line-format=>%L'
 regenerate=
+diffcmd () {
+	comm --nocheck-order --output-delimiter=::: -3 $@ |
+	perl -pe'END{exit !!$.} s/^:::/>/ || s/^/</'
+}
 
 for option in "$@"
 do
@@ -36,7 +39,7 @@ do
 		$cmd >$file.out 2>&1
 	else
 		if test -e $file.sh;  then $cmd 2>&1 | ./$file.sh; fi &&
-		if test -e $file.out; then $cmd 2>&1 | $diffcmd "$file.out" -; fi
+		if test -e $file.out; then $cmd 2>&1 | diffcmd "$file.out" -; fi
 	fi
 
 	test 0 = $? || printf 'not '
