@@ -9,10 +9,6 @@ use experimental qw( lexical_subs );
 our $VERSION = '1.05';
 
 use Getopt::Long '2.33', qw( :config gnu_getopt );
-sub podexit {
-	require Pod::Usage;
-	Pod::Usage::pod2usage(-exitval => 0, -perldocopt => '-oman', @_);
-}
 my %opt;
 GetOptions(\%opt,
 	'color|c!',
@@ -69,7 +65,12 @@ GetOptions(\%opt,
 		print $contents;
 		exit;
 	},
-	'help'    => sub { podexit(-verbose => 2) },
+	'help|?'  => sub {
+		require Pod::Usage;
+		Pod::Usage::pod2usage(
+			-exitval => 0, -perldocopt => '-oman', -verbose => 2,
+		);
+	},
 ) or exit 64;  # EX_USAGE
 
 $opt{width} ||= $ENV{COLUMNS} || 80;
