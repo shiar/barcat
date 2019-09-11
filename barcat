@@ -43,6 +43,9 @@ GetOptions(\%opt,
 		);
 	},
 	'markers|m=s',
+	'graph-format=s' => sub {
+		$opt{'graph-format'} = substr $_[1], 0, 1;
+	},
 	'spark:s' => sub {
 		$opt{spark} = [split //, $_[1] || '⎽▁▂▃▄▅▆▇█'];
 	},
@@ -75,6 +78,7 @@ GetOptions(\%opt,
 
 $opt{width} ||= $ENV{COLUMNS} || 80;
 $opt{color} //= -t *STDOUT;  # enable on tty
+$opt{'graph-format'} //= '-';
 $opt{trim}   *= $opt{width} / 100 if $opt{trimpct};
 $opt{units}   = [split //, ' kMGTPEZYyzafpnμm'] if $opt{'human-readable'};
 $opt{anchor} //= qr/\A/;
@@ -205,7 +209,7 @@ while ($nr <= $#lines) {
 	}
 	my $line = $lines[$nr] =~ s/\n/$val/r;
 	printf '%-*s', $len + length($val), $line;
-	print $barmark[$_] // '-' for 1 .. $size && (($values[$nr] || 0) - $minval) * $size + .5;
+	print $barmark[$_] // $opt{'graph-format'} for 1 .. $size && (($values[$nr] || 0) - $minval) * $size + .5;
 	say '';
 }
 continue {
@@ -307,6 +311,11 @@ regardless of encountered contents.
 Stop output after a number of lines.
 All input is still counted and analyzed for statistics,
 but disregarded for padding and bar size.
+
+=item --graph-format=<character>
+
+Glyph to repeat for the graph line.
+Defaults to a dash C<->.
 
 =item -m, --markers=
 
