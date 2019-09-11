@@ -34,8 +34,11 @@ do
 
 	name="$(echo ${file#*-} | tr _ \ )"
 	set -- barcat "$file.in"
-	case "$name" in *\ -*) set -- "$@" "-${name#* -}";; esac
-	case "$name" in *' |'*)  set -- sh -c "\$0 \$1 $3" "$@";; esac
+	case "$name" in *\ -*) set -- "$@" -"${name#* -}";; esac
+	case "$name" in
+		*' |'*) set -- sh -c "\$0 \$1 $3" "$@";;
+		*)      set -- "$1" "$2" $3
+	esac
 
 	if test -n "$regenerate"
 	then
