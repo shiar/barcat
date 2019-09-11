@@ -33,8 +33,9 @@ do
 	test -r "$file.in" || continue
 
 	name="$(echo ${file#*-} | tr _ \ )"
-	cmd="barcat $file.in"
-	case "$name" in *\ -*) cmd="$cmd -${name#* -}";; esac
+	set -- barcat "$file.in"
+	case "$name" in *\ -*) set -- "$@" "-${name#* -}";; esac
+	case "$name" in *' |'*)  set -- sh -c "\$0 \$1 $3" "$@";; esac
 
 	if test -n "$regenerate"
 	then
@@ -43,10 +44,9 @@ do
 			echo "ok $test_count # skip $file.out"
 			continue
 		fi
-		$cmd >$file.out 2>&1
+		"$@" >$file.out 2>&1
 	else
-		if test -e $file.sh;  then $cmd 2>&1 | ./$file.sh; fi &&
-		if test -e $file.out; then $cmd 2>&1 | diffcmd "$file.out" -; fi
+		if test -e $file.out; then "$@" 2>&1 | diffcmd "$file.out" -; fi
 	fi
 
 	if test 0 != $?
