@@ -83,12 +83,13 @@ $opt{'value-length'} = 1 if $opt{unmodified};
 
 my (@lines, @values, @order);
 
+$SIG{ALRM} = sub {
+	show_lines();
+	alarm $opt{interval} if defined $opt{interval};
+};
+
 if (defined $opt{interval}) {
 	$opt{interval} ||= 1;
-	$SIG{ALRM} = sub {
-		show_lines();
-		alarm $opt{interval};
-	};
 	alarm $opt{interval};
 
 	eval {
@@ -286,6 +287,7 @@ Short integers are aligned but kept without decimal point.
 =item -t, --interval[=<seconds>]
 
 Interval time to output partial progress.
+An update can also be forced by sending a I<SIGALRM> alarm signal.
 
 =item -l, --length=[-]<size>[%]
 
