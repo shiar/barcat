@@ -85,12 +85,12 @@ my (@lines, @values, @order);
 
 $SIG{ALRM} = sub {
 	show_lines();
-	alarm $opt{interval} if defined $opt{interval};
+	alarm $opt{interval} if defined $opt{interval} and $opt{interval} > 0;
 };
 
 if (defined $opt{interval}) {
 	$opt{interval} ||= 1;
-	alarm $opt{interval};
+	alarm $opt{interval} if $opt{interval} > 0;
 
 	eval {
 		require Tie::Array::Sorted;
@@ -120,6 +120,8 @@ while (readline) {
 		}
 	}
 	push @lines, $_;
+	show_lines() if defined $opt{interval} and $opt{interval} < 0
+		and $. % $opt{interval} == 0;
 }
 
 $SIG{INT} = 'DEFAULT';
@@ -284,9 +286,9 @@ turning long numbers like I<12356789> into I<12.4M>.
 Also changes an exponent I<1.602176634e-19> to I<160.2z>.
 Short integers are aligned but kept without decimal point.
 
-=item -t, --interval[=<seconds>]
+=item -t, --interval[=(<seconds>|-<lines>)]
 
-Interval time to output partial progress.
+Output partial progress every given number of seconds or input lines.
 An update can also be forced by sending a I<SIGALRM> alarm signal.
 
 =item -l, --length=[-]<size>[%]
