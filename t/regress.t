@@ -45,8 +45,14 @@ do
 			continue
 		fi
 		"$@" >$file.out 2>&1
+	elif test -e "$file.out"
+	then
+		"$@" 2>&1 | diffcmd "$file.out" -
 	else
-		if test -e $file.out; then "$@" 2>&1 | diffcmd "$file.out" -; fi
+		color 33
+		echo "not ok $test_count - $name # TODO"
+		color 0
+		continue
 	fi
 
 	if test 0 != $?
