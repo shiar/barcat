@@ -87,7 +87,7 @@ $opt{'value-length'} = 1 if $opt{unmodified};
 
 my (@lines, @values, @order);
 
-$SIG{QUIT} = \&show_stat;
+$SIG{$_} = \&show_stat for exists $SIG{INFO} ? 'INFO' : 'QUIT';
 $SIG{ALRM} = sub {
 	show_lines();
 	alarm $opt{interval} if defined $opt{interval} and $opt{interval} > 0;
