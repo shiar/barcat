@@ -50,6 +50,7 @@ GetOptions(\%opt,
 		$opt{spark} = [split //, $_[1] || '⎽▁▂▃▄▅▆▇█'];
 	},
 	'stat|s!',
+	'signal-stat=s',
 	'unmodified|u!',
 	'width|w=i',
 	'usage|h' => sub {
@@ -84,10 +85,11 @@ $opt{units}   = [split //, ' kMGTPEZYyzafpnμm'] if $opt{'human-readable'};
 $opt{anchor} //= qr/\A/;
 $opt{'value-length'} = 6 if $opt{units};
 $opt{'value-length'} = 1 if $opt{unmodified};
+$opt{'signal-stat'} //= exists $SIG{INFO} ? 'INFO' : 'QUIT';
 
 my (@lines, @values, @order);
 
-$SIG{$_} = \&show_stat for exists $SIG{INFO} ? 'INFO' : 'QUIT';
+$SIG{$_} = \&show_stat for $opt{'signal-stat'} || ();
 $SIG{ALRM} = sub {
 	show_lines();
 	alarm $opt{interval} if defined $opt{interval} and $opt{interval} > 0;
