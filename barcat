@@ -94,6 +94,7 @@ $SIG{ALRM} = sub {
 	show_lines();
 	alarm $opt{interval} if defined $opt{interval} and $opt{interval} > 0;
 };
+$SIG{INT} = \&show_exit;
 
 if (defined $opt{interval}) {
 	$opt{interval} ||= 1;
@@ -104,12 +105,6 @@ if (defined $opt{interval}) {
 		tie @order, 'Tie::Array::Sorted', sub { $_[1] <=> $_[0] };
 	} or warn $@, "Expect slowdown with large datasets!\n";
 }
-
-$SIG{INT} = sub {
-	$SIG{INT} = 'DEFAULT';  # reset for subsequent attempts
-	exit if !$.;
-	'IGNORE' # continue after assumed eof
-};
 
 my $valmatch = qr/$opt{anchor} ( \h* -? [0-9]* \.? [0-9]+ (?: e[+-]?[0-9]+ )? |)/x;
 while (readline) {
@@ -221,7 +216,6 @@ continue {
 say '' if $opt{spark};
 
 }
-show_lines();
 
 sub show_stat {
 	if ($opt{hidemin} or $opt{hidemax}) {
@@ -241,7 +235,15 @@ sub show_stat {
 	}
 	say '';
 }
-show_stat() if $opt{stat};
+
+sub show_exit {
+	show_lines();
+	show_stat() if $opt{stat};
+	exit 130 if @_;  # 0x80+signo
+	exit;
+}
+
+show_exit();
 
 __END__
 =encoding utf8
