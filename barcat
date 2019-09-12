@@ -87,6 +87,7 @@ $opt{'value-length'} = 1 if $opt{unmodified};
 
 my (@lines, @values, @order);
 
+$SIG{QUIT} = \&show_stat;
 $SIG{ALRM} = sub {
 	show_lines();
 	alarm $opt{interval} if defined $opt{interval} and $opt{interval} > 0;
@@ -220,7 +221,7 @@ say '' if $opt{spark};
 }
 show_lines();
 
-if ($opt{stat}) {
+sub show_stat {
 	if ($opt{hidemin} or $opt{hidemax}) {
 		$opt{hidemin} ||= 1;
 		$opt{hidemax} ||= @lines;
@@ -238,6 +239,7 @@ if ($opt{stat}) {
 	}
 	say '';
 }
+show_stat() if $opt{stat};
 
 __END__
 =encoding utf8
