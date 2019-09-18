@@ -42,6 +42,7 @@ GetOptions(\%opt,
 			" (range expected)\n"
 		);
 	},
+	'header!',
 	'markers|m=s',
 	'graph-format=s' => sub {
 		$opt{'graph-format'} = substr $_[1], 0, 1;
@@ -192,6 +193,8 @@ sub sival {
 	);
 }
 
+say sprintf '%*s-+%*s-+', $lenval, $minval, $size * ($maxval - $minval) - 3, $maxval if $opt{header};
+
 while ($nr <= $#lines) {
 	$nr >= $opt{hidemax} and last if defined $opt{hidemax};
 	my $val = $values[$nr];
@@ -293,6 +296,10 @@ A string can indicate the starting position of a value
 (such as I<-f:> if preceded by colons),
 or capture the numbers itself,
 for example I<-f'(\d+)'> for the first digits anywhere.
+
+=item --header
+
+Prepend a chart axis with minimum and maximum values labeled.
 
 =item -H, --human-readable
 
