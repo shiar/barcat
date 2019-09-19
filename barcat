@@ -193,7 +193,13 @@ sub sival {
 	);
 }
 
-say sprintf '%*s-+%*s-+', $lenval, $minval, $size * ($maxval - $minval) - 3, $maxval if $opt{header};
+say(
+	color(31), sprintf('%*s', $lenval, $minval),
+	color(90), '-', color(36), '+',
+	color(32), sprintf('%*s', $size * ($maxval - $minval) - 3, $maxval),
+	color(90), '-', color(36), '+',
+	color(0),
+) if $opt{header};
 
 while ($nr <= $#lines) {
 	$nr >= $opt{hidemax} and last if defined $opt{hidemax};
