@@ -236,9 +236,13 @@ while ($nr <= $#lines) {
 	$nr >= $opt{hidemax} and last if defined $opt{hidemax};
 	my $val = $values[$nr];
 	my $rel = length $val && ($val - $minval) / ($maxval - $minval);
+	my $color = !length $val || !$opt{palette} ? undef :
+		$val == $order[0] ? $opt{palette}->[-1] : # max
+		$val == $order[-1] ? $opt{palette}->[0] : # min
+		$opt{palette}->[ $rel * ($#{$opt{palette}} - 1) + 1 ];
 
 	if ($opt{spark}) {
-		print $opt{spark}->[
+		print color($color), $opt{spark}->[
 			!$val ? 0 : # blank
 			$val == $order[0] ? -1 : # max
 			$val == $order[-1] ? 1 : # min
@@ -249,10 +253,6 @@ while ($nr <= $#lines) {
 	}
 
 	if (length $val) {
-		my $color = !$opt{palette} ? undef :
-			$val == $order[0] ? $opt{palette}->[-1] : # max
-			$val == $order[-1] ? $opt{palette}->[0] : # min
-			$opt{palette}->[ $rel * ($#{$opt{palette}} - 1) + 1 ];
 		$val = $opt{units} ? sival($val) : sprintf "%*s", $lenval, $val;
 		color($color) for $val;
 	}
