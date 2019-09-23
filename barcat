@@ -47,7 +47,7 @@ GetOptions(\%opt,
 		$opt{'graph-format'} = substr $_[1], 0, 1;
 	},
 	'spark:s' => sub {
-		$opt{spark} = [split //, $_[1] || '⎽▁▂▃▄▅▆▇█'];
+		$opt{spark} = [split //, $_[1] || '▁▂▃▄▅▆▇█'];
 	},
 	'stat|s!',
 	'signal-stat=s',
