@@ -50,7 +50,7 @@ GetOptions(\%opt,
 		$opt{'graph-format'} = substr $_[1], 0, 1;
 	},
 	'spark:s' => sub {
-		$opt{spark} = [split //, $_[1] || '▁▂▃▄▅▆▇█'];
+		$opt{spark} = [split //, $_[1] || ' ▁▂▃▄▅▆▇█'];
 	},
 	'palette=s' => sub {
 		$opt{palette} = {
@@ -238,8 +238,13 @@ while ($nr <= $#lines) {
 	my $rel = length $val && ($val - $minval) / ($maxval - $minval);
 
 	if ($opt{spark}) {
-		print color($opt{palette}->[ $rel * $#{$opt{palette}} ]) if $opt{palette};
-		print $opt{spark}->[ $rel * $#{$opt{spark}} ];
+		print $opt{spark}->[
+			!$val ? 0 : # blank
+			$val == $order[0] ? -1 : # max
+			$val == $order[-1] ? 1 : # min
+			$#{$opt{spark}} < 3 ? 1 :
+			$rel * ($#{$opt{spark}} - 3) + 2.5
+		];
 		next;
 	}
 
