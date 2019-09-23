@@ -356,6 +356,11 @@ or 68% of all entries.
 
 =back
 
+=item --spark
+
+Replace lines by I<sparklines>,
+single characters corresponding to input values.
+
 =item -s, --stat
 
 Total statistics after all data.
