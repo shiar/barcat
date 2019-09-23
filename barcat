@@ -356,10 +356,17 @@ or 68% of all entries.
 
 =back
 
-=item --spark
+=item --spark[=<glyphs>]
 
 Replace lines by I<sparklines>,
 single characters corresponding to input values.
+A specified sequence of unicode characters will be used for
+Of a specified sequence of unicode characters,
+the first one will be used for non-values,
+the last one for the maximum,
+the second (if any) for the minimum,
+and any remaining will be distributed over the range of values.
+Unspecified, block fill glyphs U+2581-2588 will be used.
 
 =item -s, --stat
 
