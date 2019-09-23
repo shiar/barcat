@@ -52,8 +52,11 @@ GetOptions(\%opt,
 	'spark:s' => sub {
 		$opt{spark} = [split //, $_[1] || '▁▂▃▄▅▆▇█'];
 	},
-	'palette:s' => sub {
-		$opt{palette} = [ split /\s/, $_[1] ];
+	'palette=s' => sub {
+		$opt{palette} = {
+			fire   => [qw( 90 31 91 33 93 97 96 )],
+			whites => [qw( 1;30 0;37 1;37 )],
+		}->{$_[1]} // [ split /\s/, $_[1] ];
 	},
 	'stat|s!',
 	'signal-stat=s',
@@ -396,7 +399,7 @@ Bars extend from 0 or the minimum value if lower,
 to the largest value encountered.
 These options can be set to customize this range.
 
-=item --palette=<color>...
+=item --palette=(<preset> | <color>...)
 
 Override colors of parsed numbers.
 Can be any CSI escape, such as I<90> for default dark grey,
