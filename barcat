@@ -33,6 +33,8 @@ GetOptions(\%opt,
 	'value-length=i',
 	'hidemin=i',
 	'hidemax=i',
+	'minval=f',
+	'maxval=f',
 	'limit|L=s' => sub {
 		my ($optname, $optval) = @_;
 		$optval ||= 0;
@@ -153,8 +155,8 @@ state $nr = $opt{hidemin} ? $opt{hidemin} - 1 : 0;
 @lines > $nr or return unless $opt{hidemin};
 
 @order = sort { $b <=> $a } @order unless tied @order;
-my $maxval = ($opt{hidemax} ? max grep { length } @values[0 .. $opt{hidemax} - 1] : $order[0]) // 0;
-my $minval = min $order[-1] // (), 0;
+my $maxval = $opt{maxval} // ($opt{hidemax} ? max grep { length } @values[0 .. $opt{hidemax} - 1] : $order[0]) // 0;
+my $minval = $opt{minval} // min $order[-1] // (), 0;
 my $lenval = $opt{'value-length'} // max map { length } @order;
 my $len    = defined $opt{trim} && $opt{trim} <= 0 ? -$opt{trim} + 1 :
 	max map { length $values[$_] && length $lines[$_] }
@@ -177,8 +179,9 @@ if ($opt{markers} and $size > 0) {
 			else {
 				return $func;
 			}
-		};
-		color(36) for $barmark[($pos - $minval) * $size] = $char;
+		} - $minval;
+		$pos >= 0 or next;
+		color(36) for $barmark[$pos * $size] = $char;
 	}
 
 	state $lastmax = $maxval;
@@ -384,6 +387,12 @@ the sum of all values divided by the number of counted lines.
 Indicated by default as I<=>.
 
 =back
+
+=item --min=<number>, --max=<number>
+
+Bars extend from 0 or the minimum value if lower,
+to the largest value encountered.
+These options can be set to customize this range.
 
 =item --palette=<color>...
 
