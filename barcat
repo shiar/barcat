@@ -50,6 +50,9 @@ GetOptions(\%opt,
 	'spark:s' => sub {
 		$opt{spark} = [split //, $_[1] || '▁▂▃▄▅▆▇█'];
 	},
+	'palette:s' => sub {
+		$opt{palette} = [ split /\s/, $_[1] ];
+	},
 	'stat|s!',
 	'signal-stat=s',
 	'unmodified|u!',
@@ -91,6 +94,7 @@ $opt{anchor} //= qr/\A/;
 $opt{'value-length'} = 6 if $opt{units};
 $opt{'value-length'} = 1 if $opt{unmodified};
 $opt{'signal-stat'} //= exists $SIG{INFO} ? 'INFO' : 'QUIT';
+$opt{palette} //= $opt{color} && [31, 90, 32];
 
 my (@lines, @values, @order);
 
@@ -211,10 +215,10 @@ while ($nr <= $#lines) {
 	}
 
 	if (length $val) {
-		my $color = !$opt{color} ? undef :
-			$val == $order[0] ? 32 : # max
-			$val == $order[-1] ? 31 : # min
-			90;
+		my $color = !$opt{palette} ? undef :
+			$val == $order[0] ? $opt{palette}->[-1] : # max
+			$val == $order[-1] ? $opt{palette}->[0] : # min
+			$opt{palette}->[1] // $opt{palette}->[0];
 		$val = $opt{units} ? sival($val) : sprintf "%*s", $lenval, $val;
 		color($color) for $val;
 	}
@@ -372,6 +376,16 @@ The part between B<< <--> >> encompass all I<normal> results,
 or 68% of all entries.
 
 =back
+
+=item --palette=<color>...
+
+Override colors of parsed numbers.
+Can be any CSI escape, such as I<90> for default dark grey,
+or alternatively I<1;30> for bold black.
+
+In case of additional colors,
+the last is used for values equal to the maximum, the first for minima.
+If unspecified, these are green and red respectively (I<31 90 32>).
 
 =item --spark[=<glyphs>]
 
