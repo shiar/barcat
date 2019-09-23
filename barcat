@@ -94,6 +94,7 @@ $opt{anchor} //= qr/\A/;
 $opt{'value-length'} = 6 if $opt{units};
 $opt{'value-length'} = 1 if $opt{unmodified};
 $opt{'signal-stat'} //= exists $SIG{INFO} ? 'INFO' : 'QUIT';
+$opt{markers} //= '=avg >31.73v <68.27v +50v |0';
 $opt{palette} //= $opt{color} && [31, 90, 32];
 
 my (@lines, @values, @order);
@@ -162,14 +163,23 @@ my $size   = ($maxval - $minval) &&
 	($opt{width} - $lenval - $len) / ($maxval - $minval);  # bar multiplication
 
 my @barmark;
-if ($opt{markers} // 1 and $size > 0) {
-	my sub orderpos { (($order[$_[0]] + $order[$_[0] + .5]) / 2 - $minval) * $size }
-	$barmark[ (sum(@order) / @order - $minval) * $size ] = '=';  # average
-	$barmark[ orderpos($#order * .31731) ] = '>';
-	$barmark[ orderpos($#order * .68269) ] = '<';
-	$barmark[ orderpos($#order / 2) ] = '+';  # mean
-	$barmark[ -$minval * $size ] = '|' if $minval < 0;  # zero
-	color(36) for @barmark;
+if ($opt{markers} and $size > 0) {
+	for my $markspec (split /\h/, $opt{markers}) {
+		my ($char, $func) = split //, $markspec, 2;
+		my $pos = eval {
+			if ($func eq 'avg') {
+				return sum(@order) / @order;
+			}
+			elsif ($func =~ /\A([0-9.]+)v\z/) {
+				my $index = $#order * $1 / 100;
+				return ($order[$index] + $order[$index + .5]) / 2;
+			}
+			else {
+				return $func;
+			}
+		};
+		color(36) for $barmark[($pos - $minval) * $size] = $char;
+	}
 
 	state $lastmax = $maxval;
 	if ($maxval > $lastmax) {
@@ -344,36 +354,34 @@ but disregarded for padding and bar size.
 Glyph to repeat for the graph line.
 Defaults to a dash C<->.
 
-=item -m, --markers=
+=item -m, --markers=<format>
 
 Statistical positions to indicate on bars.
-Cannot be customized yet,
-only disabled by providing an empty argument.
-
-Any value enables all marker characters:
+A single indicator glyph precedes each position:
 
 =over 2
 
-=item B<=>
+=item <number>
 
-Average:
-the sum of all values divided by the number of counted lines.
+Exact value to match on the axis.
+A vertical bar at the zero crossing is displayed by I<|0>
+for negative values.
+For example I<:3.14> would show a colon at pi.
 
-=item B<+>
+=item <percentage>I<v>
 
-Mean, median:
+Ranked value at the given percentile.
+The default shows I<+> at I<50v> for the mean or median;
 the middle value or average between middle values.
+One standard deviation right of the mean is at about I<68.3v>.
+The default includes I<< >31.73v <68.27v >>
+to encompass all I<normal> results, or 68% of all entries, by B<< <--> >>.
 
-=item B<<>
+=item I<avg>
 
-Standard deviation left of the mean.
-Only 16% of all values are lower.
-
-=item B<< > >>
-
-Standard deviation right of the mean.
-The part between B<< <--> >> encompass all I<normal> results,
-or 68% of all entries.
+Matches the average;
+the sum of all values divided by the number of counted lines.
+Indicated by default as I<=>.
 
 =back
 
