@@ -101,7 +101,7 @@ GetOptions(\%opt,
 	},
 ) or exit 64;  # EX_USAGE
 
-$opt{width} ||= $ENV{COLUMNS} || 80;
+$opt{width} ||= $ENV{COLUMNS} || qx(tput cols) || 80;
 $opt{color} //= -t *STDOUT;  # enable on tty
 $opt{'graph-format'} //= '-';
 $opt{trim}   *= $opt{width} / 100 if $opt{trimpct};
