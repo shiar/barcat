@@ -30,7 +30,7 @@ for candidate in ${@:-t*.out}
 do
 	test_count=$((test_count+1))
 	file="${candidate%.out}"
-	input="$file.in"
+	input="${file%%_-*}.in"
 	name="$(echo ${file#*-} | tr _ \ )"
 
 	set -- barcat
@@ -38,7 +38,7 @@ do
 	case "$name" in *\ -*) set -- "$@" -"${name#* -}";; esac
 	case "$name" in
 		*' |'*) set -- sh -c "\$0 \$1 | ${name#* |}" "$@";;
-		*)      set -- "$1" "$2" $3
+		*)      set -- "$1" $2 $3
 	esac
 
 	if test -n "$regenerate"
