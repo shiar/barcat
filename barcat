@@ -112,6 +112,7 @@ $opt{'value-length'} = 1 if $opt{unmodified};
 $opt{'signal-stat'} //= exists $SIG{INFO} ? 'INFO' : 'QUIT';
 $opt{markers} //= '=avg >31.73v <68.27v +50v |0';
 $opt{palette} //= $opt{color} && [31, 90, 32];
+$opt{input} = @ARGV && $ARGV[0] =~ m/\A[-0-9]/ ? \@ARGV : undef;
 
 my (@lines, @values, @order);
 
@@ -133,7 +134,7 @@ if (defined $opt{interval}) {
 }
 
 my $valmatch = qr/$opt{anchor} ( \h* -? [0-9]* \.? [0-9]+ (?: e[+-]?[0-9]+ )? |)/x;
-while (readline) {
+while (defined ($_ = $opt{input} ? shift @{ $opt{input} } : readline)) {
 	s/\r?\n\z//;
 	s/^\h*// unless $opt{unmodified};
 	push @values, s/$valmatch/\n/ && $1;
@@ -305,11 +306,12 @@ barcat - graph to visualize input values
 
 =head1 SYNOPSIS
 
-B<barcat> [<options>] [<input>]
+B<barcat> [<options>] [<file>... | <numbers>]
 
 =head1 DESCRIPTION
 
-Visualizes relative sizes of values read from input (file(s) or STDIN).
+Visualizes relative sizes of values read from input
+(parameters, file(s) or STDIN).
 Contents are concatenated similar to I<cat>,
 but numbers are reformatted and a bar graph is appended to each line.
 
