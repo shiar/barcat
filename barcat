@@ -35,7 +35,7 @@ GetOptions(\%opt,
 	'hidemax=i',
 	'minval=f',
 	'maxval=f',
-	'limit|L=s' => sub {
+	'limit|L:s' => sub {
 		my ($optname, $optval) = @_;
 		$optval ||= 0;
 		($opt{hidemin}, $opt{hidemax}) =
@@ -367,7 +367,7 @@ unless C<--length=0>.
 Prepend a dash (i.e. make negative) to enforce padding
 regardless of encountered contents.
 
-=item -L, --limit=(<count>|<start>-[<end>])
+=item -L, --limit[=(<count> | <start>-[<end>])]
 
 Stop output after a number of lines.
 All input is still counted and analyzed for statistics,
