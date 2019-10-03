@@ -26,17 +26,18 @@ do
 	esac
 done
 
-for candidate in ${@:-t*.in}
+for candidate in ${@:-t*.out}
 do
 	test_count=$((test_count+1))
-	file="${candidate%.in}"
-	test -r "$file.in" || continue
-
+	file="${candidate%.out}"
+	input="$file.in"
 	name="$(echo ${file#*-} | tr _ \ )"
-	set -- barcat "$file.in"
+
+	set -- barcat
+	[ -r "$input" ] && set -- "$@" "$input"
 	case "$name" in *\ -*) set -- "$@" -"${name#* -}";; esac
 	case "$name" in
-		*' |'*) set -- sh -c "\$0 \$1 $3" "$@";;
+		*' |'*) set -- sh -c "\$0 \$1 | ${name#* |}" "$@";;
 		*)      set -- "$1" "$2" $3
 	esac
 
