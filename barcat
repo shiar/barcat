@@ -277,7 +277,7 @@ sub show_stat {
 	}
 	if (@order) {
 		my $total = sum @order;
-		printf '%s total', color(1) . $total . color(0);
+		printf '%s total', color(1) . sprintf('%.8g', $total) . color(0);
 		printf ' in %d values', scalar @order;
 		printf ' over %d lines', scalar @lines if @order != @lines;
 		printf(' (%s min, %s avg, %s max)',
