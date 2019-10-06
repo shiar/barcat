@@ -273,12 +273,13 @@ sub show_stat {
 	if ($opt{hidemin} or $opt{hidemax}) {
 		$opt{hidemin} ||= 1;
 		$opt{hidemax} ||= @lines;
-		printf '%s of ', sum(@values[$opt{hidemin} - 1 .. $opt{hidemax} - 1]) // 0;
+		printf '%s of ', sum(grep {length} @values[$opt{hidemin} - 1 .. $opt{hidemax} - 1]) // 0;
 	}
 	if (@order) {
 		my $total = sum @order;
 		printf '%s total', color(1) . $total . color(0);
-		printf ' in %d values', scalar @values;
+		printf ' in %d values', scalar @order;
+		printf ' over %d lines', scalar @lines if @order != @lines;
 		printf(' (%s min, %s avg, %s max)',
 			color(31) . $order[-1] . color(0),
 			color(36) . (sprintf '%*.*f', 0, 2, $total / @order) . color(0),
