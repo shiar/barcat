@@ -539,8 +539,7 @@ USD/EUR exchange rate from CSV provided by the ECB:
          -Gd 'node=SEARCHRESULTS&q=EXR.D.USD.EUR.SP00.A&exportType=csv' |
     grep '^[12]' | barcat -f',\K' --value-length=7
 
-Total population history from the World Bank dataset (XML):
-External datasets, like total population in XML from the World Bank:
+Total population history in XML from the World Bank:
 
     curl http://api.worldbank.org/v2/country/1W/indicator/SP.POP.TOTL |
     xmllint --xpath '//*[local-name()="date" or local-name()="value"]' - |
