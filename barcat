@@ -497,7 +497,7 @@ Monitor network latency from prefixed results:
 
 Commonly used after counting, for example users on the current server:
 
-    users | sed 's/ /\n/g' | sort | uniq -c | barcat
+    users | tr ' ' '\n' | sort | uniq -c | barcat
 
 Letter frequencies in text files:
 
