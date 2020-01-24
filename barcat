@@ -82,6 +82,7 @@ GetOptions(\%opt,
 		$pod =~ s/^=over\K/ 25/m;  # indent options list
 		$pod =~ s/^=item \N*\n\n\N*\n\K(?:(?:^=over.*?^=back\n)?(?!=)\N*\n)*/\n/msg;
 		$pod =~ s/[.,](?=\n)//g;  # trailing punctuation
+		$pod =~ s/^=item \K(?=--)/____/gm;  # align long options
 		# abbreviate <variable> indicators
 		$pod =~ s/\Q>.../s>/g;
 		$pod =~ s/<(?:number|count|seconds)>/N/g;
@@ -98,6 +99,7 @@ GetOptions(\%opt,
 		$parser->parse_string_document($pod);
 
 		$contents =~ s/\n(?=\n\h)//msg;  # strip space between items
+		$contents =~ s/^  \K____/    /gm;  # nbsp substitute
 		print $contents;
 		exit;
 	},
