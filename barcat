@@ -181,12 +181,13 @@ my $maxval = $opt{maxval} // (
 	$order[0]
 ) // 0;
 my $minval = $opt{minval} // min $order[-1] // (), 0;
+my $range = $maxval - $minval;
 my $lenval = $opt{'value-length'} // max map { length } @order;
 my $len    = defined $opt{trim} && $opt{trim} <= 0 ? -$opt{trim} + 1 :
 	max map { length $values[$_] && length $lines[$_] }
 		0 .. min $#lines, $opt{hidemax} || ();  # left padding
-my $size   = ($maxval - $minval) &&
-	($opt{width} - $lenval - $len) / ($maxval - $minval);  # bar multiplication
+my $size   = $range &&
+	($opt{width} - $lenval - $len) / $range;  # bar multiplication
 
 my @barmark;
 if ($opt{markers} and $size > 0) {
@@ -216,7 +217,7 @@ if ($opt{markers} and $size > 0) {
 			($lastmax - $minval) * $size + .5,
 			'-' x (($values[$nr - 1] - $minval) * $size);
 		print color(92);
-		say '+' x (($maxval - $lastmax - $minval) * $size + .5);
+		say '+' x (($range - $lastmax) * $size + .5);
 		print color(0);
 		$lastmax = $maxval;
 	}
@@ -237,7 +238,7 @@ sub sival {
 say(
 	color(31), sprintf('%*s', $lenval, $minval),
 	color(90), '-', color(36), '+',
-	color(32), sprintf('%*s', $size * ($maxval - $minval) - 3, $maxval),
+	color(32), sprintf('%*s', $size * $range - 3, $maxval),
 	color(90), '-', color(36), '+',
 	color(0),
 ) if $opt{header};
@@ -245,7 +246,7 @@ say(
 while ($nr <= $#lines) {
 	$nr >= $opt{hidemax} and last if defined $opt{hidemax};
 	my $val = $values[$nr];
-	my $rel = length $val && ($maxval - $minval) && ($val - $minval) / ($maxval - $minval);
+	my $rel = length $val && $range && ($val - $minval) / $range;
 	my $color = !length $val || !$opt{palette} ? undef :
 		$val == $order[0] ? $opt{palette}->[-1] : # max
 		$val == $order[-1] ? $opt{palette}->[0] : # min
