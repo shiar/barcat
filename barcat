@@ -133,7 +133,9 @@ if (defined $opt{interval}) {
 	} or warn $@, "Expect slowdown with large datasets!\n";
 }
 
-my $valmatch = qr/$opt{anchor} ( \h* -? [0-9]* \.? [0-9]+ (?: e[+-]?[0-9]+ )? |)/x;
+my $valmatch = qr<
+	$opt{anchor} ( \h* -? [0-9]* \.? [0-9]+ (?: e[+-]?[0-9]+ )? |)
+>x;
 while (defined ($_ = $opt{input} ? shift @{ $opt{input} } : readline)) {
 	s/\r?\n\z//;
 	s/^\h*// unless $opt{unmodified};
@@ -174,7 +176,10 @@ state $nr = $opt{hidemin} ? $opt{hidemin} - 1 : 0;
 @lines > $nr or return unless $opt{hidemin};
 
 @order = sort { $b <=> $a } @order unless tied @order;
-my $maxval = $opt{maxval} // ($opt{hidemax} ? max grep { length } @values[0 .. $opt{hidemax} - 1] : $order[0]) // 0;
+my $maxval = $opt{maxval} // (
+	$opt{hidemax} ? max grep { length } @values[0 .. $opt{hidemax} - 1] :
+	$order[0]
+) // 0;
 my $minval = $opt{minval} // min $order[-1] // (), 0;
 my $lenval = $opt{'value-length'} // max map { length } @order;
 my $len    = defined $opt{trim} && $opt{trim} <= 0 ? -$opt{trim} + 1 :
@@ -264,7 +269,8 @@ while ($nr <= $#lines) {
 	}
 	my $line = $lines[$nr] =~ s/\n/$val/r;
 	printf '%-*s', $len + length($val), $line;
-	print $barmark[$_] // $opt{'graph-format'} for 1 .. $size && (($values[$nr] || 0) - $minval) * $size + .5;
+	print $barmark[$_] // $opt{'graph-format'}
+		for 1 .. $size && (($values[$nr] || 0) - $minval) * $size + .5;
 	say '';
 }
 continue {
