@@ -37,6 +37,7 @@ do
 	[ -r "$input" ] && set -- "$@" "$input"
 	case "$name" in *\ -*) set -- "$@" -"${name#* -}";; esac
 	case "$name" in
+		*' ?' ) set -- sh -c "\$0 \$@ 2>/dev/null" "$@";;
 		*' ?'*) set -- sh -c "\$0 \$@ | test \$\? = ${name#* \?}" "$@";;
 		*' |'*) set -- sh -c "\$0 \$@ | ${name#* |}" "$@";;
 		*)      set -- "$1" $2 $3
