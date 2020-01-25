@@ -5,7 +5,7 @@ use utf8;
 use List::Util qw( min max sum );
 use open qw( :std :utf8 );
 
-our $VERSION = '1.06';
+our $VERSION = '1.07';
 
 use Getopt::Long '2.33', qw( :config gnu_getopt );
 my %opt;
