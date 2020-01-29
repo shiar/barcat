@@ -448,6 +448,11 @@ or alternatively I<1;30> for bright black.
 In case of additional colors,
 the last is used for values equal to the maximum, the first for minima.
 If unspecified, these are green and red respectively (I<31 90 32>).
+Multiple intermediate colors will be distributed
+relative to the size of values.
+
+Predefined color schemes are named I<whites> and I<fire>,
+or I<greys> and I<fire256> for 256-color variants.
 
 =item --spark[=<characters>]
 
