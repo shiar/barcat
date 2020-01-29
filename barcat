@@ -193,9 +193,8 @@ sub sival {
 sub show_lines {
 
 state $nr = $opt{hidemin};
-@lines and @lines > $nr or return;
 @lines or return;
-@lines > $nr or return unless $opt{hidemin};
+@lines > $nr or return;
 
 @order = sort { $b <=> $a } @order unless tied @order;
 my $maxval = $opt{maxval} // (
@@ -244,8 +243,6 @@ if ($opt{markers} and $size > 0) {
 		$lastmax = $maxval;
 	}
 }
-
-@lines > $nr or return if $opt{hidemin};
 
 say(
 	color(31), sprintf('%*s', $lenval, $minval),
