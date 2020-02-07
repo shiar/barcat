@@ -539,7 +539,7 @@ Any kind of database query with counts, preserving returned alignment:
 Earthquakes worldwide magnitude 1+ in the last 24 hours:
 
     https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/1.0_day.csv |
-    column -tns, | graph -f4 -u -l80%
+    column -tns, | barcat -f4 -u -l80%
 
 External datasets, like movies per year:
 
@@ -582,7 +582,7 @@ Activity graph of the last days (substitute date C<-v-{}d> on BSD):
 
     ( git log --pretty=%ci --since=30day | cut -b-10
       seq 0 30 | xargs -i date +%F -d-{}day ) |
-    sort | uniq -c | awk '$1--' | graph --spark
+    sort | uniq -c | awk '$1--' | barcat --spark
 
 =head1 AUTHOR
 
