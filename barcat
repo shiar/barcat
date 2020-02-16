@@ -4,6 +4,7 @@ use warnings;
 use utf8;
 use List::Util qw( min max sum );
 use open qw( :std :utf8 );
+use re '/ms';
 
 our $VERSION = '1.07';
 
@@ -15,15 +16,15 @@ GetOptions(\%opt,
 	'field|f=s' => sub {
 		eval {
 			local $_ = $_[1];
-			$opt{anchor} = /^[0-9]+$/ ? qr/(?:\S*\h+){$_}\K/ : qr/$_/;
-		} or die $@ =~ s/(?: at .+)?$/ for option $_[0]/r;
+			$opt{anchor} = /\A[0-9]+\z/ ? qr/(?:\S*\h+){$_}\K/ : qr/$_/;
+		} or die $@ =~ s/(?: at \N+)?\Z/ for option $_[0]/r;
 	},
 	'human-readable|H!',
 	'interval|t:i',
 	'trim|length|l=s' => sub {
 		my ($optname, $optval) = @_;
 		$optval =~ s/%$// and $opt{trimpct}++;
-		$optval =~ m/^-?[0-9]+$/ or die(
+		$optval =~ m/\A-?[0-9]+\z/ or die(
 			"Value \"$optval\" invalid for option $optname",
 			" (number or percentage expected)\n"
 		);
@@ -79,10 +80,10 @@ GetOptions(\%opt,
 	'usage|h' => sub {
 		local $/;
 		my $pod = readline *DATA;
-		$pod =~ s/^=over\K/ 25/m;  # indent options list
-		$pod =~ s/^=item \N*\n\n\N*\n\K(?:(?:^=over.*?^=back\n)?(?!=)\N*\n)*/\n/msg;
+		$pod =~ s/^=over\K/ 25/;  # indent options list
+		$pod =~ s/^=item\ \N*\n\n\N*\n\K(?:(?:^=over.*?^=back\n)?(?!=)\N*\n)*/\n/g;
 		$pod =~ s/[.,](?=\n)//g;  # trailing punctuation
-		$pod =~ s/^=item \K(?=--)/____/gm;  # align long options
+		$pod =~ s/^=item\ \K(?=--)/____/g;  # align long options
 		# abbreviate <variable> indicators
 		$pod =~ s/\Q>.../s>/g;
 		$pod =~ s/<(?:number|count|seconds)>/N/g;
@@ -99,7 +100,7 @@ GetOptions(\%opt,
 		$parser->parse_string_document($pod);
 
 		$contents =~ s/\n(?=\n\h)//msg;  # strip space between items
-		$contents =~ s/^  \K____/    /gm;  # nbsp substitute
+		$contents =~ s/^\ \ \K____/    /g;  # nbsp substitute
 		print $contents;
 		exit;
 	},
@@ -146,11 +147,11 @@ if (defined $opt{interval}) {
 }
 
 my $valmatch = qr<
-	$opt{anchor} ( \h* -? [0-9]* \.? [0-9]+ (?: e[+-]?[0-9]+ )? |)
+	$opt{anchor} ( \h* -? [0-9]* [.]? [0-9]+ (?: e[+-]?[0-9]+ )? |)
 >x;
 while (defined ($_ = $opt{input} ? shift @{ $opt{input} } : readline)) {
 	s/\r?\n\z//;
-	s/^\h*// unless $opt{unmodified};
+	s/\A\h*// unless $opt{unmodified};
 	push @values, s/$valmatch/\n/ && $1;
 	push @order, $1 if length $1;
 	if (defined $opt{trim} and defined $1) {
@@ -182,7 +183,7 @@ sub color {
 
 sub sival {
 	my $unit = int(log(abs $_[0] || 1) / log(10) - 3*($_[0] < 1) + 1e-15);
-	my $float = $_[0] !~ /^0*[-0-9]{1,3}$/;
+	my $float = $_[0] !~ /\A0*[-0-9]{1,3}\z/;
 	sprintf('%3.*f%1s',
 		$float && ($unit % 3) == ($unit < 0),  # tenths
 		$_[0] / 1000 ** int($unit/3),   # number
