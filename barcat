@@ -4,7 +4,7 @@ use warnings;
 use utf8;
 use List::Util qw( min max sum );
 use open qw( :std :utf8 );
-use re '/ms';
+use re '/msx';
 
 our $VERSION = '1.07';
 
@@ -17,7 +17,7 @@ GetOptions(\%opt,
 		eval {
 			local $_ = $_[1];
 			$opt{anchor} = /\A[0-9]+\z/ ? qr/(?:\S*\h+){$_}\K/ : qr/$_/;
-		} or die $@ =~ s/(?: at \N+)?\Z/ for option $_[0]/r;
+		} or die $@ =~ s/(?:\ at\ \N+)?\Z/ for option $_[0]/r;
 	},
 	'human-readable|H!',
 	'interval|t:i',
@@ -39,7 +39,7 @@ GetOptions(\%opt,
 		my ($optname, $optval) = @_;
 		$optval ||= 0;
 		($opt{hidemin}, $opt{hidemax}) =
-		$optval =~ m/\A (?: ([0-9]+)? - )? ([0-9]+)? \z/x or die(
+		$optval =~ m/\A (?: ([0-9]+)? - )? ([0-9]+)? \z/ or die(
 			"Value \"$optval\" invalid for option limit",
 			" (range expected)\n"
 		);
@@ -81,7 +81,7 @@ GetOptions(\%opt,
 		local $/;
 		my $pod = readline *DATA;
 		$pod =~ s/^=over\K/ 25/;  # indent options list
-		$pod =~ s/^=item\ \N*\n\n\N*\n\K(?:(?:^=over.*?^=back\n)?(?!=)\N*\n)*/\n/g;
+		$pod =~ s/^=item\ \N*\n\n\N*\n\K (?:(?:^=over.*?^=back\n)?(?!=)\N*\n)*/\n/g;
 		$pod =~ s/[.,](?=\n)//g;  # trailing punctuation
 		$pod =~ s/^=item\ \K(?=--)/____/g;  # align long options
 		# abbreviate <variable> indicators
