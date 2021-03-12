@@ -222,13 +222,22 @@ if ($opt{markers} and $size > 0) {
 				return sum(@order) / @order;
 			}
 			elsif ($func =~ /\A([0-9.]+)v\z/) {
+				die "Invalid marker $char: percentile $1 out of bounds\n" if $1 > 100;
 				my $index = $#order * $1 / 100;
 				return ($order[$index] + $order[$index + .5]) / 2;
 			}
-			else {
+			elsif ($func =~ /\A-?[0-9.]+\z/) {
 				return $func;
 			}
-		} - $minval;
+			else {
+				die "Unknown marker $char: $func\n";
+			}
+		};
+		defined $pos or do {
+			warn $@ if $@;
+			next;
+		};
+		$pos -= $minval;
 		$pos >= 0 or next;
 		color(36) for $barmark[$pos * $size] = $char;
 	}
