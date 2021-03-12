@@ -210,7 +210,7 @@ my $lenval = $opt{'value-length'} // max map { length } @order;
 my $len    = defined $opt{trim} && $opt{trim} <= 0 ? -$opt{trim} + 1 :
 	max map { length $values[$_] && length $lines[$_] }
 		0 .. min $#lines, $opt{hidemax} || ();  # left padding
-my $size   = $range &&
+my $size   = defined $opt{width} && $range &&
 	($opt{width} - $lenval - $len) / $range;  # bar multiplication
 
 my @barmark;
@@ -267,7 +267,7 @@ while ($nr <= $#lines) {
 	if ($opt{spark}) {
 		say '' if $opt{width} and $nr and $nr % $opt{width} == 0;
 		print color($color), $opt{spark}->[
-			!$val ? 0 : # blank
+			!$val || !$#{$opt{spark}} ? 0 : # blank
 			$val == $order[0] ? -1 : # max
 			$val == $order[-1] ? 1 : # min
 			$#{$opt{spark}} < 3 ? 1 :
