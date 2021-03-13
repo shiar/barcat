@@ -35,7 +35,12 @@ do
 
 	set -- barcat
 	[ -r "$input" ] && set -- "$@" "$input"
-	case "$name" in *\ -*) set -- "$@" -"${name#* -}";; esac
+	case "$name" in
+		*\ -*)
+			args="${name#* -}"
+			set -- "$@" -"${args% [?|]*}"
+			;;
+	esac
 	case "$name" in
 		*' ?' ) set -- sh -c "\$0 \$@ 2>/dev/null" "$@";;
 		*' ?'*) set -- sh -c "\$0 \$@ | test \$\? = ${name#* \?}" "$@";;
