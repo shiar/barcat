@@ -1,6 +1,7 @@
 #!/usr/bin/env perl
 use 5.014;
 use warnings;
+use re '/ms';
 use Test::More;
 
 my %CMDARGS = (
@@ -20,7 +21,20 @@ while (readline $input) {
 	/^\h/ or next;
 	chomp;
 
-	my ($name) = /[\h(]*([^|]+)/;
+	# compose an identifier from significant parts
+	do {
+		s/^\h+//;             # indentation
+		s/\\\n\s*//g;         # line continuations
+		s/^[(\h]+//;          # subshell
+		s/^echo\ .*?\|\s*//;  # preceding input
+		s/\|.*//;             # subsequent pipes
+		s/^cat\ //;           # local file
+		s/^curl\ // and do {  # remote url
+			s/\ -.+//g;                 # download options
+			s{//[^/\s]+/\K\S*(?=/)}{};  # subdirectories
+			s{^https?://}{};            # http protocol
+		};
+	} for my $name = $_;
 
 	# prepare shell command to execute
 	my $cmd = $_;
@@ -28,13 +42,13 @@ while (readline $input) {
 		$subcmd .= " \\K", $args .= ' ' unless $subcmd =~ m/\\K/;
 		$cmd =~ s/\b$subcmd/$args/;
 	}
-	$cmd =~ s/'/'\\''/g, $cmd = "bash -c 'set -o pipefail\n$cmd'";
+	$cmd =~ s/'/'\\''/g, $cmd = "  bash -c 'set -o pipefail\n$cmd'";
 
 	# run and report unexpected results
 	ok(eval {
 		qx($cmd) or return;
 		return $? == 0;
-	}, $name);
+	}, $name) or diag($cmd);
 }
 
 done_testing();
