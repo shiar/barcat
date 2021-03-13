@@ -556,12 +556,12 @@ In PostgreSQL from within the client:
 
 Earthquakes worldwide magnitude 1+ in the last 24 hours:
 
-    https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/1.0_day.csv |
+    curl https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/1.0_day.csv |
     column -tns, | barcat -f4 -u -l80%
 
 External datasets, like movies per year:
 
-    curl https://github.com/prust/wikipedia-movie-data/raw/master/movies.json |
+    curl https://github.com/prust/wikipedia-movie-data/raw/master/movies.json -L |
     perl -054 -nlE 'say if s/^"year"://' | uniq -c | barcat
 
 But please get I<jq> to process JSON
@@ -569,7 +569,7 @@ and replace the manual selection by C<< jq '.[].year' >>.
 
 Pokémon height comparison:
 
-    curl https://github.com/Biuni/PokemonGO-Pokedex/raw/master/pokedex.json |
+    curl https://github.com/Biuni/PokemonGO-Pokedex/raw/master/pokedex.json -L |
     jq -r '.pokemon[] | [.height,.num,.name] | join(" ")' | barcat
 
 USD/EUR exchange rate from CSV provided by the ECB:
@@ -580,7 +580,7 @@ USD/EUR exchange rate from CSV provided by the ECB:
 
 Total population history in XML from the World Bank:
 
-    curl http://api.worldbank.org/v2/country/1W/indicator/SP.POP.TOTL |
+    curl http://api.worldbank.org/v2/country/1W/indicator/SP.POP.TOTL -L |
     xmllint --xpath '//*[local-name()="date" or local-name()="value"]' - |
     sed -r 's,</wb:value>,\n,g; s,(<[^>]+>)+, ,g' | barcat -f1 -H
 
