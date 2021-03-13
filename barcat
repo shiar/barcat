@@ -308,7 +308,7 @@ say $opt{palette} ? color(0) : '' if $opt{spark};
 
 sub show_stat {
 	if ($opt{hidemin} or $opt{hidemax}) {
-		printf '%s of ', sum(grep { length }
+		printf '%.8g of ', sum(grep { length }
 			@values[$opt{hidemin} .. ($opt{hidemax} || @lines) - 1]
 		) // 0;
 	}
