@@ -2,7 +2,12 @@
 use 5.014;
 use warnings;
 use re '/ms';
+
 use Test::More;
+{ # silence fail diagnostics because of single caller
+	no warnings 'redefine';
+	sub Test::Builder::_ok_debug {}
+}
 
 my %CMDARGS = (
 	ping => '-c 1',
@@ -46,9 +51,11 @@ while (readline $input) {
 
 	# run and report unexpected results
 	ok(eval {
-		qx($cmd) or return;
-		return $? == 0;
-	}, $name) or diag($cmd);
+		my $output = qx($cmd);
+		$? == 0 or die "error status ", $? >> 8, "\n";
+		length $output or die "empty output\n";
+		return 1;
+	}, $name) or diag("Failed command\n$cmd\nfrom $filename line $.: $@");
 }
 
 done_testing();
