@@ -81,7 +81,10 @@ GetOptions(\%opt,
 		local $/ = undef;  # slurp
 		my $pod = readline *DATA;
 		$pod =~ s/^=over\K/ 25/;  # indent options list
-		$pod =~ s/^=item\ \N*\n\n\N*\n\K (?:(?:^=over.*?^=back\n)?(?!=)\N*\n)*/\n/g;
+		$pod =~ s{
+			^=item \h \N*\n\n \N*\n \K  # first line
+			(?: (?: ^=over .*? ^=back\n )? (?!=) \N*\n )*
+		}{\n}g;  # abbreviate options
 		$pod =~ s/[.,](?=\n)//g;  # trailing punctuation
 		$pod =~ s/^=item\ \K(?=--)/____/g;  # align long options
 		# abbreviate <variable> indicators
