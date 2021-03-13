@@ -40,7 +40,7 @@ do
 		*' ?' ) set -- sh -c "\$0 \$@ 2>/dev/null" "$@";;
 		*' ?'*) set -- sh -c "\$0 \$@ | test \$\? = ${name#* \?}" "$@";;
 		*' |'*) set -- sh -c "\$0 \$@ | ${name#* |}" "$@";;
-		*)      set -- "$1" $2 $3
+		*)      eval set -- "$1" $2 $3
 	esac
 
 	if test -n "$regenerate"
