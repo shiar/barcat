@@ -130,6 +130,19 @@ $opt{hidemin} = ($opt{hidemin} || 1) - 1;
 $opt{input} = (@ARGV && $ARGV[0] =~ m/\A[-0-9]/) ? \@ARGV : undef
 	and undef $opt{interval};
 
+$opt{'sum-format'} = sub { sprintf '%.8g', $_[0] };
+$opt{'calc-format'} = sub { sprintf '%*.*f', 0, 2, $_[0] };
+$opt{'value-format'} = $opt{units} && sub {
+	my $unit = int(log(abs $_[0] || 1) / log(10) - 3*($_[0] < 1) + 1e-15);
+	my $float = $_[0] !~ /^0*[-0-9]{1,3}$/;
+	sprintf('%3.*f%1s',
+		$float && ($unit % 3) == ($unit < 0),  # tenths
+		$_[0] / 1000 ** int($unit/3),   # number
+		$#{$opt{units}} * 1.5 < abs $unit ? "e$unit" : $opt{units}->[$unit/3]
+	);
+};
+
+
 my (@lines, @values, @order);
 
 $SIG{$_} = \&show_stat for $opt{'signal-stat'} || ();
@@ -184,16 +197,6 @@ sub color {
 	$opt{color} and defined $_[0] or return '';
 	return "\e[$_[0]m" if defined wantarray;
 	$_ = color(@_) . $_ . color(0) if defined;
-}
-
-sub sival {
-	my $unit = int(log(abs $_[0] || 1) / log(10) - 3*($_[0] < 1) + 1e-15);
-	my $float = $_[0] !~ /\A0*[-0-9]{1,3}\z/;
-	return sprintf('%3.*f%1s',
-		$float && ($unit % 3) == ($unit < 0),  # tenths
-		$_[0] / 1000 ** int($unit/3),   # number
-		$#{$opt{units}} * 1.5 < abs $unit ? "e$unit" : $opt{units}->[$unit/3]
-	);
 }
 
 sub show_lines {
@@ -289,7 +292,8 @@ while ($nr <= $#lines) {
 	}
 
 	if (length $val) {
-		$val = $opt{units} ? sival($val) : sprintf "%*s", $lenval, $val;
+		$val = $opt{'value-format'} ? $opt{'value-format'}->($val) :
+			sprintf "%*s", $lenval, $val;
 		color($color) for $val;
 	}
 	my $line = $lines[$nr] =~ s/\n/$val/r;
@@ -308,18 +312,18 @@ say $opt{palette} ? color(0) : '' if $opt{spark};
 
 sub show_stat {
 	if ($opt{hidemin} or $opt{hidemax}) {
-		printf '%.8g of ', sum(grep { length }
+		printf '%.8g of ', $opt{'sum-format'}->(sum(grep { length }
 			@values[$opt{hidemin} .. ($opt{hidemax} || @lines) - 1]
-		) // 0;
+		) // 0);
 	}
 	if (@order) {
 		my $total = sum @order;
-		printf '%s total', color(1) . sprintf('%.8g', $total) . color(0);
+		printf '%s total', color(1) . $opt{'sum-format'}->($total) . color(0);
 		printf ' in %d values', scalar @order;
 		printf ' over %d lines', scalar @lines if @order != @lines;
 		printf(' (%s min, %s avg, %s max)',
 			color(31) . $order[-1] . color(0),
-			color(36) . (sprintf '%*.*f', 0, 2, $total / @order) . color(0),
+			color(36) . $opt{'calc-format'}->($total / @order) . color(0),
 			color(32) . $order[0] . color(0),
 		);
 	}
