@@ -2,6 +2,7 @@
 use 5.014;
 use warnings;
 use re '/ms';
+use IPC::Run 'run';
 
 use Test::More;
 { # silence fail diagnostics because of single caller
@@ -47,15 +48,15 @@ while (readline $input) {
 		$subcmd .= " \\K", $args .= ' ' unless $subcmd =~ m/\\K/;
 		$cmd =~ s/\b$subcmd/$args/;
 	}
-	$cmd =~ s/'/'\\''/g, $cmd = "  bash -c 'set -o pipefail\n$cmd'";
+	my @cmd = (bash => -c => "set -o pipefail\n$cmd");
 
 	# run and report unexpected results
 	ok(eval {
-		my $output = qx($cmd);
+		run(\@cmd, \undef, \my $output);
 		$? == 0 or die "error status ", $? >> 8, "\n";
 		length $output or die "empty output\n";
 		return 1;
-	}, $name) or diag("Failed command\n$cmd\nfrom $filename line $.: $@");
+	}, $name) or diag("Failed command\n@cmd\nfrom $filename line $.: $@");
 }
 
 done_testing();
