@@ -52,8 +52,9 @@ while (readline $input) {
 
 	# run and report unexpected results
 	ok(eval {
-		run(\@cmd, \undef, \my $output);
-		$? == 0 or die "error status ", $? >> 8, "\n";
+		run(\@cmd, \undef, \my $output, \my $error);
+		die("error message:\n    $error\n") if $error;
+		$? == 0 or die "exit status ", $? >> 8, "\n";
 		length $output or die "empty output\n";
 		return 1;
 	}, $name) or diag("Failed command\n@cmd\nfrom $filename line $.: $@");
