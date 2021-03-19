@@ -11,6 +11,7 @@ our $VERSION = '1.07';
 use Getopt::Long '2.33', qw( :config gnu_getopt );
 my %opt;
 GetOptions(\%opt,
+	'ascii|a!',
 	'color|c!',
 	'C' => sub { $opt{color} = 0 },
 	'field|f=s' => sub {
@@ -50,7 +51,9 @@ GetOptions(\%opt,
 		$opt{'graph-format'} = substr $_[1], 0, 1;
 	},
 	'spark:s' => sub {
-		$opt{spark} = [split //, $_[1] || ' ▁▂▃▄▅▆▇█'];
+		$opt{spark} = [split //,
+			$_[1] || ($opt{ascii} ? ' ..oOO' : ' ▁▂▃▄▅▆▇█')
+		];
 	},
 	'palette=s' => sub {
 		$opt{palette} = {
@@ -119,7 +122,8 @@ $opt{width} ||= $ENV{COLUMNS} || qx(tput cols) || 80 unless $opt{spark};
 $opt{color} //= -t *STDOUT;  # enable on tty
 $opt{'graph-format'} //= '-';
 $opt{trim}   *= $opt{width} / 100 if $opt{trimpct};
-$opt{units}   = [split //, ' kMGTPEZYyzafpnμm'] if $opt{'human-readable'};
+$opt{units}   = [split //, ' kMGTPEZYyzafpn'.($opt{ascii} ? 'u' : 'μ').'m']
+	if $opt{'human-readable'};
 $opt{anchor} //= qr/\A/;
 $opt{'value-length'} = 6 if $opt{units};
 $opt{'value-length'} = 1 if $opt{unmodified};
@@ -179,7 +183,7 @@ while (defined ($_ = $opt{input} ? shift @{ $opt{input} } : readline)) {
 		}
 		elsif (length > $trimpos) {
 			# cut and replace (intentional lvalue for speed, contrary to PBP)
-			substr($_, $trimpos - 1) = '…';
+			substr($_, $trimpos - 1) = $opt{ascii} ? '>' : '…';
 		}
 	}
 	push @lines, $_;
@@ -367,6 +371,12 @@ you'll need a larger animal like I<gnuplot>.
 =head1 OPTIONS
 
 =over
+
+=item -a, --[no-]ascii
+
+Restrict user interface to ASCII characters,
+replacing default UTF-8 by their closest approximation.
+Input is always interpreted as UTF-8 and shown as is.
 
 =item -c, --[no-]color
 
