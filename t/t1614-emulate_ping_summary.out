@@ -1,0 +1,3 @@
+barcat -fe= -L-1 -s --report 'rtt min/avg/max/mdev = ${0v}/${avg; $_=sprintf"%.3f",$_}/${100v}/${mdev; $_=sprintf"%.03f",$_} ms   ' input/ping.txt
+rtt min/avg/max/mdev = 9.383/9.968/11.810/0.674 ms   
+rtt min/avg/max/mdev = 9.38/9.956/11.8/0.615 ms   

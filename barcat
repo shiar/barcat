@@ -414,6 +414,12 @@ sub _calc {
 	elsif ($func eq 'avg') {
 		return calc('sum') / @{$order};
 	}
+	elsif ($func eq 'mdev') {
+		#TODO square each value?
+		my $avg = calc('avg');
+		my $median = calc('50v');
+		return sqrt(abs($avg**2 - $median**2)) / 2;
+	}
 	elsif ($func =~ /\A([0-9.]+)v\z/) {
 		$1 <= 100 or die(
 			"percentile $1 out of bounds\n"
