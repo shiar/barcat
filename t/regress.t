@@ -68,8 +68,15 @@ do
 
 	if test 0 != $?
 	then
-		fail_count=$((fail_count+1))
-		color 1\;31
+		case "$name" in
+		*' #TODO')
+			color 33
+			;;
+		*)
+			fail_count=$((fail_count+1))
+			color 1\;31
+		esac
+
 		printf 'not '
 	fi
 	echo "ok $test_count - $name"
