@@ -326,9 +326,9 @@ sub show_stat {
 		printf ' in %d values', scalar @order;
 		printf ' over %d lines', scalar @lines if @order != @lines;
 		printf(' (%s min, %s avg, %s max)',
-			color(31) . $order[-1] . color(0),
-			color(36) . $opt{'calc-format'}->($total / @order) . color(0),
-			color(32) . $order[0] . color(0),
+			color(31) . ($opt{'value-format'} || sub {$_[0]})->($order[-1]) . color(0),
+			color(36) . ($opt{'value-format'} || $opt{'calc-format'})->($total / @order) . color(0),
+			color(32) . ($opt{'value-format'} || sub {$_[0]})->($order[0]) . color(0),
 		);
 	}
 	say '';
