@@ -209,12 +209,21 @@ sub show_lines {
 state $nr =
 	$opt{hidemin} < 0 ? @lines + $opt{hidemin} + 1 :
 	$opt{hidemin};
-@lines or return;
 @lines > $nr or return;
+
+my $limit = $#lines;
+if (defined $opt{hidemax}) {
+	if ($opt{hidemin} and $opt{hidemin} < 0) {
+		$limit -= $opt{hidemax} - 1;
+	}
+	else {
+		$limit = $opt{hidemax} - 1;
+	}
+}
 
 @order = sort { $b <=> $a } @order unless tied @order;
 my $maxval = $opt{maxval} // (
-	$opt{hidemax} ? max grep { length } @values[0 .. $opt{hidemax} - 1] :
+	$opt{hidemax} ? max grep { length } @values[$nr .. $limit] :
 	$order[0]
 ) // 0;
 my $minval = $opt{minval} // min $order[-1] // (), 0;
@@ -277,8 +286,7 @@ say(
 	color(0),
 ) if $opt{header};
 
-while ($nr <= $#lines) {
-	$nr >= $opt{hidemax} and last if defined $opt{hidemax};
+while ($nr <= $limit) {
 	my $val = $values[$nr];
 	my $rel = length $val && $range && ($val - $minval) / $range;
 	my $color = !length $val || !$opt{palette} ? undef :
@@ -320,8 +328,11 @@ say $opt{palette} ? color(0) : '' if $opt{spark};
 sub show_stat {
 	if ($opt{hidemin} or $opt{hidemax}) {
 		my $linemin = $opt{hidemin};
-		$linemin += @lines if $linemin < 0;
 		my $linemax = ($opt{hidemax} || @lines) - 1;
+		if ($linemin < 0) {
+			$linemin += @lines;
+			$linemax = @lines - $linemax;
+		}
 		printf '%.8g of ', $opt{'sum-format'}->(
 			sum(grep {length} @values[$linemin .. $linemax]) // 0
 		);
