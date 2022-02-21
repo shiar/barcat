@@ -78,7 +78,7 @@ GetOptions(\%opt,
 		exit;
 	},
 	'usage|h' => sub {
-		local $/;
+		local $/ = undef;  # slurp
 		my $pod = readline *DATA;
 		$pod =~ s/^=over\K/ 25/;  # indent options list
 		$pod =~ s/^=item\ \N*\n\n\N*\n\K (?:(?:^=over.*?^=back\n)?(?!=)\N*\n)*/\n/g;
@@ -124,7 +124,7 @@ $opt{'signal-stat'} //= exists $SIG{INFO} ? 'INFO' : 'QUIT';
 $opt{markers} //= '=avg >31.73v <68.27v +50v |0';
 $opt{palette} //= $opt{color} && [31, 90, 32];
 $opt{hidemin} = ($opt{hidemin} || 1) - 1;
-$opt{input} = @ARGV && $ARGV[0] =~ m/\A[-0-9]/ ? \@ARGV : undef
+$opt{input} = (@ARGV && $ARGV[0] =~ m/\A[-0-9]/) ? \@ARGV : undef
 	and undef $opt{interval};
 
 my (@lines, @values, @order);
@@ -152,11 +152,12 @@ my $valmatch = qr<
 while (defined ($_ = $opt{input} ? shift @{ $opt{input} } : readline)) {
 	s/\r?\n\z//;
 	s/\A\h*// unless $opt{unmodified};
-	push @values, s/$valmatch/\n/ && $1;
-	push @order, $1 if length $1;
-	if (defined $opt{trim} and defined $1) {
+	my $valnum = s/$valmatch/\n/ && $1;
+	push @values, $valnum;
+	push @order, $valnum if length $valnum;
+	if (defined $opt{trim} and defined $valnum) {
 		my $trimpos = abs $opt{trim};
-		$trimpos -= length $1 if $opt{unmodified};
+		$trimpos -= length $valnum if $opt{unmodified};
 		if ($trimpos <= 1) {
 			$_ = substr $_, 0, 2;
 		}
