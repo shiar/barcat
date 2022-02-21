@@ -162,6 +162,7 @@ while (defined ($_ = $opt{input} ? shift @{ $opt{input} } : readline)) {
 			$_ = substr $_, 0, 2;
 		}
 		elsif (length > $trimpos) {
+			# cut and replace (intentional lvalue for speed, contrary to PBP)
 			substr($_, $trimpos - 1) = '…';
 		}
 	}
