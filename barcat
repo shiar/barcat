@@ -112,18 +112,21 @@ $opt{input} = (@ARGV && $ARGV[0] =~ m/\A[-0-9]/) ? \@ARGV : undef
 $opt{'sum-format'} = sub { sprintf '%.8g', $_[0] };
 $opt{'calc-format'} = sub { sprintf '%*.*f', 0, 2, $_[0] };
 $opt{'value-format'} = $opt{units} && sub {
-	my $unit = int(
+	my $unit = (
 		log(abs $_[0] || 1) / log(10)
 		- 3 * (abs($_[0]) < .9995)   # shift to smaller unit if below 1
-		- log(.9995) / log(10)  # 3 digits rounding up
 		+ 1e-15  # float imprecision
 	);
-	my $float = $_[0] !~ /^0*[-0-9]{1,3}$/;
+	my $decimal = ($unit % 3) == ($unit < 0);
+	$unit -= log($decimal ? .995 : .9995) / log(10);  # rounded
+	$decimal = ($unit % 3) == ($unit < 0);
+	$decimal &&= $_[0] !~ /^-?0*[0-9]{1,3}$/;  # integer 0..999
 	sprintf('%*.*f%1s',
 		3 + ($_[0] < 0), # digits plus optional negative sign
-		$float && ($unit % 3) == ($unit < 0),  # tenths
-		$_[0] / 1000 ** int($unit/3),   # number
-		$#{$opt{units}} * 1.5 < abs $unit ? "e$unit" : $opt{units}->[$unit/3]
+		$decimal,  # tenths
+		$_[0] / 1000 ** int($unit/3),  # number
+		$#{$opt{units}} * 1.5 < abs $unit ? sprintf('e%d', $unit) :
+			$opt{units}->[$unit/3]  # suffix
 	);
 };
 
