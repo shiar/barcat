@@ -114,12 +114,13 @@ $opt{'calc-format'} = sub { sprintf '%*.*f', 0, 2, $_[0] };
 $opt{'value-format'} = $opt{units} && sub {
 	my $unit = int(
 		log(abs $_[0] || 1) / log(10)
-		- 3 * ($_[0] < .9995)   # shift to smaller unit if below 1
+		- 3 * (abs($_[0]) < .9995)   # shift to smaller unit if below 1
 		- log(.9995) / log(10)  # 3 digits rounding up
 		+ 1e-15  # float imprecision
 	);
 	my $float = $_[0] !~ /^0*[-0-9]{1,3}$/;
-	sprintf('%3.*f%1s',
+	sprintf('%*.*f%1s',
+		3 + ($_[0] < 0), # digits plus optional negative sign
 		$float && ($unit % 3) == ($unit < 0),  # tenths
 		$_[0] / 1000 ** int($unit/3),   # number
 		$#{$opt{units}} * 1.5 < abs $unit ? "e$unit" : $opt{units}->[$unit/3]
