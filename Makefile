@@ -1,0 +1,2 @@
+barcat: reformat-podusage
+	./$< $@

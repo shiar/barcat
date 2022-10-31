@@ -82,33 +82,7 @@ GetOptions(\%opt,
 		exit;
 	},
 	'usage|h' => sub {
-		local $/ = undef;  # slurp
-		my $pod = readline *DATA;
-		$pod =~ s/^=over\K/ 25/;  # indent options list
-		$pod =~ s{
-			^=item \h \N*\n\n \N*\n \K  # first line
-			(?: (?: ^=over .*? ^=back\n )? (?!=) \N*\n )*
-		}{\n}g;  # abbreviate options
-		$pod =~ s/[.,](?=\n)//g;  # trailing punctuation
-		$pod =~ s/^=item\ \K(?=--)/____/g;  # align long options
-		# abbreviate <variable> indicators
-		$pod =~ s/\Q>.../s>/g;
-		$pod =~ s/<(?:number|count|seconds)>/N/g;
-		$pod =~ s/<character(s?)>/\Uchar$1/g;
-		$pod =~ s/\Q | /|/g;
-		$pod =~ s/(?<!\w)<([a-z]+)>/\U$1/g;  # uppercase
-
-		require Pod::Usage;
-		my $parser = Pod::Usage->new(USAGE_OPTIONS => {
-			-indent => 2, -width => 78,
-		});
-		$parser->select('SYNOPSIS', 'OPTIONS');
-		$parser->output_string(\my $contents);
-		$parser->parse_string_document($pod);
-
-		$contents =~ s/\n(?=\n\h)//msg;  # strip space between items
-		$contents =~ s/^\ \ \K____/    /g;  # nbsp substitute
-		print $contents;
+		/^=/ ? last : print for readline *DATA;  # text between __END__ and pod
 		exit;
 	},
 	'help|?'  => sub {
@@ -362,6 +336,37 @@ sub show_exit {
 show_exit();
 
 __END__
+Usage:
+  barcat [OPTIONS] [FILES|NUMBERS]
+
+Options:
+  -a, --[no-]ascii         Restrict user interface to ASCII characters
+  -c, --[no-]color         Force colored output of values and bar markers
+  -f, --field=(N|REGEXP)   Compare values after a given number of whitespace
+                           separators
+      --header             Prepend a chart axis with minimum and maximum
+                           values labeled
+  -H, --human-readable     Format values using SI unit prefixes
+  -t, --interval[=(N|-LINES)]
+                           Output partial progress every given number of
+                           seconds or input lines
+  -l, --length=[-]SIZE[%]  Trim line contents (between number and bars)
+  -L, --limit[=(N|-LAST|START-[END])]
+                           Stop output after a number of lines
+      --graph-format=CHAR  Glyph to repeat for the graph line
+  -m, --markers=FORMAT     Statistical positions to indicate on bars
+      --min=N, --max=N     Bars extend from 0 or the minimum value if lower
+      --palette=(PRESET|COLORS)
+                           Override colors of parsed numbers
+      --spark[=CHARS]      Replace lines by sparklines
+  -s, --stat               Total statistics after all data
+  -u, --unmodified         Do not reformat values, keeping leading whitespace
+      --value-length=SIZE  Reserved space for numbers
+  -w, --width=COLUMNS      Override the maximum number of columns to use
+  -h, --usage              Overview of available options
+      --help               Full documentation
+      --version            Version information
+
 =encoding utf8
 
 =head1 NAME

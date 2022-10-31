@@ -1,0 +1,45 @@
+#!/usr/bin/env perl
+use 5.014;
+use warnings;
+use open qw( :std :utf8 );
+use re '/msx';
+
+our $VERSION = '1.00';
+
+local $/ = undef;  # slurp
+my $source = readline;
+my $pod = $source;
+$pod =~ s/^=over\K/ 25/;  # indent options list
+$pod =~ s{
+	^=item \h \N*\n\n \N*\n \K  # first line
+	(?: (?: ^=over .*? ^=back\n )? (?!=) \N*\n )*
+}{\n}g;  # abbreviate options
+$pod =~ s/[.,](?=\n)//g;  # trailing punctuation
+$pod =~ s/^=item\ \K(?=--)/____/g;  # align long options
+# abbreviate <variable> indicators
+$pod =~ s/\Q>.../s>/g;
+$pod =~ s/<(?:number|count|seconds)>/N/g;
+$pod =~ s/<character(s?)>/\Uchar$1/g;
+$pod =~ s/\Q | /|/g;
+$pod =~ s/(?<!\w)<([a-z]+)>/\U$1/g;  # uppercase
+
+require Pod::Usage;
+my $parser = Pod::Usage->new(USAGE_OPTIONS => {
+	-indent => 2, -width => 78,
+});
+$parser->select('SYNOPSIS', 'OPTIONS');
+$parser->output_string(\my $usage);
+$parser->parse_string_document($pod);
+
+$usage =~ s/\n(?=\n\h)//msg;  # strip space between items
+$usage =~ s/^\ \ \K____/    /g;  # nbsp substitute
+
+if ($ARGV eq '-') {
+	# custom formatted minimal usage text from pod document
+	print $usage;
+}
+elsif (open my $rewrite, '>', $ARGV) {
+	# replace perl code between program end and pod start
+	$source =~ s/^__END__\n \K .*? (?=^=)/$usage/;
+	print {$rewrite} $source;
+}
