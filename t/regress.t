@@ -26,7 +26,12 @@ do
 	esac
 done
 
-for candidate in ${@:-t*.out}
+params="${@:-t*.out}"
+color 0\;36
+echo "1..$(echo $params | wc -w)"
+color 0
+
+for candidate in $params
 do
 	test_count=$((test_count+1))
 	file="${candidate%.out}"
@@ -92,8 +97,6 @@ else
 	echo "# failed $fail_count among $test_count test(s)"
 	fail_count=1  # exit code
 fi
-
-color 0\;36
-echo "1..$test_count"
 color 0
+
 exit $fail_count
