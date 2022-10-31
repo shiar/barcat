@@ -291,6 +291,10 @@ while ($nr <= $limit) {
 		color($color) for $val;
 	}
 	my $line = $lines[$nr] =~ s/\n/$val/r;
+	if (not length $val) {
+		say $line;
+		next;
+	}
 	printf '%-*s', $len + length($val), $line;
 	print $barmark[$_] // $opt{'graph-format'}
 		for 1 .. $size && (($values[$nr] || 0) - $minval) * $size + .5;
