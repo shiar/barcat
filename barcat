@@ -6,7 +6,7 @@ use List::Util qw( min max sum );
 use open qw( :std :utf8 );
 use re '/msx';
 
-our $VERSION = '1.07';
+our $VERSION = '1.08';
 
 my %opt;
 if (@ARGV) {
@@ -79,8 +79,9 @@ GetOptions(\%opt,
 	'signal-stat=s',
 	'unmodified|u!',
 	'width|w=i',
-	'version' => sub {
-		say "barcat version $VERSION";
+	'version|V' => sub {
+		my $mascot = $opt{ascii} ? '=^,^=' : 'ฅ^•ﻌ•^ฅ';
+		say "barcat $mascot version $VERSION";
 		exit;
 	},
 	'usage|h' => sub {
@@ -380,14 +381,14 @@ Options:
       --value-length=SIZE  Reserved space for numbers
   -w, --width=COLUMNS      Override the maximum number of columns to use
   -h, --usage              Overview of available options
-      --help               Full documentation
-      --version            Version information
+      --help               Full pod documentation
+  -V, --version            Version information
 
 =encoding utf8
 
 =head1 NAME
 
-barcat - graph to visualize input values
+barcat - concatenate texts with graph to visualize values
 
 =head1 SYNOPSIS
 
@@ -563,10 +564,10 @@ Overview of available options.
 
 =item --help
 
-Full documentation
-rendered by perldoc.
+Full pod documentation
+as rendered by perldoc.
 
-=item --version
+=item -V, --version
 
 Version information.
 
