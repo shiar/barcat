@@ -1,6 +1,7 @@
 #!/usr/bin/env perl
 use 5.014;
 use warnings;
+use utf8;
 use open qw( :std :utf8 );
 use re '/msx';
 
@@ -33,6 +34,16 @@ $parser->parse_string_document($pod);
 
 $usage =~ s/\n(?=\n\h)//msg;  # strip space between items
 $usage =~ s/^\ \ \K____/    /g;  # nbsp substitute
+
+if (open my $logo, '<', 'mascot.txt') {
+	# append logo lines to top usage lines
+	my @ll = split /\n/, readline $logo;
+	my @ul = split /\n/, $usage, @ll + 1;
+	# centered in empty space on the second (longest) line
+	my $pad = (78 - 1 + length($ul[1]) - length($ll[0])) >> 1;
+	$ul[$_] .= (' ' x ($pad - length($ul[$_]))) . $ll[$_] for 0..$#ll;
+	$usage = join "\n", @ul;
+}
 
 if ($ARGV eq '-') {
 	# custom formatted minimal usage text from pod document

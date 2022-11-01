@@ -352,9 +352,9 @@ sub show_exit {
 show_exit();
 
 __END__
-Usage:
-  barcat [OPTIONS] [FILES|NUMBERS]
-
+Usage:                                               /\_/\
+  barcat [OPTIONS] [FILES|NUMBERS]                  (=•.•=)
+                                                    (u   u)
 Options:
   -a, --[no-]ascii         Restrict user interface to ASCII characters
   -c, --[no-]color         Force colored output of values and bar markers
