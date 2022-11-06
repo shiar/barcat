@@ -55,7 +55,7 @@ GetOptions(\%opt,
 	},
 	'spark:s' => sub {
 		$opt{spark} = [split //,
-			$_[1] || ($opt{ascii} ? ' ..oOO' : ' ▁▂▃▄▅▆▇█')
+			$_[1] || ($opt{ascii} ? ' .oO' : ' ▁▂▃▄▅▆▇█')
 		];
 	},
 	'palette=s' => sub {
@@ -285,10 +285,9 @@ while ($nr <= $limit) {
 		say '' if $opt{width} and $nr and $nr % $opt{width} == 0;
 		print color($color), $opt{spark}->[
 			!$val || !$#{$opt{spark}} ? 0 : # blank
-			$val == $order[0] ? -1 : # max
-			$val == $order[-1] ? 1 : # min
-			$#{$opt{spark}} < 3 ? 1 :
-			$rel * ($#{$opt{spark}} - 3) + 2.5
+			$#{$opt{spark}} < 2 ? 1 :
+			$val >= $order[0] ? -1 :
+			$rel * ($#{$opt{spark}} - 1e-14) + 1
 		];
 		next;
 	}
@@ -532,12 +531,9 @@ or I<greys> and I<fire256> for 256-color variants.
 
 Replace lines by I<sparklines>,
 single characters corresponding to input values.
-A specified sequence of unicode characters will be used for
 Of a specified sequence of unicode characters,
 the first one will be used for non-values,
-the last one for the maximum,
-the second (if any) for the minimum,
-and any remaining will be distributed over the range of values.
+the remainder will be distributed over the range of values.
 Unspecified, block fill glyphs U+2581-2588 will be used.
 
 =item -s, --stat
