@@ -53,11 +53,8 @@ GetOptions(\%opt,
 	'graph-format=s' => sub {
 		$opt{'graph-format'} = substr $_[1], 0, 1;
 	},
-	'spark:s' => sub {
-		$opt{spark} = [split //,
-			$_[1] || ($opt{ascii} ? ' .oO' : ' ▁▂▃▄▅▆▇█')
-		];
-	},
+	'spark|_!',
+	'indicators:s',
 	'palette=s' => sub {
 		$opt{palette} = {
 			fire   => [qw( 90 31 91 33 93 97 96 )],
@@ -109,6 +106,9 @@ $opt{'value-length'} = 1 if $opt{unmodified};
 $opt{'signal-stat'} //= exists $SIG{INFO} ? 'INFO' : 'QUIT';
 $opt{markers} //= '=avg >31.73v <68.27v +50v |0';
 $opt{palette} //= $opt{color} && [31, 90, 32];
+$opt{indicators} = [split //,
+	$opt{indicators} || ($opt{ascii} ? ' .oO' : ' ▁▂▃▄▅▆▇█')
+] if defined $opt{indicators} or $opt{spark};
 $opt{hidemin} = ($opt{hidemin} || 1) - 1;
 $opt{input} = (@ARGV && $ARGV[0] =~ m/\A[-0-9]/) ? \@ARGV : undef
 	and undef $opt{interval};
@@ -220,7 +220,7 @@ my $len    = defined $opt{trim} && $opt{trim} <= 0 ? -$opt{trim} + 1 :
 	max map { length $values[$_] && length $lines[$_] }
 		0 .. min $#lines, $opt{hidemax} || ();  # left padding
 my $size   = defined $opt{width} && $range &&
-	($opt{width} - $lenval - $len) / $range;  # bar multiplication
+	($opt{width} - $lenval - $len - !!$opt{indicators}) / $range;  # bar multiplication
 
 my @barmark;
 if ($opt{markers} and $size > 0) {
@@ -280,17 +280,19 @@ while ($nr <= $limit) {
 		$val == $order[0] ? $opt{palette}->[-1] : # max
 		$val == $order[-1] ? $opt{palette}->[0] : # min
 		$opt{palette}->[ $rel * ($#{$opt{palette}} - 1) + 1 ];
+	my $indicator = $opt{indicators} && $opt{indicators}->[
+		!$val || !$#{$opt{indicators}} ? 0 : # blank
+		$#{$opt{indicators}} < 2 ? 1 :
+		$val >= $order[0] ? -1 :
+		$rel * ($#{$opt{indicators}} - 1e-14) + 1
+	];
 
 	if ($opt{spark}) {
 		say '' if $opt{width} and $nr and $nr % $opt{width} == 0;
-		print color($color), $opt{spark}->[
-			!$val || !$#{$opt{spark}} ? 0 : # blank
-			$#{$opt{spark}} < 2 ? 1 :
-			$val >= $order[0] ? -1 :
-			$rel * ($#{$opt{spark}} - 1e-14) + 1
-		];
+		print color($color), $_ for $indicator;
 		next;
 	}
+	print $indicator if defined $indicator;
 
 	if (length $val) {
 		$val = $opt{'value-format'} ? $opt{'value-format'}->($val) :
@@ -374,7 +376,9 @@ Options:
       --min=N, --max=N     Bars extend from 0 or the minimum value if lower
       --palette=(PRESET|COLORS)
                            Override colors of parsed numbers
-      --spark[=CHARS]      Replace lines by sparklines
+  -_, --spark              Replace lines by sparklines
+      --indicators[=CHARS] Prefix a unicode character corresponding to each
+                           value
   -s, --stat               Total statistics after all data
   -u, --unmodified         Do not reformat values, keeping leading whitespace
       --value-length=SIZE  Reserved space for numbers
@@ -527,13 +531,17 @@ relative to the size of values.
 Predefined color schemes are named I<whites> and I<fire>,
 or I<greys> and I<fire256> for 256-color variants.
 
-=item --spark[=<characters>]
+=item -_, --spark
 
 Replace lines by I<sparklines>,
-single characters corresponding to input values.
-Of a specified sequence of unicode characters,
-the first one will be used for non-values,
-the remainder will be distributed over the range of values.
+single characters (configured by C<--indicators>)
+corresponding to input values.
+
+=item --indicators[=<characters>]
+
+Prefix a unicode character corresponding to each value.
+The first specified character will be used for non-values,
+the remaining sequence will be distributed over the range of values.
 Unspecified, block fill glyphs U+2581-2588 will be used.
 
 =item -s, --stat
@@ -656,7 +664,7 @@ Activity graph of the last days (substitute date C<-v-{}d> on BSD):
 
 Sparkline graphics of simple input given as inline parameters:
 
-	barcat --spark= 3 1 4 1 5 0 9 2 4
+    barcat -_ 3 1 4 1 5 0 9 2 4
 
 =head1 AUTHOR
 
