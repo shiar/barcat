@@ -589,7 +589,7 @@ Compare file sizes (with human-readable numbers):
 
 Memory usage of user processes with long names truncated:
 
-    ps xo %mem,pid,cmd | barcat -l40
+    ps xo rss,pid,cmd | barcat -l40
 
 Monitor network latency from prefixed results:
 
@@ -607,7 +607,7 @@ Letter frequencies in text files:
 
 Number of HTTP requests per day:
 
-    cat log/access.log | cut -d\  -f4 | cut -d: -f1 | uniq -c | barcat
+    cat httpd/access.log | cut -d\  -f4 | cut -d: -f1 | uniq -c | barcat
 
 Any kind of database query with counts, preserving returned alignment:
 
@@ -616,7 +616,7 @@ Any kind of database query with counts, preserving returned alignment:
 
 In PostgreSQL from within the client:
 
-	postgres=> SELECT sin(generate_series(0, 3, .1)) \g |barcat
+    > SELECT sin(generate_series(0, 3, .1)) \g |barcat
 
 Earthquakes worldwide magnitude 1+ in the last 24 hours:
 
@@ -626,10 +626,7 @@ Earthquakes worldwide magnitude 1+ in the last 24 hours:
 External datasets, like movies per year:
 
     curl https://github.com/prust/wikipedia-movie-data/raw/master/movies.json -L |
-    perl -054 -nlE 'say if s/^"year"://' | uniq -c | barcat
-
-But please get I<jq> to process JSON
-and replace the manual selection by C<< jq '.[].year' >>.
+    jq .[].year | uniq -c | barcat
 
 Pokémon height comparison:
 
@@ -640,13 +637,13 @@ USD/EUR exchange rate from CSV provided by the ECB:
 
     curl https://sdw.ecb.europa.eu/export.do \
          -Gd 'node=SEARCHRESULTS&q=EXR.D.USD.EUR.SP00.A&exportType=csv' |
-    grep '^[12]' | barcat -f',\K' --value-length=7
+    barcat -f',\K' --value-length=7
 
 Total population history in XML from the World Bank:
 
-    curl http://api.worldbank.org/v2/country/1W/indicator/SP.POP.TOTL -L |
-    xmllint --xpath '//*[local-name()="date" or local-name()="value"]' - |
-    sed -r 's,</wb:value>,\n,g; s,(<[^>]+>)+, ,g' | barcat -f1 -H
+    curl http://api.worldbank.org/v2/country/1W/indicator/SP.POP.TOTL |
+    xmlstarlet sel -t -m '*/*' -v wb:date -o ' ' -v wb:value -n |
+    barcat -f1 -H
 
 And of course various Git statistics, such commit count by year:
 

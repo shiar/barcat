@@ -13,7 +13,7 @@ use Test::More;
 my %CMDARGS = (
 	ping => '-c 1',
 	curl => '-sS',
-	'cat \Klog/' => '/var/log/apache2/',
+	'cat \Khttpd/' => '/var/log/apache2/',
 );
 
 my $filename = 'barcat';
@@ -22,9 +22,10 @@ open my $input, '<', $filename
 
 local $/ = "\n\n";
 while (readline $input) {
-	# find code snippets in the appropriate section
+	# find scriptlets in the appropriate section
 	/^=head1 EXAMPLES/ ... /^=head1/ or next;
-	/^\h/ or next;
+	/^\h/ or next;  # indented code snippet
+	/\A\h*>/ and next;  # psql prompt
 	chomp;
 
 	# compose an identifier from significant parts
