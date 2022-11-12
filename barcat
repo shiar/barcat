@@ -111,8 +111,8 @@ $opt{'value-length'} = 1 if $opt{unmodified};
 $opt{'signal-stat'} //= exists $SIG{INFO} ? 'INFO' : 'QUIT';
 $opt{markers} //= '=avg >31.73v <68.27v +50v |0';
 $opt{palette} //= $opt{color} && [31, 90, 32];
-$opt{indicators} = [split //,
-	$opt{indicators} || ($opt{ascii} ? ' .oO' : ' ▁▂▃▄▅▆▇█')
+$opt{indicators} = [split //, $opt{indicators} ||
+	($opt{ascii} ? ' .oO' : $opt{spark} ? ' ▁▂▃▄▅▆▇█' : ' ▏▎▍▌▋▊▉█')
 ] if defined $opt{indicators} or $opt{spark};
 $opt{hidemin} = ($opt{hidemin} || 1) - 1;
 $opt{input} = (@ARGV && $ARGV[0] =~ m/\A[-0-9]/) ? \@ARGV : undef
