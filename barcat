@@ -194,7 +194,7 @@ sub color {
 sub show_lines {
 
 state $nr =
-	$opt{hidemin} < 0 ? @lines + $opt{hidemin} + 1 :
+	$opt{hidemin} < 0 ? max(0, @lines + $opt{hidemin} + 1) :
 	$opt{hidemin};
 @lines > $nr or return;
 
@@ -203,7 +203,7 @@ if (defined $opt{hidemax}) {
 	if ($opt{hidemin} and $opt{hidemin} < 0) {
 		$limit -= $opt{hidemax} - 1;
 	}
-	else {
+	elsif ($opt{hidemax} <= $limit) {
 		$limit = $opt{hidemax} - 1;
 	}
 }
