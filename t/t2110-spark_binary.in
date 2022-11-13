@@ -1,1 +1,15 @@
-t1005-float.in
+header:
+-2
+1
+2
+0
+not 0
+0 again
+3
+
+8
+3
+.9
+1
+empty
+

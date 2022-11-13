@@ -291,7 +291,7 @@ while ($nr <= $limit) {
 		$val == $order[-1] ? $opt{palette}->[0] : # min
 		$opt{palette}->[ $rel * ($#{$opt{palette}} - 1) + 1 ];
 	my $indicator = $opt{indicators} && $opt{indicators}->[
-		!$val || !$#{$opt{indicators}} ? 0 : # blank
+		!length($val) || !$#{$opt{indicators}} ? 0 : # blank
 		$#{$opt{indicators}} < 2 ? 1 :
 		$val >= $order[0] ? -1 :
 		$rel * ($#{$opt{indicators}} - 1e-14) + 1
