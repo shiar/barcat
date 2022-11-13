@@ -57,6 +57,7 @@ GetOptions(\%opt,
 	'indicators:s',
 	'palette=s' => sub {
 		$opt{palette} = {
+			''     => [],
 			fire   => [qw( 90 31 91 33 93 97 96 )],
 			fire256=> [map {"38;5;$_"} qw(
 				235  52 88 124 160 196
@@ -75,7 +76,11 @@ GetOptions(\%opt,
 				(map { 201 - $_     } 0..4), # -b
 				196,
 			],
-		}->{$_[1]} // [ split /[^0-9;]/, $_[1] ];
+		}->{$_[1]} // do {
+			my @vals = split /[^0-9;]/, $_[1]
+				or die "Empty palette resulting from \"$_[1]\"\n";
+			\@vals;
+		};
 	},
 	'stat|s!',
 	'signal-stat=s',
