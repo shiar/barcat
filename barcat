@@ -285,7 +285,7 @@ say(
 
 while ($nr <= $limit) {
 	my $val = $values[$nr];
-	my $rel = length $val && $range && ($val - $minval) / $range;
+	my $rel = length $val && $range && min(1, ($val - $minval) / $range);
 	my $color = !length $val || !$opt{palette} ? undef :
 		$val == $order[0] ? $opt{palette}->[-1] : # max
 		$val == $order[-1] ? $opt{palette}->[0] : # min
