@@ -64,6 +64,7 @@ GetOptions(\%opt,
 			)],
 			whites => [qw( 1;30 0;37 1;37 )],
 			greys  => [map {"38;5;$_"} 0, 232..255, 15],
+			random => [map {"38;5;$_"} List::Util::shuffle(17..231)],
 			rainbow=> [map {"38;5;$_"}
 				196, # r
 				(map { 196 + $_*6   } 0..4), # +g
