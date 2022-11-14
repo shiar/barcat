@@ -14,8 +14,8 @@ require Getopt::Long;
 Getopt::Long->import('2.33', qw( :config gnu_getopt ));
 GetOptions(\%opt,
 	'ascii|a!',
-	'color|c!',
-	'C' => sub { $opt{color} = 0 },
+	'color|C!',
+	'M' => sub { $opt{color} = 0 },
 	'field|f=s' => sub {
 		eval {
 			local $_ = $_[1];
@@ -369,7 +369,7 @@ Usage:                                               /\_/\
                                                     (u   u)
 Options:
   -a, --[no-]ascii         Restrict user interface to ASCII characters
-  -c, --[no-]color         Force colored output of values and bar markers
+  -C, --[no-]color         Force colored output of values and bar markers
   -f, --field=(N|REGEXP)   Compare values after a given number of whitespace
                            separators
       --header             Prepend a chart axis with minimum and maximum
@@ -430,12 +430,12 @@ Restrict user interface to ASCII characters,
 replacing default UTF-8 by their closest approximation.
 Input is always interpreted as UTF-8 and shown as is.
 
-=item -c, --[no-]color
+=item -C, --[no-]color
 
 Force colored output of values and bar markers.
 Defaults on if output is a tty,
 disabled otherwise such as when piped or redirected.
-Can also be disabled by setting I<-C>
+Can also be disabled by setting I<-M>
 or the I<NO_COLOR> environment variable.
 
 =item -f, --field=(<number> | <regexp>)
