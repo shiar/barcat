@@ -27,6 +27,7 @@ GetOptions(\%opt,
 		} or die $@ =~ s/(?:\ at\ \N+)?\Z/ for option $_[0]/r;
 	},
 	'human-readable|H!',
+	'sexagesimal!',
 	'interval|t:i',
 	'trim|length|l=s' => sub {
 		my ($optname, $optval) = @_;
@@ -129,7 +130,10 @@ $opt{input} = (@ARGV && $ARGV[0] =~ m/\A[-0-9]/) ? \@ARGV : undef
 
 $opt{'sum-format'} = sub { sprintf '%.8g', $_[0] };
 $opt{'calc-format'} = sub { sprintf '%*.*f', 0, 2, $_[0] };
-$opt{'value-format'} = $opt{units} && sub {
+$opt{'value-format'} = $opt{sexagesimal} ? sub {
+	my $s = $_[0] + .5;
+	sprintf('%d:%02d:%02d', $s/3600, $s/60%60, $s%60);
+} : $opt{units} && sub {
 	my $unit = (
 		log(abs $_[0] || 1) / log(10)
 		- 3 * (abs($_[0]) < .9995)   # shift to smaller unit if below 1
@@ -380,6 +384,7 @@ Options:
       --header             Prepend a chart axis with minimum and maximum
                            values labeled
   -H, --human-readable     Format values using SI unit prefixes
+      --sexagesimal        Convert seconds to HH:MM:SS time format
   -t, --interval[=(N|-LINES)]
                            Output partial progress every given number of
                            seconds or input lines
@@ -466,6 +471,10 @@ Format values using SI unit prefixes,
 turning long numbers like I<12356789> into I<12.4M>.
 Also changes an exponent I<1.602176634e-19> to I<160.2z>.
 Short integers are aligned but kept without decimal point.
+
+=item --sexagesimal
+
+Convert seconds to HH:MM:SS time format.
 
 =item -t, --interval[=(<seconds> | -<lines>)]
 
@@ -613,11 +622,11 @@ Compare media metadata, like image size or play time:
 
     exiftool -T -p '$megapixels ($imagesize) $filename' * | barcat
 
-    exiftool -T -p '$duration# $avgbitrate# $filename' * | barcat -H
+    exiftool -T -p '$duration# $avgbitrate# $filename' * | barcat --sexagesimal
 
     find -type f -print0 | xargs -0 -L1 \
     ffprobe -show_format -of json -v error |
-    jq -r '[.format|.duration,.bit_rate,.filename]|join(" ")' | barcat -H
+    jq -r '.format|.duration+" "+.bit_rate+" "+.filename' | barcat --sex
 
 Memory usage of user processes with long names truncated:
 
