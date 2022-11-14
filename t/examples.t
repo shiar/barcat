@@ -34,6 +34,7 @@ while (readline $input) {
 		s/\\\n\s*//g;         # line continuations
 		s/^[(\h]+//;          # subshell
 		s/^echo\ .*?\|\s*//;  # preceding input
+		s/'(\S+)[^']*'/$1/g;  # quoted arguments
 		s/\|.*//;             # subsequent pipes
 		s/^cat\ //;           # local file
 		s/^curl\ // and do {  # remote url
