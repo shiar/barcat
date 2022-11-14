@@ -105,7 +105,7 @@ GetOptions(\%opt,
 }
 
 $opt{width} ||= $ENV{COLUMNS} || qx(tput cols) || 80 unless $opt{spark};
-$opt{color} //= -t *STDOUT;  # enable on tty
+$opt{color} //= $ENV{NO_COLOR} ? 0 : -t *STDOUT;  # enable on tty
 $opt{'graph-format'} //= '-';
 $opt{trim}   *= $opt{width} / 100 if $opt{trimpct};
 $opt{units}   = [split //, ' kMGTPEZYyzafpn'.($opt{ascii} ? 'u' : 'μ').'m']
@@ -435,6 +435,8 @@ Input is always interpreted as UTF-8 and shown as is.
 Force colored output of values and bar markers.
 Defaults on if output is a tty,
 disabled otherwise such as when piped or redirected.
+Can also be disabled by setting I<-C>
+or the I<NO_COLOR> environment variable.
 
 =item -f, --field=(<number> | <regexp>)
 
