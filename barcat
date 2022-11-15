@@ -116,7 +116,7 @@ $opt{trim}   *= $opt{width} / 100 if $opt{trimpct};
 $opt{units}   = [split //, ' kMGTPEZYyzafpn'.($opt{ascii} ? 'u' : 'μ').'m']
 	if $opt{'human-readable'};
 $opt{anchor} //= qr/\A/;
-$opt{'value-length'} = 6 if $opt{units};
+$opt{'value-length'} = 4 if $opt{units};
 $opt{'value-length'} = 1 if $opt{unmodified};
 $opt{'signal-stat'} //= exists $SIG{INFO} ? 'INFO' : 'QUIT';
 $opt{markers} //= '=avg >31.73v <68.27v +50v |0';
