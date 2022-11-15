@@ -131,8 +131,8 @@ $opt{input} = (@ARGV && $ARGV[0] =~ m/\A[-0-9]/) ? \@ARGV : undef
 $opt{'sum-format'} = sub { sprintf '%.8g', $_[0] };
 $opt{'calc-format'} = sub { sprintf '%*.*f', 0, 2, $_[0] };
 $opt{'value-format'} = $opt{sexagesimal} ? sub {
-	my $s = $_[0] + .5;
-	sprintf('%d:%02d:%02d', $s/3600, $s/60%60, $s%60);
+	my $s = abs($_[0]) + .5;
+	sprintf('%s%d:%02d:%02d', $_[0] < 0 && '-', $s/3600, $s/60%60, $s%60);
 } : $opt{units} && sub {
 	my $unit = (
 		log(abs $_[0] || 1) / log(10)
