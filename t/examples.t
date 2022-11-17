@@ -31,9 +31,10 @@ SKIP: {
 	my $ref = "$filename line $.";
 
 	# store curl downloads
-	s{\bcurl (\S*)(?<param>[^|]*)}{
-		my $url = $1;
-		my @params = split ' ', $+{param};
+	$cmd =~ s{\bcurl (\S*)([^|]*)}{
+		my ($url, $params) = ($1, $2);
+		my $cache = 'sample/data/';
+		-w $cache or skip($url, 2);
 		my $ext = (
 			$cmd =~ /\bxml/     ? 'xml'  :
 			$cmd =~ / jq /      ? 'json' :
@@ -42,13 +43,15 @@ SKIP: {
 		);
 		my ($domain, $path) = $url =~ m{//([^/]+) .*/ ([^/]*) \z}x;
 		$path =~ s/\.$ext\z//;
-		my $cache = join '.', $path =~ tr/./_/r, $domain, $ext;
-		$cache = "sample/data/$cache";
+		$cache .= join '.', $path =~ tr/./_/r, $domain, $ext;
+		my $cached = -e $cache;
 		SKIP: {
-			-e $cache and skip($url, 1);
-			ok(defined runres(['curl', '-sS', $url, '-o', $cache, @params]), $url)
-				or diag("download at $ref: $@");
+			# download to file
+			skip($url, 1) if $cached;
+			$cached = defined runres("curl -sSf $url$params -o $cache");
+			ok($cached, $url) or diag("download at $ref: $@");
 		}
+		$cached or skip($url, 1);
 		"cat $cache"
 	}e;
 
