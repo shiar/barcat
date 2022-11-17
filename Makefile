@@ -7,7 +7,10 @@ barcat: reformat-podusage
 	./$< $@
 
 test:
-	prove -f t/regress.t
+	t/regress.t
+tests:
+	mkdir -p sample/out
+	prove -f
 
 install: barcat
 	$(INSTALL) -d '$(bindir)'

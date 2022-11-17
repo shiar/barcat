@@ -72,6 +72,13 @@ while (readline $input) {
 	my $output = runres($cmd);
 	ok(!!$output, $name)
 		or diag("command at $ref\n$cmd\n" . ($@ || 'empty output'));
+	defined $output or next;
+
+	# record output for review
+	my $numprefix = sprintf '%02d', Test::More->builder->current_test;
+	if (open my $record, '>', "sample/out/t$numprefix-$name.txt") {
+		print {$record} $output;
+	}
 }
 
 sub runres {
