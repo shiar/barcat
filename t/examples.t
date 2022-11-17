@@ -21,6 +21,7 @@ open my $input, '<', $filename
 
 local $/ = "\n\n";
 while (readline $input) {
+SKIP: {
 	# find scriptlets in the appropriate section
 	/^=head1 EXAMPLES/ ... /^=head1/ or next;
 	/^\h/ or next;  # indented code snippet
@@ -68,6 +69,12 @@ while (readline $input) {
 		$cmd =~ s/\b$subcmd/$args/;
 	}
 
+	for my $param ($cmd =~ m{^[(\h]* (\w\S*)}gx) {
+		$param eq 'cat' or
+		runres(['which', $param])
+			or diag("dependency $param missing at $ref\n$cmd"), skip($name, 1);
+	}
+
 	# run and report unexpected results
 	my $output = runres($cmd);
 	ok(!!$output, $name)
@@ -79,7 +86,7 @@ while (readline $input) {
 	if (open my $record, '>', "sample/out/t$numprefix-$name.txt") {
 		print {$record} $output;
 	}
-}
+}}
 
 sub runres {
 	my ($cmd) = @_;
