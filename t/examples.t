@@ -12,7 +12,6 @@ use Test::More;
 
 my %CMDARGS = (
 	ping => '-c 1',
-	curl => '-sS',
 	'cat \Khttpd/' => '/var/log/apache2/',
 );
 
@@ -27,6 +26,30 @@ while (readline $input) {
 	/^\h/ or next;  # indented code snippet
 	/\A\h*>/ and next;  # psql prompt
 	chomp;
+	my $cmd = $_;
+	my $ref = "$filename line $.";
+
+	# store curl downloads
+	s{\bcurl (\S*)(?<param>[^|]*)}{
+		my $url = $1;
+		my @params = split ' ', $+{param};
+		my $ext = (
+			$cmd =~ /\bxml/     ? 'xml'  :
+			$cmd =~ / jq /      ? 'json' :
+			$cmd =~ /[=.]csv\b/ ? 'csv'  :
+			                      'txt'
+		);
+		my ($domain, $path) = $url =~ m{//([^/]+) .*/ ([^/]*) \z}x;
+		$path =~ s/\.$ext\z//;
+		my $cache = join '.', $path =~ tr/./_/r, $domain, $ext;
+		$cache = "sample/data/$cache";
+		SKIP: {
+			-e $cache and skip($url, 1);
+			ok(defined runres(['curl', '-sS', $url, '-o', $cache, @params]), $url)
+				or diag("download at $ref: $@");
+		}
+		"cat $cache"
+	}e;
 
 	# compose an identifier from significant parts
 	do {
@@ -35,31 +58,32 @@ while (readline $input) {
 		s/^[(\h]+//;          # subshell
 		s/^echo\ .*?\|\s*//;  # preceding input
 		s/'(\S+)[^']*'/$1/g;  # quoted arguments
-		s/\|.*//;             # subsequent pipes
-		s/^cat\ //;           # local file
-		s/^curl\ // and do {  # remote url
-			s/\ -.+//g;                 # download options
-			s{//[^/\s]+/\K\S*(?=/)}{};  # subdirectories
-			s{^https?://}{};            # http protocol
-		};
-	} for my $name = $_;
+		s/\h*\|.*//;          # subsequent pipes
+		s/^cat\ (?:\S+\/)?//; # local file
+	} for my $name = $cmd;
 
 	# prepare shell command to execute
-	my $cmd = $_;
 	while (my ($subcmd, $args) = each %CMDARGS) {
 		$subcmd .= " \\K", $args .= ' ' unless $subcmd =~ m/\\K/;
 		$cmd =~ s/\b$subcmd/$args/;
 	}
-	my @cmd = (bash => -c => "set -o pipefail\n$cmd");
 
 	# run and report unexpected results
-	ok(eval {
-		run(\@cmd, \undef, \my $output, \my $error);
-		die("error message:\n    $error\n") if $error;
+	my $output = runres($cmd);
+	ok(!!$output, $name)
+		or diag("command at $ref\n$cmd\n" . ($@ || 'empty output'));
+}
+
+sub runres {
+	my ($cmd) = @_;
+	ref $cmd eq 'ARRAY'
+		or $cmd = [bash => -c => "set -o pipefail\n$cmd"];
+	eval {
+		run($cmd, \undef, \my $output, \my $error);
+		die("error message:\n".($error =~ s/^/    /gr)."\n") if $error;
 		$? == 0 or die "exit status ", $? >> 8, "\n";
-		length $output or die "empty output\n";
-		return 1;
-	}, $name) or diag("Failed command\n@cmd\nfrom $filename line $.: $@");
+		return $output;
+	};
 }
 
 done_testing();
