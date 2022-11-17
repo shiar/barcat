@@ -313,8 +313,9 @@ while ($nr <= $limit) {
 	print $indicator if defined $indicator;
 
 	if (length $val) {
-		$val = $opt{'value-format'} ? $opt{'value-format'}->($val) :
-			sprintf "%*s", $lenval, $val;
+		$val = sprintf("%*s", $lenval,
+			$opt{'value-format'} ? $opt{'value-format'}->($val) : $val
+		);
 		color($color) for $val;
 	}
 	my $line = $lines[$nr] =~ s/\n/$val/r;
