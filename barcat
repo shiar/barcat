@@ -585,7 +585,9 @@ Reserved space for numbers.
 =item -w, --width=<columns>
 
 Override the maximum number of columns to use.
-Appended graphics will extend to fill up the entire screen.
+Appended graphics will extend to fill up the entire screen,
+otherwise determined by the environment variable I<COLUMNS>
+or by running the C<tput> command.
 
 =item -h, --usage
 
