@@ -662,7 +662,7 @@ In PostgreSQL from within the client:
 Earthquakes worldwide magnitude 1+ in the last 24 hours:
 
     curl https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/1.0_day.csv |
-    column -tns, | barcat -f4 -u -l80%
+    column -ts, -n | barcat -f4 -u -l80%
 
 External datasets, like movies per year:
 
@@ -689,7 +689,7 @@ Total population history in XML from the World Bank:
 Population and other information for all countries:
 
     curl http://download.geonames.org/export/dump/countryInfo.txt |
-    grep -v '^#\s' | column -tns$'\t' | barcat -f+2 -u -l150 -s
+    grep -v '^#\s' | column -ts$'\t' -n | barcat -f+2 -u -l150 -s
 
 And of course various Git statistics, such commit count by year:
 
