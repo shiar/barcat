@@ -650,14 +650,21 @@ Number of HTTP requests per day:
 
     cat httpd/access.log | cut -d\  -f4 | cut -d: -f1 | uniq -c | barcat
 
-Any kind of database query with counts, preserving returned alignment:
+Any kind of database query results, preserving returned alignment:
 
-    echo 'SELECT count(*),schemaname FROM pg_tables GROUP BY 2' |
+    echo 'SELECT sin(value * .1) FROM generate_series(0, 30) value' |
     psql -t | barcat -u
 
-In PostgreSQL from within the client:
+In PostgreSQL from within the client; a fancy C<\dt+> perhaps:
 
-    > SELECT sin(generate_series(0, 3, .1)) \g |barcat
+    > SELECT schemaname, relname, pg_total_relation_size(relid)
+      FROM pg_statio_user_tables ORDER BY idx_blks_hit
+      \g |barcat -uHf+
+
+Same thing in SQLite (requires the sqlite3 client):
+
+    > .once |barcat -Hf+
+    > SELECT name, sum(pgsize) FROM dbstat GROUP BY 1;
 
 Earthquakes worldwide magnitude 1+ in the last 24 hours:
 
