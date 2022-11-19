@@ -11,8 +11,10 @@ use Test::More;
 }
 
 my %CMDARGS = (
-	ping => '-c 1',
+	ping => '-c 1 ',
 	'cat \Khttpd/' => '/var/log/apache2/',
+	' \K\*(?=\h*\|)' => 'sample/media/*.*',
+	find => 'sample/media -name \*.\* ',
 );
 
 my $filename = 'barcat';
@@ -68,8 +70,8 @@ SKIP: {
 
 	# prepare shell command to execute
 	while (my ($subcmd, $args) = each %CMDARGS) {
-		$subcmd .= " \\K", $args .= ' ' unless $subcmd =~ m/\\K/;
-		$cmd =~ s/\b$subcmd/$args/;
+		$subcmd .= " \\K" unless $subcmd =~ m/\\K/;
+		$cmd =~ s/$subcmd/$args/;
 	}
 
 	for my $param ($cmd =~ m{^[(\h]* (\w\S*)}gx) {
