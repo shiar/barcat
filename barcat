@@ -54,6 +54,7 @@ GetOptions(\%opt,
 			" (range expected)\n"
 		);
 	},
+	'log|e!',
 	'header!',
 	'markers|m=s',
 	'graph-format=s' => sub {
@@ -230,6 +231,7 @@ my $maxval = $opt{maxval} // (
 ) // 0;
 my $minval = $opt{minval} // min $order[-1] // (), 0;
 my $range = $maxval - $minval;
+$range &&= log $maxval if $opt{log};
 my $lenval = $opt{'value-length'} // max map { length } @order;
 my $len    = defined $opt{trim} && $opt{trim} <= 0 ? -$opt{trim} + 1 :
 	max map { length $values[$_] && length $lines[$_] }
@@ -264,6 +266,7 @@ if ($opt{markers} and $size > 0) {
 			next;
 		};
 		$pos -= $minval;
+		$pos &&= log $pos if $opt{log};
 		$pos >= 0 or next;
 		color(36) for $barmark[$pos * $size] = $char;
 	}
@@ -323,8 +326,10 @@ while ($nr <= $limit) {
 		next;
 	}
 	printf '%-*s', $len + length($val), $line;
+	my $barlen = $values[$nr] || 0;
+	$barlen &&= log $barlen if $opt{log};
 	print $barmark[$_] // $opt{'graph-format'}
-		for 1 .. $size && (($values[$nr] || 0) - $minval) * $size + .5;
+		for 1 .. $size && ($barlen - $minval) * $size + .5;
 	say '';
 }
 continue {
@@ -391,6 +396,7 @@ Options:
   -l, --length=[-]SIZE[%]  Trim line contents (between number and bars)
   -L, --limit[=(N|-LAST|START-[END])]
                            Stop output after a number of lines
+  -e, --log                Logarithmic (exponential) scale instead of linear
       --graph-format=CHAR  Glyph to repeat for the graph line
   -m, --markers=FORMAT     Statistical positions to indicate on bars
       --min=N, --max=N     Bars extend from 0 or the minimum value if lower
@@ -500,6 +506,11 @@ A specific range can be given by two values.
 
 All input is still counted and analyzed for statistics,
 but disregarded for padding and bar size.
+
+=item -e, --log
+
+Logarithmic (I<e>xponential) scale instead of linear
+to compare orders of magnitude.
 
 =item --graph-format=<character>
 
@@ -698,7 +709,7 @@ Total population history in XML from the World Bank:
 Population and other information for all countries:
 
     curl http://download.geonames.org/export/dump/countryInfo.txt |
-    grep -v '^#\s' | column -ts$'\t' -n | barcat -f+2 -u -l150 -s
+    grep -v '^#\s' | column -ts$'\t' -n | barcat -f+2 -e -u -l150 -s
 
 And of course various Git statistics, such commit count by year:
 
