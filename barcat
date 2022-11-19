@@ -231,13 +231,13 @@ my $maxval = $opt{maxval} // (
 ) // 0;
 my $minval = $opt{minval} // min $order[-1] // (), 0;
 my $range = $maxval - $minval;
-$range &&= log $maxval if $opt{log};
+$range &&= log $range if $opt{log};
 my $lenval = $opt{'value-length'} // max map { length } @order;
 my $len    = defined $opt{trim} && $opt{trim} <= 0 ? -$opt{trim} + 1 :
 	max map { length $values[$_] && length $lines[$_] }
 		0 .. min $#lines, $opt{hidemax} || ();  # left padding
 my $size   = defined $opt{width} && $range &&
-	($opt{width} - $lenval - $len - !!$opt{indicators}) / $range;  # bar multiplication
+	($opt{width} - $lenval - $len - !!$opt{indicators});  # bar multiplication
 
 my @barmark;
 if ($opt{markers} and $size > 0) {
@@ -268,7 +268,7 @@ if ($opt{markers} and $size > 0) {
 		$pos -= $minval;
 		$pos &&= log $pos if $opt{log};
 		$pos >= 0 or next;
-		color(36) for $barmark[$pos * $size] = $char;
+		color(36) for $barmark[$pos / $range * $size] = $char;
 	}
 
 	state $lastmax = $maxval;
@@ -276,10 +276,10 @@ if ($opt{markers} and $size > 0) {
 		print ' ' x ($lenval + $len);
 		printf color(90);
 		printf '%-*s',
-			($lastmax - $minval) * $size + .5,
-			'-' x (($values[$nr - 1] - $minval) * $size);
+			($lastmax - $minval) * $size / $range + .5,
+			'-' x (($values[$nr - 1] - $minval) * $size / $range);
 		print color(92);
-		say '+' x (($range - $lastmax) * $size + .5);
+		say '+' x (($range - $lastmax) * $size / $range + .5);
 		print color(0);
 		$lastmax = $maxval;
 	}
@@ -288,14 +288,19 @@ if ($opt{markers} and $size > 0) {
 say(
 	color(31), sprintf('%*s', $lenval, $minval),
 	color(90), '-', color(36), '+',
-	color(32), sprintf('%*s', $size * $range - 3, $maxval),
+	color(32), sprintf('%*s', $size - 3, $maxval),
 	color(90), '-', color(36), '+',
 	color(0),
 ) if $opt{header};
 
 while ($nr <= $limit) {
 	my $val = $values[$nr];
-	my $rel = length $val && $range && min(1, ($val - $minval) / $range);
+	my $rel;
+	if (length $val) {
+		$rel = $val - $minval;
+		$rel &&= log $rel if $opt{log};
+		$rel = min(1, $rel / $range) if $range; # 0..1
+	}
 	my $color = !length $val || !$opt{palette} ? undef :
 		$val == $order[0] ? $opt{palette}->[-1] : # max
 		$val == $order[-1] ? $opt{palette}->[0] : # min
@@ -326,10 +331,10 @@ while ($nr <= $limit) {
 		next;
 	}
 	printf '%-*s', $len + length($val), $line;
-	my $barlen = $values[$nr] || 0;
-	$barlen &&= log $barlen if $opt{log};
-	print $barmark[$_] // $opt{'graph-format'}
-		for 1 .. $size && ($barlen - $minval) * $size + .5;
+	if ($rel and $size) {
+		print $barmark[$_] // $opt{'graph-format'}
+			for 1 .. $rel * $size + .5;
+	}
 	say '';
 }
 continue {
