@@ -384,10 +384,19 @@ sub show_stat {
 sub varfmt {
 	my ($fmt, $vars) = @_;
 	$fmt =~ s[\$\{ (\w+) (?<cmd>; (?: [^{}]+ | \{.*?\} )*)? \}]{
-		local $_ = $vars->{$1}; #TODO //
-		$_ = $opt{'value-format'}->($_) if $opt{reformat};
-		eval $+{cmd} if $+{cmd}; #TODO $@
-		$_;
+		local $_ = $vars->{$1};
+		if (defined) {
+			$_ = $opt{'value-format'}->($_) if $opt{reformat};
+			if ($+{cmd}) {
+				eval $+{cmd};
+				warn "Error in \$$1 report: $@" if $@;
+			}
+			$_;
+		}
+		else {
+			warn "Unknown variable \$$1 in report\n";
+			"\$$1";
+		}
 	}eg;
 	return $fmt;
 }
