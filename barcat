@@ -28,6 +28,7 @@ GetOptions(\%opt,
 	},
 	'human-readable|H!',
 	'sexagesimal!',
+	'reformat!',
 	'interval|t:i',
 	'trim|length|l=s' => sub {
 		my ($optname, $optval) = @_;
@@ -128,7 +129,6 @@ $opt{hidemin} = ($opt{hidemin} || 1) - 1;
 $opt{input} = (@ARGV && $ARGV[0] =~ m/\A[-0-9]/) ? \@ARGV : undef
 	and undef $opt{interval};
 
-$opt{'sum-format'} = sub { sprintf '%.8g', $_[0] };
 $opt{'calc-format'} = sub { sprintf '%*.*f', 0, 2, $_[0] };
 $opt{'value-format'} = $opt{sexagesimal} ? sub {
 	my $s = abs($_[0]) + .5;
@@ -150,7 +150,8 @@ $opt{'value-format'} = $opt{sexagesimal} ? sub {
 		$#{$opt{units}} * 1.5 < abs $unit ? sprintf('e%d', $unit) :
 			$opt{units}->[$unit/3]  # suffix
 	);
-};
+} and $opt{reformat}++;
+$opt{'value-format'} ||= sub { sprintf '%.8g', $_[0] };
 
 
 my (@lines, @values, @order);
@@ -195,10 +196,6 @@ while (defined ($_ = $opt{input} ? shift @{ $opt{input} } : readline)) {
 	push @lines, $_;
 	show_lines() if defined $opt{interval} and $opt{interval} < 0
 		and $. % $opt{interval} == 0;
-}
-
-if ($opt{'zero-missing'}) {
-	push @values, (0) x 10;
 }
 
 $SIG{INT} = 'DEFAULT';
@@ -314,7 +311,7 @@ while ($nr <= $limit) {
 
 	if (length $val) {
 		$val = sprintf("%*s", $lenval,
-			$opt{'value-format'} ? $opt{'value-format'}->($val) : $val
+			$opt{reformat} ? $opt{'value-format'}->($val) : $val
 		);
 		color($color) for $val;
 	}
@@ -344,19 +341,19 @@ sub show_stat {
 			$linemin += @lines;
 			$linemax = @lines - $linemax;
 		}
-		printf '%.8g of ', $opt{'sum-format'}->(
+		printf '%.8g of ', $opt{'value-format'}->(
 			sum(grep {length} @values[$linemin .. $linemax]) // 0
 		);
 	}
 	if (@order) {
 		my $total = sum @order;
-		printf '%s total', color(1) . $opt{'sum-format'}->($total) . color(0);
+		printf '%s total', color(1) . $opt{'value-format'}->($total) . color(0);
 		printf ' in %d values', scalar @order;
 		printf ' over %d lines', scalar @lines if @order != @lines;
 		printf(' (%s min, %s avg, %s max)',
-			color(31) . ($opt{'value-format'} || sub {$_[0]})->($order[-1]) . color(0),
-			color(36) . ($opt{'value-format'} || $opt{'calc-format'})->($total / @order) . color(0),
-			color(32) . ($opt{'value-format'} || sub {$_[0]})->($order[0]) . color(0),
+			color(31) . ($opt{reformat} ? $opt{'value-format'} : sub {$_[0]})->($order[-1]) . color(0),
+			color(36) . ($opt{reformat} ? $opt{'value-format'} : $opt{'calc-format'})->($total / @order) . color(0),
+			color(32) . ($opt{reformat} ? $opt{'value-format'} : sub {$_[0]})->($order[0]) . color(0),
 		);
 	}
 	say '';
