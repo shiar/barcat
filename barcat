@@ -20,7 +20,9 @@ GetOptions(\%opt,
 		eval {
 			local $_ = $_[1];
 			s/\A[0-9]+\z/(?:\\S*\\h+){$_}\\K/;
-			s/\A[+]([0-9]*)\z/(?:\\d+\\D+\\b){$1}\\K \\s* (?=\\d)/;
+			s{\A[+]([0-9]*)\z}{
+				(!!$1 && '(?:\d+\D+\b){'.$1.'}\K') . '\s* (?=\d)'
+			}e;
 			$opt{anchor} = qr/$_/;
 		} or die $@ =~ s/(?:\ at\ \N+)?\Z/ for option $_[0]/r;
 	},
@@ -605,7 +607,7 @@ Compare file sizes (with human-readable numbers):
 
 Same from formatted results, selecting the first numeric value:
 
-    tree -s --noreport | barcat -H -f+0
+    tree -s --noreport | barcat -H -f+
 
 Memory usage of user processes with long names truncated:
 
