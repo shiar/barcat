@@ -90,6 +90,7 @@ GetOptions(\%opt,
 		};
 	},
 	'stat|s!',
+	'report=s',
 	'signal-stat=s',
 	'unmodified|u!',
 	'width|w=i',
@@ -122,6 +123,11 @@ $opt{'value-length'} = 4 if $opt{units};
 $opt{'value-length'} = 1 if $opt{unmodified};
 $opt{'signal-stat'} //= exists $SIG{INFO} ? 'INFO' : 'QUIT';
 $opt{markers} //= '=avg >31.73v <68.27v +50v |0';
+$opt{report} //= join(', ',
+	'${min; color(31)} min',
+	'${avg; $opt{reformat} or $_ = sprintf "%0.2f", $_; color(36)} avg',
+	'${max; color(32)} max',
+);
 $opt{palette} //= $opt{color} && [31, 90, 32];
 $opt{indicators} = [split //, $opt{indicators} ||
 	($opt{ascii} ? ' .oO' : $opt{spark} ? ' ▁▂▃▄▅▆▇█' : ' ▏▎▍▌▋▊▉█')
@@ -359,17 +365,31 @@ sub show_stat {
 	}
 	if (@order) {
 		my $total = sum @order;
-		printf '%s total', color(1) . $opt{'value-format'}->($total) . color(0);
-		printf ' in %d values', scalar @order;
-		printf ' over %d lines', scalar @lines if @order != @lines;
-		printf(' (%s min, %s avg, %s max)',
-			color(31) . ($opt{reformat} ? $opt{'value-format'} : sub {$_[0]})->($order[-1]) . color(0),
-			color(36) . ($opt{reformat} ? $opt{'value-format'} : $opt{'calc-format'})->($total / @order) . color(0),
-			color(32) . ($opt{reformat} ? $opt{'value-format'} : sub {$_[0]})->($order[0]) . color(0),
-		);
+		my $fmt = '${sum;color(1)} total in ${count} values';
+		$fmt .= ' over ${lines} lines' if @order != @lines;
+		$fmt .= " ($_)" for $opt{report} || ();
+		print varfmt($fmt, {
+			sum => $total,
+			count => int @order,
+			lines => int @lines,
+			min => $order[-1],
+			max => $order[0],
+			avg => $total / @order,
+		});
 	}
 	say '';
 	return 1;
+}
+
+sub varfmt {
+	my ($fmt, $vars) = @_;
+	$fmt =~ s[\$\{ (\w+) (?<cmd>; (?: [^{}]+ | \{.*?\} )*)? \}]{
+		local $_ = $vars->{$1}; #TODO //
+		$_ = $opt{'value-format'}->($_) if $opt{reformat};
+		eval $+{cmd} if $+{cmd}; #TODO $@
+		$_;
+	}eg;
+	return $fmt;
 }
 
 sub show_exit {
