@@ -359,13 +359,14 @@ sub show_stat {
 			$linemin += @lines;
 			$linemax = @lines - $linemax;
 		}
-		printf '%.8g of ', $opt{'value-format'}->(
-			sum(grep {length} @values[$linemin .. $linemax]) // 0
-		);
+		print varfmt('${sum+} of ', {
+			lines => $linemax - $linemin + 1,
+			sum => sum(0, grep {length} @values[$linemin .. $linemax]),
+		});
 	}
 	if (@order) {
 		my $total = sum @order;
-		my $fmt = '${sum;color(1)} total in ${count#} values';
+		my $fmt = '${sum+;color(1)} total in ${count#} values';
 		$fmt .= ' over ${lines#} lines' if @order != @lines;
 		$fmt .= " ($_)" for $opt{report} || ();
 		print varfmt($fmt, {
@@ -383,9 +384,9 @@ sub show_stat {
 
 sub varfmt {
 	my ($fmt, $vars) = @_;
-	$fmt =~ s[\$\{( (?: [^{}]++ | \{(?1)\} )+ )\}]{
+	$fmt =~ s[\$\{ \h*+ ((?: [^{}]++ | \{(?1)\} )+) \}]{
 		my ($name, $cmd) = split /\s*;/, $1, 2;
-		my $format = $name !~ s/\h*\#// && $opt{reformat};
+		my $format = $name =~ s/\+// || $name !~ s/\#// && $opt{reformat};
 		local $_ = $vars->{$name};
 		if (defined) {
 			$_ = $opt{'value-format'}->($_) if $format;
