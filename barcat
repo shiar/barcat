@@ -180,9 +180,8 @@ if (defined $opt{interval}) {
 	} or warn $@, "Expect slowdown with large datasets!\n";
 }
 
-my $valmatch = qr<
-	$opt{anchor} ( \h* -? [0-9]* [.]? [0-9]+ (?: e[+-]?[0-9]+ )? |)
->x;
+my $float = qr<[0-9]* [.]? [0-9]+ (?: e[+-]?[0-9]+ )?>; # positive numberish
+my $valmatch = qr< $opt{anchor} ( \h* -? $float |) >x;
 while (defined ($_ = $opt{input} ? shift @{ $opt{input} } : readline)) {
 	s/\r?\n\z//;
 	s/\A\h*// unless $opt{unmodified};
@@ -249,7 +248,7 @@ my @barmark;
 if ($opt{markers} and $size > 0) {
 	for my $markspec (split /\h/, $opt{markers}) {
 		my ($char, $func) = split //, $markspec, 2;
-		my $pos = eval {
+		my @pos = eval {
 			if ($func eq 'avg') {
 				return sum(@order) / @order;
 			}
@@ -263,18 +262,28 @@ if ($opt{markers} and $size > 0) {
 			elsif ($func =~ /\A-?[0-9.]+\z/) {
 				return $func;
 			}
+			elsif ($func =~ /\A\/($float)\z/) {
+				my @range = $1;
+				#TODO log
+				for (my $next = $1; $next < $maxval; $next += $range[0]) {
+					push @range, $next;
+				}
+				return @range;
+			}
 			else {
 				die "Unknown marker $char: $func\n";
 			}
 		};
-		defined $pos or do {
+		@pos or do {
 			warn $@ if $@;
 			next;
 		};
-		$pos -= $minval;
-		$pos &&= log $pos if $opt{log};
-		$pos >= 0 or next;
-		color(36) for $barmark[$pos / $range * $size] = $char;
+		for my $pos (@pos) {
+			$pos -= $minval;
+			$pos &&= log $pos if $opt{log};
+			$pos >= 0 or next;
+			color(36) for $barmark[$pos / $range * $size] = $char;
+		}
 	}
 
 	state $lastmax = $maxval;
@@ -566,7 +575,12 @@ A single indicator glyph precedes each position:
 Exact value to match on the axis.
 A vertical bar at the zero crossing is displayed by I<|0>
 for negative values.
-For example I<:3.14> would show a colon at pi.
+For example I<π3.14> would locate pi.
+
+=item I</><interval>
+
+Repeated at every multiple of a number.
+For example I<:/1> for a grid at every integer.
 
 =item <percentage>I<v>
 
@@ -741,7 +755,7 @@ Total population history in XML from the World Bank:
 
     curl http://api.worldbank.org/v2/country/1W/indicator/SP.POP.TOTL |
     xmlstarlet sel -t -m '*/*' -v wb:date -o ' ' -v wb:value -n |
-    barcat -f1 -H
+    barcat -f1 -H --markers=+/1e9
 
 Population and other information for all countries:
 
