@@ -6,7 +6,7 @@ use List::Util qw( min max sum );
 use open qw( :std :utf8 );
 use re '/msx';
 
-our $VERSION = '1.08';
+our $VERSION = '1.09';
 
 my %opt;
 if (@ARGV) {
@@ -246,7 +246,9 @@ if ($opt{markers} and $size > 0) {
 				return sum(@order) / @order;
 			}
 			elsif ($func =~ /\A([0-9.]+)v\z/) {
-				die "Invalid marker $char: percentile $1 out of bounds\n" if $1 > 100;
+				$1 <= 100 or die(
+					"Invalid marker $char: percentile $1 out of bounds\n"
+				);
 				my $index = $#order * $1 / 100;
 				return ($order[$index] + $order[$index + .5]) / 2;
 			}
