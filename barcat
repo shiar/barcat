@@ -263,10 +263,10 @@ if ($opt{markers} and $size > 0) {
 				return $func;
 			}
 			elsif ($func =~ /\A\/($float)\z/) {
-				my @range = $1;
-				#TODO log
-				for (my $next = $1; $next < $maxval; $next += $range[0]) {
-					push @range, $next;
+				my @range = my $multiple = my $next = $1;
+				while ($next < $maxval) {
+					$multiple *= 10 if $opt{log};
+					push @range, $next += $multiple;
 				}
 				return @range;
 			}
