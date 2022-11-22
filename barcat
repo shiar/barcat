@@ -115,7 +115,7 @@ $opt{width} ||= $ENV{COLUMNS} || qx(tput cols) || 80 unless $opt{spark};
 $opt{color} //= $ENV{NO_COLOR} ? 0 : -t *STDOUT;  # enable on tty
 $opt{'graph-format'} //= '-';
 $opt{trim}   *= $opt{width} / 100 if $opt{trimpct};
-$opt{units}   = [split //, ' kMGTPEZYyzafpn'.($opt{ascii} ? 'u' : 'μ').'m']
+$opt{units}   = [split //, ' kMGTPEZYRQqryzafpn'.($opt{ascii} ? 'u' : 'μ').'m']
 	if $opt{'human-readable'};
 $opt{anchor} //= qr/\A/;
 $opt{'value-length'} = 4 if $opt{units};
