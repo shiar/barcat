@@ -2,13 +2,15 @@
 use 5.014;
 use warnings;
 use re '/ms';
-use IPC::Run 'run';
 
 use Test::More;
 { # silence fail diagnostics because of single caller
 	no warnings 'redefine';
 	sub Test::Builder::_ok_debug {}
 }
+
+eval q(use IPC::Run 'run');
+plan skip_all => "IPC::Run required to test commands" if $@;
 
 my %CMDARGS = (
 	ping => '-c 1 ',
