@@ -10,7 +10,7 @@ colorize=
 test -t 1 && colorize=1
 color () {
 	test -n "$colorize" &&
-	printf '\e[%sm' $@
+	printf '\33[%sm' $@
 }
 regenerate=
 diffcmd () {
