@@ -1,3 +1,4 @@
+barcat -e t1261-binary_powers.in
                    1 2^0  
                    2 2^1  
                    4 2^2  

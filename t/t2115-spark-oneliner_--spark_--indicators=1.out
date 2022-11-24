@@ -1,1 +1,2 @@
+barcat --spark --indicators=1 t2115-spark-oneliner.in
 111111111111111

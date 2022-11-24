@@ -1,3 +1,4 @@
+barcat --markers=')0v (100v' t2264-minmax_percent.in
 123e-6 micro     (---------------------
     .1 long line (---------------------)
     -1           (--------------

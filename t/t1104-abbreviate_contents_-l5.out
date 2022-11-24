@@ -1,3 +1,4 @@
+barcat -l5 t1104-abbreviate_contents.in
   1     ---
   2 pr… ------
   3:  … --------<-

@@ -1,3 +1,4 @@
+barcat -uw1 t1201-unchanged.in
 1                             
  2 prepend                     
 	3:   append                   

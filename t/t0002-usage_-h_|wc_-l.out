@@ -1,1 +1,2 @@
+barcat -h |wc -l
 36

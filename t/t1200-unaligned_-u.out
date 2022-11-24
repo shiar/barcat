@@ -1,3 +1,4 @@
+barcat -u t1200-unaligned.in
 1                             -
  2 prepend                     --
 	3:   append                   --<

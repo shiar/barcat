@@ -1,3 +1,4 @@
+barcat -l30 t1101-wow_much_length.in
   1                             -
   2 prepend                     -<
   3:   append                   -<

@@ -5,24 +5,17 @@ cd "${0%/*}" || exit 1
 test_count=0
 fail_count=0
 
-COLUMNS=40
 colorize=
 test -t 1 && colorize=1
 color () {
 	test -n "$colorize" &&
 	printf '\33[%sm' $@
 }
-regenerate=
-diffcmd () {
-	comm --nocheck-order --output-delimiter=::: -3 $@ |
-	perl -pe"END{exit !!\$.} s/^:::/$(color 31)>/ || s/^/$(color 32)</"
-}
 
 for option in "$@"
 do
 	case "$option" in
-	-G) regenerate=1 && shift;;
-	-*) echo "Usage: $0 [-G] [<files>...]"; exit 64;;
+	-*) echo "Usage: $0 [<files>...]"; exit 64;;
 	esac
 done
 
@@ -35,35 +28,11 @@ for candidate in $params
 do
 	test_count=$((test_count+1))
 	file="${candidate%.out}"
-	input="${file%%_-*}.in"
 	name="$(echo ${file#*-} | tr _ \ )"
 
-	set -- barcat
-	[ -r "$input" ] && set -- "$@" "$input"
-	case "$name" in
-		*\ -*)
-			args="${name#* -}"
-			set -- "$@" -"${args% [?|]*}"
-			;;
-	esac
-	case "$name" in
-		*' ?' ) set -- sh -c "\$0 \$@ 2>/dev/null" "$@";;
-		*' ?'*) set -- sh -c "\$0 \$@ | test \$\? = ${name#* \?}" "$@";;
-		*' |'*) set -- sh -c "\$0 \$@ | ${name#* |}" "$@";;
-		*)      eval set -- "$1" $2 $3
-	esac
-
-	if test -n "$regenerate"
+	if test -e "$file.out"
 	then
-		if test -e $file.sh
-		then
-			echo "ok $test_count # skip $file.out"
-			continue
-		fi
-		"$@" >$file.out 2>&1
-	elif test -e "$file.out"
-	then
-		"$@" 2>&1 | diffcmd "$file.out" -
+		./cmddiff "$file.out"
 	else
 		color 33
 		echo "not ok $test_count - $name # TODO"

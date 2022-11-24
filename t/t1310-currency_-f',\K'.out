@@ -1,3 +1,4 @@
+barcat -f',\K' t1310-currency.in
 Data Source in SDW: null
 ,EXR.D.USD.EUR.SP00.A
 ,"ECB reference exchange rate, US dollar/Euro, 2:15 pm (C.E.T.)"

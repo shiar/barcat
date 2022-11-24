@@ -1,3 +1,4 @@
+barcat -l1 t1103-only_separators.in
   1  ----
   2  -------
   3: ---------<-

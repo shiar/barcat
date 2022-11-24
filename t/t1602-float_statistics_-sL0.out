@@ -1,1 +1,2 @@
+barcat -sL0 t1602-float_statistics.in
 -7.459 total in 16 values over 18 lines (-3 min, -0.47 avg, 2 max)

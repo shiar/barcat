@@ -1,1 +1,2 @@
+barcat --spark --indicators=XO t2110-spark_binary.in
 XOOOOXOOXOOOOXX

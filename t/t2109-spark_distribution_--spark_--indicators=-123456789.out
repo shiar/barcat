@@ -1,1 +1,2 @@
+barcat --spark --indicators=-123456789 t2109-spark_distribution.in
 123456789

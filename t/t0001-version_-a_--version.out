@@ -1,1 +1,2 @@
+barcat -a --version
 barcat =^,^= version 1.09

@@ -1,3 +1,4 @@
+barcat -ftime= t1301-field_grep.in
 PING google.com(ams15s40-in-x0e.1e100.net (2a00:1450:400e:80d::200e)) 56 data bytes
 ... icmp_seq=1 9.92 ms   -----------+-
 ... icmp_seq=2 9.38 ms   -----------+

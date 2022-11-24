@@ -1,3 +1,4 @@
+barcat --spark -w9 t2103-spark-lines.in
 █████████
 ▇▇▇▆▆▅▅▄▄
 ▃▃▂▂▂▁▁▁▁

@@ -1,3 +1,4 @@
+barcat --graph-format=─ t2221-unicode_line.in
 123e-6 micro     ──────────<─=+───────|
     .1 long line ──────────<─=+───────|─
     -1           ──────────<─=+─

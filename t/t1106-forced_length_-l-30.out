@@ -1,3 +1,4 @@
+barcat -l-30 t1106-forced_length.in
   1                               <
   2 prepend                       <
   3:   append                     <+

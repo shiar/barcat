@@ -1,1 +1,2 @@
+barcat -f\( ?64
 Unmatched ( in regex; marked by <-- HERE in m/( <-- HERE / for option field

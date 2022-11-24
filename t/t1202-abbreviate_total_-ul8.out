@@ -1,3 +1,4 @@
+barcat -ul8 t1202-abbreviate_total.in
 1      ---
  2 pre… -------
 	3:   … --------<-

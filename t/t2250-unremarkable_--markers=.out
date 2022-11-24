@@ -1,3 +1,4 @@
+barcat --markers= t2250-unremarkable.in
 123e-6 micro     ----------------------
     .1 long line -----------------------
     -1           ---------------

@@ -1,3 +1,4 @@
+barcat -e --markers=+/1 t2259-log_axis.in
      1 
     10 ----+-
    100 ----+-----+

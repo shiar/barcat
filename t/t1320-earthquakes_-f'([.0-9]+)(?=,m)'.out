@@ -1,3 +1,4 @@
+barcat -f'([.0-9]+)(?=,m)' t1320-earthquakes.in
 time,latitude,longitude,depth,mag,magType,nst,gap,dmin,rms,net,id,updated,place,type,horizontalError,depthError,magError,magNst,status,locationSource,magSource
 2019-09-23T13:32:01.060Z,36.0413322,-120.2453308,13.57,2.48,md,26,131,0.1773,0.12,nc,nc73278290,2019-09-23T14:03:45.416Z,"11km WNW of Avenal, CA",earthquake,0.53,1.66,0.23,16,automatic,nc,nc                                               
 2019-09-23T13:16:57.170Z,36.0901667,-117.8598333,5.57,1.33,ml,18,89,0.02765,0.13,ci,ci38853575,2019-09-23T13:20:31.134Z,"9km ENE of Coso Junction, CA",earthquake,0.3,0.49,0.274,14,automatic,ci,ci                                          

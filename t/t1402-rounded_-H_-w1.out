@@ -1,3 +1,4 @@
+barcat -H -w1 t1402-rounded.in
 999k -  
 1.0M +  
 1.0M ++ 

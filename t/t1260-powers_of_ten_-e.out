@@ -1,3 +1,4 @@
+barcat -e t1260-powers_of_ten.in
      1 
     10 ------
    100 ----------<
