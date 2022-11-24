@@ -1,4 +1,4 @@
-barcat -ul8 t1202-abbreviate_total.in
+barcat -ul8 input/aligned.txt
 1      ---
  2 pre… -------
 	3:   … --------<-

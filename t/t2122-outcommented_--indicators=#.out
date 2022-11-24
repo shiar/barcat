@@ -1,4 +1,4 @@
-barcat --indicators=# t2122-outcommented.in
+barcat --indicators=# input/unvalued.txt
 #nan
 # -1 negative  -------
 # -2 negativer 

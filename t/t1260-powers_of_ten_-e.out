@@ -1,4 +1,4 @@
-barcat -e t1260-powers_of_ten.in
+barcat -e input/powers_of_ten.txt
      1 
     10 ------
    100 ----------<

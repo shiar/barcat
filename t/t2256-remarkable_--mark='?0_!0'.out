@@ -1,4 +1,4 @@
-barcat --mark='?0 !0' t2256-remarkable.in
+barcat --mark='?0 !0' input/ascii.txt
 123e-6 micro     ---------------------!
     .1 long line ---------------------!-
     -1           ---------------

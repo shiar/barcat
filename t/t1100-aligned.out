@@ -1,4 +1,4 @@
-barcat t1100-aligned.in
+barcat input/aligned.txt
   1                             -
   2 prepend                     -<
   3:   append                   -<

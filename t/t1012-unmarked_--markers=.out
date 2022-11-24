@@ -1,4 +1,4 @@
-barcat --markers= t1012-unmarked.in
+barcat --markers= input/intsine.txt
  998 ---
 1987 -------
 2955 ----------

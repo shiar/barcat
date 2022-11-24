@@ -1,4 +1,4 @@
-barcat --mark=:/1 t2258-repeat_markers.in
+barcat --mark=:/1 input/seq9.txt
 1 ---:
 2 ---:---:
 3 ---:---:---:-

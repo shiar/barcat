@@ -1,4 +1,4 @@
-barcat --markers=:-2 t2255-value_marker.in
+barcat --markers=:-2 input/ascii.txt
 123e-6 micro     ------:---------------
     .1 long line ------:----------------
     -1           ------:--------

@@ -1,4 +1,4 @@
-barcat -f, --value-length=7 --minval=1.1 --maxval=1.11 -L10-30 -s t1312-currency-crop.in
+barcat -f, --value-length=7 --minval=1.1 --maxval=1.11 -L10-30 -s input/currency.txt
 2019-09-17 1.1026 ------
 2019-09-16 1.1031 -------
 2019-09-13 1.1096 ---------------------

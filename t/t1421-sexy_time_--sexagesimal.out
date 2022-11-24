@@ -1,4 +1,4 @@
-barcat --sexagesimal t1421-sexy_time.in
+barcat --sexagesimal input/sexy_time.txt
  0:00:00 
  0:00:01 
  0:00:01 

@@ -1,4 +1,4 @@
-barcat --graph-format=─ --markers='┼avg ╫50v ┬-2' t2295-unicode_in_my_bar.in
+barcat --graph-format=─ --markers='┼avg ╫50v ┬-2' input/ascii.txt
 123e-6 micro     ──────┬─────┼╫────────
     .1 long line ──────┬─────┼╫─────────
     -1           ──────┬─────┼╫─

@@ -1,2 +1,2 @@
-barcat -a --spark t2105-spark_ascii.in
+barcat -a --spark input/sinine.txt
 OOOOOOOOOOOOOoooooo...................ooooooOOOOOOOOOOOOOOOOOOOOooooo....................oooooOOOOOO

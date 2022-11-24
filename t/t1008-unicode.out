@@ -1,4 +1,4 @@
-barcat t1008-unicode.in
+barcat input/unicode.txt
 9324 A -<----+-=--->--------------------
  920 B -<-
  476 C -<

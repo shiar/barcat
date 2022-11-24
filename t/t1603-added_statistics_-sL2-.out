@@ -1,4 +1,4 @@
-barcat -sL2- t1603-added_statistics.in
+barcat -sL2- input/unicode.txt
  920 B -<-
  476 C -<
  619 Ĉ -<

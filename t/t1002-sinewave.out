@@ -1,4 +1,4 @@
-barcat t1002-sinewave.in
+barcat input/intsine.txt
  998 ---
 1987 -------
 2955 ----------

@@ -1,4 +1,4 @@
-barcat -l-30 t1106-forced_length.in
+barcat -l-30 input/aligned.txt
   1                               <
   2 prepend                       <
   3:   append                     <+

@@ -1,4 +1,4 @@
-barcat -uw1 t1201-unchanged.in
+barcat -uw1 input/aligned.txt
 1                             
  2 prepend                     
 	3:   append                   

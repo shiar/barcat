@@ -1,4 +1,4 @@
-barcat --graph-format=* t2220-starry_line.in
+barcat --graph-format=* input/ascii.txt
 123e-6 micro     **********<*=+*******|
     .1 long line **********<*=+*******|*
     -1           **********<*=+*

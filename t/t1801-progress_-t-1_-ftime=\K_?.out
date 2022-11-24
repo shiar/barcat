@@ -1,4 +1,4 @@
-barcat -t-1 -ftime='\K' t1801-progress.in ?
+barcat -t-1 -ftime='\K' input/ping.txt ?
 PING google.com(ams15s40-in-x0e.1e100.net (2a00:1450:400e:80d::200e)) 56 data bytes
 ... icmp_seq=1 time=9.92 ms   ---------+
 ... icmp_seq=2 time=9.38 ms   --------+

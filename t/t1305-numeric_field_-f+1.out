@@ -1,4 +1,4 @@
-barcat -f+1 t1305-numeric_field.in
+barcat -f+1 input/numeric_field.txt
 1
 numeric 1   2 3                ------=-+
 -1      -  2-3                 ------=-+

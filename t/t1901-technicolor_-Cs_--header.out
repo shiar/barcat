@@ -1,4 +1,4 @@
-barcat -Cs --header t1901-technicolor.in
+barcat -Cs --header input/float.txt
 [31m         -3[90m-[36m+[32m                  2[90m-[36m+[0m
 [31m         -3[0m       
 [90m     -2.449[0m       --

@@ -1,4 +1,4 @@
-barcat -Hes t1405-megametric.in
+barcat -Hes input/megametric.txt
  30e-34 
 300e-33 
 3.0e-32 

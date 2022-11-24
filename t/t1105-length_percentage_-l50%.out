@@ -1,4 +1,4 @@
-barcat -l50% t1105-length_percentage.in
+barcat -l50% input/aligned.txt
   1                    --
   2 prepend            ---
   3:   append          ----<

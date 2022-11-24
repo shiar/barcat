@@ -1,4 +1,4 @@
-barcat -f'(?<=\()' t1330-pokemon.in
+barcat -f'(?<=\()' input/pokemon.txt
 001 Bulbasaur (  6.9 kg 0.71 m 0.69)    
 002 Ivysaur ( 13.0 kg 0.99 m 0.042)     
 003 Venusaur (100.0 kg 2.01 m 0.017)    

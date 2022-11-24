@@ -1,4 +1,4 @@
-barcat -C --palette= t1920-colorwave_uncolored.in
+barcat -C --palette= input/sinewaves.txt
                     1 ---[36m<[0m---[36m+[0m[36m|[0m----[36m>[0m----
     0.987688340623216 ---[36m<[0m---[36m+[0m[36m|[0m----[36m>[0m----
     0.951056516406084 ---[36m<[0m---[36m+[0m[36m|[0m----[36m>[0m----

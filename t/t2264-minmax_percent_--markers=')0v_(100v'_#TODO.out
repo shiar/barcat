@@ -1,4 +1,4 @@
-barcat --markers=')0v (100v' t2264-minmax_percent.in
+barcat --markers=')0v (100v' input/ascii.txt
 123e-6 micro     (---------------------
     .1 long line (---------------------)
     -1           (--------------

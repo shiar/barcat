@@ -1,1 +1,1 @@
-barcat t1700-empty_input.in
+barcat input/empty_input.txt

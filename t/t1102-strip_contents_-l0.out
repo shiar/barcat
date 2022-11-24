@@ -1,4 +1,4 @@
-barcat -l0 t1102-strip_contents.in
+barcat -l0 input/aligned.txt
   1 ----
   2 -------
   3:---------<-

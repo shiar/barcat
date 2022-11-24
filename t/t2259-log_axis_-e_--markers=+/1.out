@@ -1,4 +1,4 @@
-barcat -e --markers=+/1 t2259-log_axis.in
+barcat -e --markers=+/1 input/powers_of_ten.txt
      1 
     10 ----+-
    100 ----+-----+

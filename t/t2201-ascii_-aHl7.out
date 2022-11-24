@@ -1,4 +1,4 @@
-barcat -aHl7 t2201-ascii.in
+barcat -aHl7 input/ascii.txt
 123u micro -------------<--=+---------|
 100m long> -------------<--=+---------|-
   -1        -------------<--=+-

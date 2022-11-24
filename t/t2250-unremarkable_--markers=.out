@@ -1,4 +1,4 @@
-barcat --markers= t2250-unremarkable.in
+barcat --markers= input/ascii.txt
 123e-6 micro     ----------------------
     .1 long line -----------------------
     -1           ---------------

@@ -1,2 +1,2 @@
-barcat -sL0 t1601-integer_statistics.in
+barcat -sL0 input/seq3.txt
 6 total in 3 values (1 min, 2.00 avg, 3 max)

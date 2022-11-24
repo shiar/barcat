@@ -1,2 +1,2 @@
-barcat --spark --indicators=-123456789 t2109-spark_distribution.in
+barcat --spark --indicators=-123456789 input/seq9.txt
 123456789

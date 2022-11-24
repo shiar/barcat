@@ -1,4 +1,4 @@
-barcat -l5 t1104-abbreviate_contents.in
+barcat -l5 input/aligned.txt
   1     ---
   2 pr… ------
   3:  … --------<-

@@ -1,4 +1,4 @@
-barcat -f2 t1300-field_number.in
+barcat -f2 input/numcolumns.txt
 1 2  3 4    ---
 10 20 30 40 -------<+--=------>---------
 3 16  9 123 -------<

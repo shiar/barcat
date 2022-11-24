@@ -1,1 +1,1 @@
-barcat -L-5 t1514-limit_beyond_end.in
+barcat -L-5 input/empty_input.txt

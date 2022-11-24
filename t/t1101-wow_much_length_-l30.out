@@ -1,4 +1,4 @@
-barcat -l30 t1101-wow_much_length.in
+barcat -l30 input/aligned.txt
   1                             -
   2 prepend                     -<
   3:   append                   -<

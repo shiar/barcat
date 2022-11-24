@@ -1,4 +1,4 @@
-barcat t1005-float.in
+barcat input/float.txt
          -3       
      -2.449       --
          -2       ----

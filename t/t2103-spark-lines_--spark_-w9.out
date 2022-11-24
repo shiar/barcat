@@ -1,4 +1,4 @@
-barcat --spark -w9 t2103-spark-lines.in
+barcat --spark -w9 input/sinine.txt
 █████████
 ▇▇▇▆▆▅▅▄▄
 ▃▃▂▂▂▁▁▁▁

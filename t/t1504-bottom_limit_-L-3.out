@@ -1,4 +1,4 @@
-barcat -L-3 t1504-bottom_limit.in
+barcat -L-3 input/intsine.txt
 3350 ------------
 2392 --------
 1411 -----

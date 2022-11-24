@@ -1,4 +1,4 @@
-barcat -f',\K' t1310-currency.in
+barcat -f',\K' input/currency.txt
 Data Source in SDW: null
 ,EXR.D.USD.EUR.SP00.A
 ,"ECB reference exchange rate, US dollar/Euro, 2:15 pm (C.E.T.)"

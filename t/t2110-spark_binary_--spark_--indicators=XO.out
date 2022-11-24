@@ -1,2 +1,2 @@
-barcat --spark --indicators=XO t2110-spark_binary.in
+barcat --spark --indicators=XO input/zeroes.txt
 XOOOOXOOXOOOOXX
