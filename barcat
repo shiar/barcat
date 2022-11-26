@@ -239,8 +239,8 @@ my $range = $maxval - $minval;
 $range &&= log $range if $opt{log};
 my $lenval = $opt{'value-length'} // max map { length } @order;
 my $len    = defined $opt{trim} && $opt{trim} <= 0 ? -$opt{trim} + 1 :
-	max map { length $values[$_] && length $lines[$_] }
-		0 .. min $#lines, $opt{hidemax} || ();  # left padding
+	max(map { length $values[$_] && length $lines[$_] } $nr .. $limit)
+	// 0;  # left padding
 my $size   = defined $opt{width} && $range &&
 	($opt{width} - $lenval - $len - !!$opt{indicators});  # bar multiplication
 
