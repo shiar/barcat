@@ -48,11 +48,13 @@ GetOptions(\%opt,
 		my ($optname, $optval) = @_;
 		$optval ||= 0;
 		$optval =~ /\A-[0-9]+\z/ and $optval .= '-';  # tail shorthand
+		$optval =~ s/[+]/--/;
 		($opt{hidemin}, $opt{hidemax}) =
-		$optval =~ m/\A (?: (-? [0-9]+)? - )? ([0-9]+)? \z/ or die(
+		$optval =~ m/\A (?: (-? [0-9]+)? - )? (-? [0-9]+)? \z/ or die(
 			"Value \"$optval\" invalid for option limit",
 			" (range expected)\n"
 		);
+		s/\A-0*\z// and $_ ||= undef for $opt{hidemax} // ();
 	},
 	'log|e!',
 	'header!',
@@ -221,7 +223,10 @@ state $nr =
 
 my $limit = $#lines;
 if (defined $opt{hidemax}) {
-	if ($opt{hidemin} and $opt{hidemin} < 0) {
+	if ($opt{hidemax} < 0) {
+		$limit = $nr - $opt{hidemax} - 1;
+	}
+	elsif ($opt{hidemin} and $opt{hidemin} < 0) {
 		$limit -= $opt{hidemax} - 1;
 	}
 	elsif ($opt{hidemax} <= $limit) {
@@ -440,8 +445,8 @@ Options:
                            Output partial progress every given number of
                            seconds or input lines
   -l, --length=[-]SIZE[%]  Trim line contents (between number and bars)
-  -L, --limit[=(N|-LAST|START-[END])]
-                           Stop output after a number of lines
+  -L, --limit=[N|[-]START(-[END]|+N)]
+                           Select a range of lines to display
   -e, --log                Logarithmic (exponential) scale instead of linear
       --graph-format=CHAR  Glyph to repeat for the graph line
   -m, --markers=FORMAT     Statistical positions to indicate on bars
@@ -543,14 +548,16 @@ unless C<--length=0>.
 Prepend a dash (i.e. make negative) to enforce padding
 regardless of encountered contents.
 
-=item -L, --limit[=(<count> | -<last> | <start>-[<end>])]
+=item -L, --limit=[<count> | [-]<start>(-[<end>] | +<count>)]
 
-Stop output after a number of lines.
-A single value indicates the last line number (like C<head>),
+Select a range of lines to display.
+A single integer indicates the last line number (like C<head>),
 or first line counting from the bottom if negative (like C<tail>).
-A specific range can be given by two values.
 
-All input is still counted and analyzed for statistics,
+A range consists of a starting line number followed by either
+a dash C<-> to an optional end, or plus sign C<+> with count.
+
+All hidden input is still counted and analyzed for statistics,
 but disregarded for padding and bar size.
 
 =item -e, --log
