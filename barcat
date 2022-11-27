@@ -648,6 +648,10 @@ Unspecified, block fill glyphs U+2581-2588 will be used.
 
 Total statistics after all data.
 
+While processing (possibly a neverending pipe),
+intermediate results are also shown on signal I<SIGINFO> if available (control+t on BSDs)
+or I<SIGQUIT> otherwise (ctrl+\ on linux).
+
 =item -u, --unmodified
 
 Do not reformat values, keeping leading whitespace.
