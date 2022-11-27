@@ -40,8 +40,6 @@ GetOptions(\%opt,
 		$opt{trim} = $optval;
 	},
 	'value-length=i',
-	'hidemin=i',
-	'hidemax=i',
 	'minval=f',
 	'maxval=f',
 	'limit|L:s' => sub {
@@ -49,12 +47,35 @@ GetOptions(\%opt,
 		$optval ||= 0;
 		$optval =~ /\A-[0-9]+\z/ and $optval .= '-';  # tail shorthand
 		$optval =~ s/[+]/--/;
-		($opt{hidemin}, $opt{hidemax}) =
+		my ($start, $end) =
 		$optval =~ m/\A (?: (-? [0-9]+)? - )? (-? [0-9]+)? \z/ or die(
 			"Value \"$optval\" invalid for option limit",
 			" (range expected)\n"
 		);
-		s/\A-0*\z// and $_ ||= undef for $opt{hidemax} // ();
+		$start ||= 1;
+		$start--;
+		s/\A-0*\z// and $_ ||= undef for $end // ();
+
+		$opt{hidemin} = sub {
+			my ($lines) = @_;
+			if ($start < 0) {
+				return max(0, $lines + $start + 2);
+			}
+			return $start;
+		} if $start;
+		$opt{hidemax} = sub {
+			my ($limit, $offset) = @_;
+			if ($end < 0) {
+				return $offset - $end - 1; # count
+			}
+			elsif ($start < 0) {
+				return $limit - $end + 1; # bottom
+			}
+			elsif ($end <= $limit) {
+				return $end - 1; # less
+			}
+			return $limit;
+		} if defined $end;
 	},
 	'log|e!',
 	'header!',
@@ -134,7 +155,6 @@ $opt{palette} //= $opt{color} && [31, 90, 32];
 $opt{indicators} = [split //, $opt{indicators} ||
 	($opt{ascii} ? ' .oO' : $opt{spark} ? ' ▁▂▃▄▅▆▇█' : ' ▏▎▍▌▋▊▉█')
 ] if defined $opt{indicators} or $opt{spark};
-$opt{hidemin} = ($opt{hidemin} || 1) - 1;
 $opt{input} = (@ARGV && $ARGV[0] =~ m/\A[-0-9]/) ? \@ARGV : undef
 	and undef $opt{interval};
 
@@ -216,23 +236,10 @@ sub color {
 
 sub show_lines {
 
-state $nr =
-	$opt{hidemin} < 0 ? max(0, @lines + $opt{hidemin} + 1) :
-	$opt{hidemin};
+state $nr = $opt{hidemin} ? $opt{hidemin}->($#lines) : 0;
 @lines > $nr or return;
 
-my $limit = $#lines;
-if (defined $opt{hidemax}) {
-	if ($opt{hidemax} < 0) {
-		$limit = $nr - $opt{hidemax} - 1;
-	}
-	elsif ($opt{hidemin} and $opt{hidemin} < 0) {
-		$limit -= $opt{hidemax} - 1;
-	}
-	elsif ($opt{hidemax} <= $limit) {
-		$limit = $opt{hidemax} - 1;
-	}
-}
+my $limit = $opt{hidemax} ? $opt{hidemax}->($#lines, $nr) : $#lines;
 
 @order = sort { $b <=> $a } @order unless tied @order;
 my $maxval = $opt{maxval} // (
@@ -367,16 +374,12 @@ say $opt{palette} ? color(0) : '' if $opt{spark};
 
 sub show_stat {
 	if ($opt{hidemin} or $opt{hidemax}) {
-		my $linemin = $opt{hidemin};
-		my $linemax = ($opt{hidemax} || @lines) - 1;
-		if ($linemin < 0) {
-			$linemin += @lines;
-			$linemax = @lines - $linemax;
-		}
+		my $linemin = $opt{hidemin} ? $opt{hidemin}->($#lines) : 0;
+		my $linemax = $opt{hidemax} ? $opt{hidemax}->($#lines, $linemin) : $#lines;
 		print varfmt('${sum+} of ', {
 			lines => $linemax - $linemin + 1,
 			sum => sum(0, grep {length} @values[$linemin .. $linemax]),
-		});
+		}) if $linemin <= $linemax;
 	}
 	if (@order) {
 		my $total = sum @order;
