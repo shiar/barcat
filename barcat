@@ -146,10 +146,16 @@ $opt{'value-length'} = 4 if $opt{units};
 $opt{'value-length'} = 1 if $opt{unmodified};
 $opt{'signal-stat'} //= exists $SIG{INFO} ? 'INFO' : 'QUIT';
 $opt{markers} //= '=avg >31.73v <68.27v +50v |0';
-$opt{report} //= join(', ',
-	'${min; color(31)} min',
-	'${avg; $opt{reformat} or $_ = sprintf "%0.2f", $_; color(36)} avg',
-	'${max; color(32)} max',
+$opt{report} //= join('',
+	'${partsum+; $_ .= " of "}',
+	'${sum+; color(1); $_ .= " total in "}',
+	'${count#} values',
+	'${lines#; $_ = $_ != @order && " over $_ lines"}',
+	sprintf(' (%s)', join ', ',
+		'${min; color(31)} min',
+		'${avg; $opt{reformat} or $_ = sprintf "%0.2f", $_; color(36)} avg',
+		'${max; color(32)} max',
+	),
 );
 $opt{palette} //= $opt{color} && [31, 90, 32];
 $opt{indicators} = [split //, $opt{indicators} ||
@@ -301,7 +307,7 @@ if ($opt{markers} and $size > 0) {
 	state $lastmax = $maxval;
 	if ($maxval > $lastmax) {
 		print ' ' x ($lenval + $len);
-		printf color(90);
+		print color(90);
 		printf '%-*s',
 			($lastmax - $minval) * $size / $range + .5,
 			'-' x (($values[$nr - 1] - $minval) * $size / $range);
@@ -373,27 +379,24 @@ say $opt{palette} ? color(0) : '' if $opt{spark};
 }
 
 sub show_stat {
-	if ($opt{hidemin} or $opt{hidemax}) {
-		my $linemin = $opt{hidemin} ? $opt{hidemin}->($#lines) : 0;
-		my $linemax = $opt{hidemax} ? $opt{hidemax}->($#lines, $linemin) : $#lines;
-		print varfmt('${sum+} of ', {
-			lines => $linemax - $linemin + 1,
-			sum => sum(0, grep {length} @values[$linemin .. $linemax]),
-		}) if $linemin <= $linemax;
-	}
+	my %vars = (
+		count => int @order,
+		lines => int @lines,
+	);
+	my $linemin = !$opt{hidemin} ? 0 :
+		($vars{start} = $opt{hidemin}->($#lines));
+	my $linemax = !$opt{hidemax} ? $#lines :
+		($vars{end} = $opt{hidemax}->($#lines, $vars{start}));
 	if (@order) {
-		my $total = sum @order;
-		my $fmt = '${sum+;color(1)} total in ${count#} values';
-		$fmt .= ' over ${lines#} lines' if @order != @lines;
-		$fmt .= " ($_)" for $opt{report} || ();
-		print varfmt($fmt, {
-			sum => $total,
-			count => int @order,
-			lines => int @lines,
+		$vars{partsum} = sum(0, grep {length} @values[$linemin .. $linemax])
+			if $linemin <= $linemax and ($opt{hidemin} or $opt{hidemax});
+		%vars = (%vars,
+			sum => sum(@order),
 			min => $order[-1],
 			max => $order[0],
-			avg => $total / @order,
-		});
+		);
+		$vars{avg} = $vars{sum} / @order;
+		print varfmt($opt{report}, \%vars);
 	}
 	say '';
 	return 1;
@@ -405,17 +408,13 @@ sub varfmt {
 		my ($name, $cmd) = split /\s*;/, $1, 2;
 		my $format = $name =~ s/\+// || $name !~ s/\#// && $opt{reformat};
 		local $_ = $vars->{$name};
-		if (defined) {
+		defined && do {
 			$_ = $opt{'value-format'}->($_) if $format;
 			if ($cmd) {
 				eval $cmd;
 				warn "Error in \$$name report: $@" if $@;
 			}
 			$_;
-		}
-		else {
-			warn "Unknown variable \$$name in report\n";
-			"\$$name";
 		}
 	}eg;
 	return $fmt;
