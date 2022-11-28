@@ -151,7 +151,7 @@ $opt{report} //= join('',
 	'${sum+; color(1); $_ .= " total in "}',
 	'${count#} values',
 	'${lines#; $_ = $_ != @order && " over $_ lines"}',
-	sprintf(' (%s)', join ', ',
+	sprintf('${count: (%s)}', join ', ',
 		'${min; color(31)} min',
 		'${avg; $opt{reformat} or $_ = sprintf "%0.2f", $_; color(36)} avg',
 		'${max; color(32)} max',
@@ -396,21 +396,23 @@ sub show_stat {
 			max => $order[0],
 		);
 		$vars{avg} = $vars{sum} / @order;
-		print varfmt($opt{report}, \%vars);
 	}
-	say '';
+	say varfmt($opt{report}, \%vars);
 	return 1;
 }
 
 sub varfmt {
 	my ($fmt, $vars) = @_;
 	$fmt =~ s[\$\{ \h*+ ((?: [^{}]++ | \{(?1)\} )+) \}]{
-		my ($name, $cmd) = split /\s*;/, $1, 2;
+		my ($name, $op, $cmd) = split /\s*([;:])/, $1, 2;
 		my $format = $name =~ s/\+// || $name !~ s/\#// && $opt{reformat};
 		local $_ = $vars->{$name};
 		defined && do {
 			$_ = $opt{'value-format'}->($_) if $format;
-			if ($cmd) {
+			if ($cmd and $op eq ':') {
+				$_ = varfmt($cmd, $vars);
+			}
+			elsif ($cmd) {
 				eval $cmd;
 				warn "Error in \$$name report: $@" if $@;
 			}
