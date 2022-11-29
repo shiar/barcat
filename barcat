@@ -94,7 +94,7 @@ GetOptions(\%opt,
 				202 208 214 220 226  227 228 229 230 231  159
 			)],
 			whites => [qw( 1;30 0;37 1;37 )],
-			greys  => [map {"38;5;$_"} 0, 232..255, 15],
+			grays  => [map {"38;5;$_"} 0, 232..255, 15],
 			random => [map {"38;5;$_"} List::Util::shuffle(17..231)],
 			rainbow=> [map {"38;5;$_"}
 				196, # r
@@ -619,7 +619,7 @@ These options can be set to customize this range.
 =item B<--palette>=(I<preset> | I<color>...)
 
 Override colors of parsed numbers.
-Can be any CSI escape, such as C<90> for default dark grey,
+Can be any CSI escape, such as C<90> for default dark gray,
 or alternatively C<1;30> for bright black.
 
 In case of additional colors,
@@ -628,8 +628,35 @@ If unspecified, these are green and red respectively (C<31 90 32>).
 Multiple intermediate colors will be distributed
 relative to the size of values.
 
-Predefined color schemes are named I<whites> and I<fire>,
-or I<greys> and I<fire256> for 256-color variants.
+A non-numeric name can refer to a predefined color scheme:
+
+=over 8
+
+=item B<whites>
+
+Minimal set of monochrome brightnesses.
+
+=item B<grays>
+
+Utilize the 24 grayscale ramp in 256-color terminals.
+
+=item B<fire>
+
+Gradient red to white in 7 out of 16 colors.
+
+=item B<fire256>
+
+Extended to 17 colors out of 256.
+
+=item B<rainbow>
+
+Saturated red to green to blue to red.
+
+=item B<random>
+
+All 215 extended colors in unrelated orders.
+
+=back
 
 =item B<-_>, B<--spark>
 
