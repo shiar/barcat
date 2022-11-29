@@ -476,7 +476,7 @@ barcat - concatenate texts with graph to visualize values
 
 =head1 SYNOPSIS
 
-B<barcat> [<options>] [<file>... | <numbers>]
+B<barcat> [I<options>] [I<file>... | I<numbers>]
 
 =head1 DESCRIPTION
 
@@ -495,68 +495,68 @@ you'll need a larger animal like I<gnuplot>.
 
 =over
 
-=item -a, --[no-]ascii
+=item B<-a>, B<-->[B<no->]B<ascii>
 
 Restrict user interface to ASCII characters,
 replacing default UTF-8 by their closest approximation.
 Input is always interpreted as UTF-8 and shown as is.
 
-=item -C, --[no-]color
+=item B<-C>, B<-->[B<no->]B<color>
 
 Force colored output of values and bar markers.
 Defaults on if output is a tty,
 disabled otherwise such as when piped or redirected.
-Can also be disabled by setting I<-M>
+Can also be disabled by setting B<-M>
 or the I<NO_COLOR> environment variable.
 
-=item -f, --field=([+]<number> | <regexp>)
+=item B<-f>, B<--field>=([B<+>]I<number> | I<regexp>)
 
 Compare values after a given number of whitespace separators,
 or matching a regular expression.
 
-Unspecified or I<-f0> means values are at the start of each line.
-With I<-f1> the second word is taken instead.
+Unspecified or B<-f0> means values are at the start of each line.
+With B<-f1> the second word is taken instead.
 A string can indicate the starting position of a value
-(such as I<-f:> if preceded by colons),
+(such as B<-f:> if preceded by colons),
 or capture the numbers itself,
-for example I<-f'(\d+)'> for the first digits anywhere.
-A shorthand for this is I<+0>, or I<+N> to find the Nth number.
+for example B<-f'(\d+)'> for the first digits anywhere.
+A shorthand for this is C<+0>, or C<+N> to find the Nth number.
 
-=item --header
+=item B<--header>
 
 Prepend a chart axis with minimum and maximum values labeled.
 
-=item -H, --human-readable
+=item B<-H>, B<--human-readable>
 
 Format values using SI unit prefixes,
-turning long numbers like I<12356789> into I<12.4M>.
-Also changes an exponent I<1.602176634e-19> to I<160.2z>.
+turning long numbers like C<12356789> into C<12.4M>.
+Also changes an exponent C<1.602176634e-19> to C<160.2z>.
 Short integers are aligned but kept without decimal point.
 
-=item --sexagesimal
+=item B<--sexagesimal>
 
 Convert seconds to HH:MM:SS time format.
 
-=item -t, --interval[=(<seconds> | -<lines>)]
+=item B<-t>, B<--interval>[=(I<seconds> | B<->I<lines>)]
 
 Output partial progress every given number of seconds or input lines.
 An update can also be forced by sending a I<SIGALRM> alarm signal.
 
-=item -l, --length=[-]<size>[%]
+=item B<-l>, B<--length>=[B<->]I<size>[B<%>]
 
 Trim line contents (between number and bars)
 to a maximum number of characters.
 The exceeding part is replaced by an abbreviation sign,
-unless C<--length=0>.
+unless B<--length=0>.
 
 Prepend a dash (i.e. make negative) to enforce padding
 regardless of encountered contents.
 
-=item -L, --limit=[<count> | [-]<start>(-[<end>] | +<count>)]
+=item B<-L>, B<--limit>=[I<count> | [B<->]I<start>(B<->[I<end>] | B<+>I<count>)]
 
 Select a range of lines to display.
-A single integer indicates the last line number (like C<head>),
-or first line counting from the bottom if negative (like C<tail>).
+A single integer indicates the last line number (like I<head>),
+or first line counting from the bottom if negative (like I<tail>).
 
 A range consists of a starting line number followed by either
 a dash C<-> to an optional end, or plus sign C<+> with count.
@@ -564,87 +564,87 @@ a dash C<-> to an optional end, or plus sign C<+> with count.
 All hidden input is still counted and analyzed for statistics,
 but disregarded for padding and bar size.
 
-=item -e, --log
+=item B<-e>, B<--log>
 
-Logarithmic (I<e>xponential) scale instead of linear
+Logarithmic (B<e>xponential) scale instead of linear
 to compare orders of magnitude.
 
-=item --graph-format=<character>
+=item B<--graph-format>=I<character>
 
 Glyph to repeat for the graph line.
 Defaults to a dash C<->.
 
-=item -m, --markers=<format>
+=item B<-m>, B<--markers>=I<format>
 
 Statistical positions to indicate on bars.
 A single indicator glyph precedes each position:
 
 =over 2
 
-=item <number>
+=item I<number>
 
 Exact value to match on the axis.
-A vertical bar at the zero crossing is displayed by I<|0>
+A vertical bar at the zero crossing is displayed by C<|0>
 for negative values.
-For example I<π3.14> would locate pi.
+For example C<π3.14> would locate pi.
 
-=item I</><interval>
+=item B</>I<interval>
 
 Repeated at every multiple of a number.
-For example I<:/1> for a grid at every integer.
+For example C<:/1> for a grid at every integer.
 
-=item <percentage>I<v>
+=item I<percentage>B<v>
 
 Ranked value at the given percentile.
-The default shows I<+> at I<50v> for the mean or median;
+The default shows C<+> at C<50v> for the mean or median;
 the middle value or average between middle values.
-One standard deviation right of the mean is at about I<68.3v>.
-The default includes I<< >31.73v <68.27v >>
-to encompass all I<normal> results, or 68% of all entries, by B<< <--> >>.
+One standard deviation right of the mean is at about C<68.3v>.
+The default includes C<< >31.73v <68.27v >>
+to encompass all I<normal> results, or 68% of all entries, by I<< <--> >>.
 
-=item I<avg>
+=item B<avg>
 
 Matches the average;
 the sum of all values divided by the number of counted lines.
-Indicated by default as I<=>.
+Indicated by default as C<=>.
 
 =back
 
-=item --min=<number>, --max=<number>
+=item B<--min>=I<number>, B<--max>=I<number>
 
 Bars extend from 0 or the minimum value if lower,
 to the largest value encountered.
 These options can be set to customize this range.
 
-=item --palette=(<preset> | <color>...)
+=item B<--palette>=(I<preset> | I<color>...)
 
 Override colors of parsed numbers.
-Can be any CSI escape, such as I<90> for default dark grey,
-or alternatively I<1;30> for bright black.
+Can be any CSI escape, such as C<90> for default dark grey,
+or alternatively C<1;30> for bright black.
 
 In case of additional colors,
 the last is used for values equal to the maximum, the first for minima.
-If unspecified, these are green and red respectively (I<31 90 32>).
+If unspecified, these are green and red respectively (C<31 90 32>).
 Multiple intermediate colors will be distributed
 relative to the size of values.
 
 Predefined color schemes are named I<whites> and I<fire>,
 or I<greys> and I<fire256> for 256-color variants.
 
-=item -_, --spark
+=item B<-_>, B<--spark>
 
 Replace lines by I<sparklines>,
-single characters (configured by C<--indicators>)
+single characters (configured by B<--indicators>)
 corresponding to input values.
 
-=item --indicators[=<characters>]
+=item B<--indicators>[=I<characters>]
 
 Prefix a unicode character corresponding to each value.
 The first specified character will be used for non-values,
 the remaining sequence will be distributed over the range of values.
 Unspecified, block fill glyphs U+2581-2588 will be used.
 
-=item -s, --stat
+=item B<-s>, B<--stat>
 
 Total statistics after all data.
 
@@ -652,32 +652,32 @@ While processing (possibly a neverending pipe),
 intermediate results are also shown on signal I<SIGINFO> if available (control+t on BSDs)
 or I<SIGQUIT> otherwise (ctrl+\ on linux).
 
-=item -u, --unmodified
+=item B<-u>, B<--unmodified>
 
 Do not reformat values, keeping leading whitespace.
 Keep original value alignment, which may be significant in some programs.
 
-=item --value-length=<size>
+=item B<--value-length>=I<size>
 
 Reserved space for numbers.
 
-=item -w, --width=<columns>
+=item B<-w>, B<--width>=I<columns>
 
 Override the maximum number of columns to use.
 Appended graphics will extend to fill up the entire screen,
 otherwise determined by the environment variable I<COLUMNS>
-or by running the C<tput> command.
+or by running the I<tput> command.
 
-=item -h, --usage
+=item B<-h>, B<--usage>
 
 Overview of available options.
 
-=item --help
+=item B<--help>
 
 Full pod documentation
 as rendered by perldoc.
 
-=item -V, --version
+=item B<-V>, B<--version>
 
 Version information.
 
