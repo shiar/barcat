@@ -43,7 +43,7 @@ for my $candidate (@params) {
 	my $shell = $script;
 	if ($script =~ /\|/) {
 		# explicit shell wrapper to capture all warnings
-		$script =~ s/'/'\\''/g;
+		$shell =~ s/'/'\\''/g;
 		$shell = "sh -c '$shell'";
 	}
 	$shell .= ' 2>' . ($wantwarn ? '&1' : '/dev/null');
