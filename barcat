@@ -210,11 +210,11 @@ if (defined $opt{interval}) {
 }
 
 my $float = qr<[0-9]* [.]? [0-9]+ (?: e[+-]?[0-9]+ )?>; # positive numberish
-my $valmatch = qr< $opt{anchor} ( \h* -? $float |) >x;
+my $valmatch = qr< $opt{anchor} ( \h* -? $float |) >;
 while (defined ($_ = $opt{input} ? shift @{ $opt{input} } : readline)) {
 	s/\r?\n\z//;
 	if ($opt{count}) {
-		my ($valnum) = m/(\S*)/;
+		my ($valnum) = m/$opt{anchor} (\S*)/;
 		$valnum //= '';
 		$uniq{$valnum}++ and next;
 		push @lines, "\n " . $_;
@@ -776,7 +776,7 @@ Users on the current server while preserving order:
 
 Number of HTTP requests per day:
 
-    cat httpd/access.log | cut -d\  -f4 | cut -d: -f1 | uniq -c | barcat
+    barcat -cf'\[([^:]+)' httpd/access.log
 
 Any kind of database query results, preserving returned alignment:
 

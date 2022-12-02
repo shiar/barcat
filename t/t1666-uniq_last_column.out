@@ -1,0 +1,5 @@
+barcat -c -f2 input/duplicolumns.txt
+4 prefix 1 1 ---<------+-=-----
+6 random 2 2 ---<------+-=-------->-----
+1 prefix 3 0 ---<-
+1 prefix 2   ---<-

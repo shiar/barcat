@@ -1,0 +1,4 @@
+barcat -c -f'(e.)' input/duplicates.txt
+17 thrice    --+------=---->------------
+ 1  indented --
+ 2 different --+
