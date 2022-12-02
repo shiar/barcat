@@ -26,6 +26,7 @@ GetOptions(\%opt,
 			$opt{anchor} = qr/$_/;
 		} or die $@ =~ s/(?:\ at\ \N+)?\Z/ for option $_[0]/r;
 	},
+	'count|c!',
 	'human-readable|H!',
 	'sexagesimal!',
 	'reformat!',
@@ -189,7 +190,7 @@ $opt{'value-format'} = $opt{sexagesimal} ? sub {
 $opt{'value-format'} ||= sub { sprintf '%.8g', $_[0] };
 
 
-my (@lines, @values, @order);
+my (@lines, @values, @order, %uniq);
 
 $SIG{$_} = \&show_stat for $opt{'signal-stat'} || ();
 $SIG{ALRM} = sub {
@@ -212,6 +213,14 @@ my $float = qr<[0-9]* [.]? [0-9]+ (?: e[+-]?[0-9]+ )?>; # positive numberish
 my $valmatch = qr< $opt{anchor} ( \h* -? $float |) >x;
 while (defined ($_ = $opt{input} ? shift @{ $opt{input} } : readline)) {
 	s/\r?\n\z//;
+	if ($opt{count}) {
+		my ($valnum) = m/(\S*)/;
+		$valnum //= '';
+		$uniq{$valnum}++ and next;
+		push @lines, "\n " . $_;
+		push @values, $valnum;
+		next;
+	}
 	s/\A\h*// unless $opt{unmodified};
 	my $valnum = s/$valmatch/\n/ && $1;
 	push @values, $valnum;
@@ -246,6 +255,11 @@ state $nr = $opt{hidemin} ? $opt{hidemin}->($#lines) : 0;
 @lines > $nr or return;
 
 my $limit = $opt{hidemax} ? $opt{hidemax}->($#lines, $nr) : $#lines;
+
+if ($opt{count}) {
+	$_ = $uniq{$_} for @values;
+	@order = @values;
+}
 
 @order = sort { $b <=> $a } @order unless tied @order;
 my $maxval = $opt{maxval} // (
@@ -438,6 +452,8 @@ Usage:                                               /\_/\
 Options:
   -a, --[no-]ascii         Restrict user interface to ASCII characters
   -C, --[no-]color         Force colored output of values and bar markers
+  -c, --count              Omit repetitions and count the number of
+                           occurrences
   -f, --field=([+]N|REGEXP)
                            Compare values after a given number of whitespace
                            separators
@@ -508,6 +524,12 @@ Defaults on if output is a tty,
 disabled otherwise such as when piped or redirected.
 Can also be disabled by setting B<-M>
 or the I<NO_COLOR> environment variable.
+
+=item B<-c>, B<--count>
+
+Omit repetitions and count the number of occurrences.
+Similar to piping input to C<sort | uniq -c>
+but keeping the order of first appearances.
 
 =item B<-f>, B<--field>=([B<+>]I<number> | I<regexp>)
 
@@ -742,15 +764,15 @@ Monitor network latency from prefixed results:
 
     ping google.com | barcat -f'time=\K' -t
 
-Commonly used after counting, for example users on the current server:
-
-    users | tr ' ' '\n' | sort | uniq -c | barcat
-
-Letter frequencies in text files:
+Commonly used after counting, eg letter frequencies in text files:
 
     cat /usr/share/games/fortunes/*.u8 |
     perl -CS -nE 'say for grep length, split /\PL*/, uc' |
     sort | uniq -c | barcat
+
+Users on the current server while preserving order:
+
+    users | tr ' ' '\n' | barcat -c
 
 Number of HTTP requests per day:
 
