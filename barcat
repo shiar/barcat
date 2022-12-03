@@ -206,25 +206,29 @@ if (defined $opt{interval}) {
 	eval {
 		require Tie::Array::Sorted;
 		tie @order, 'Tie::Array::Sorted', sub { $_[1] <=> $_[0] };
-	} or warn $@, "Expect slowdown with large datasets!\n";
+	} or warn $@, "Expect slowdown with large datasets!\n"
+		unless $opt{count};
 }
 
 my $float = qr<[0-9]* [.]? [0-9]+ (?: e[+-]?[0-9]+ )?>; # positive numberish
 my $valmatch = qr< $opt{anchor} ( \h* -? $float |) >;
 while (defined ($_ = $opt{input} ? shift @{ $opt{input} } : readline)) {
 	s/\r?\n\z//;
+	my $valnum;
 	if ($opt{count}) {
-		my ($valnum) = m/$opt{anchor} (\S*)/;
+		($valnum) = m/$opt{anchor} (\S*)/;
 		$valnum //= '';
 		$uniq{$valnum}++ and next;
-		push @lines, "\n " . $_;
 		push @values, $valnum;
-		next;
+		s/\A/\n /;
 	}
-	s/\A\h*// unless $opt{unmodified};
-	my $valnum = s/$valmatch/\n/ && $1;
-	push @values, $valnum;
-	push @order, $valnum if length $valnum;
+	else {
+		s/\A\h*// unless $opt{unmodified};
+		$valnum = s/$valmatch/\n/ && $1;
+		push @values, $valnum;
+		push @order, $valnum if length $valnum;
+	}
+
 	if (defined $opt{trim} and defined $valnum) {
 		my $trimpos = abs $opt{trim};
 		$trimpos -= length $valnum if $opt{unmodified};
@@ -237,6 +241,8 @@ while (defined ($_ = $opt{input} ? shift @{ $opt{input} } : readline)) {
 		}
 	}
 	push @lines, $_;
+}
+continue {
 	show_lines() if defined $opt{interval} and $opt{interval} < 0
 		and $. % $opt{interval} == 0;
 }
@@ -257,7 +263,7 @@ state $nr = $opt{hidemin} ? $opt{hidemin}->($#lines) : 0;
 my $limit = $opt{hidemax} ? $opt{hidemax}->($#lines, $nr) : $#lines;
 
 if ($opt{count}) {
-	$_ = $uniq{$_} for @values;
+	$_ = $uniq{$_} for @values[$nr .. $limit];
 	@order = @values;
 }
 
@@ -388,6 +394,7 @@ continue {
 	$nr++;
 }
 say $opt{palette} ? color(0) : '' if $opt{spark};
+%uniq = () if $opt{interval} and $opt{count};
 
 	return $nr;
 }
