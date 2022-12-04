@@ -509,7 +509,6 @@ Visualizes relative sizes of values read from input
 Contents are concatenated similar to I<cat>,
 but numbers are reformatted and a bar graph is appended to each line.
 
-Don't worry, barcat does not drink and divide.
 It can has various options for input and output (re)formatting,
 but remains limited to one-dimensional charts.
 For more complex graphing needs
