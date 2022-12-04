@@ -1,4 +1,4 @@
-barcat --markers=')0v (100v' input/ascii.txt
+barcat --markers=')0v (100v' input/ascii.txt # TODO position before marker character
 123e-6 micro     (---------------------
     .1 long line (---------------------)
     -1           (--------------

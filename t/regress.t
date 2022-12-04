@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 use 5.014;
 use warnings;
-use re '/ms';
+use re '/msx';
 use Getopt::Long qw(2.32 :config gnu_getopt);
 use Test::More;
 use File::Basename;
@@ -23,8 +23,7 @@ plan(tests => int @params);
 for my $candidate (@params) {
 	my $name = basename($candidate, '.out');
 	$name =~ tr/_/ /;
-	my $todo = $name =~ s/ #TODO$//;
-	local $TODO = $todo ? ' ' : undef;
+	local $TODO;
 
 	if (!-e $candidate) {
 		local $TODO = 'missing output';
@@ -38,8 +37,11 @@ for my $candidate (@params) {
 
 	my $script = $spec;
 	chomp $script;
+	$script =~ s/\h* [#]\h* todo \h* (.*?) \z//i
+		and $TODO = $+ || ' ';
 	my $wantexit = $script =~ s/\h+[?](\d+)\z// ? $1 : 0;
 	my $wantwarn = $script !~ s/[?]\z//;
+
 	my $shell = $script;
 	if ($script =~ /\|/) {
 		# explicit shell wrapper to capture all warnings
