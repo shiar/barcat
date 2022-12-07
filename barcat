@@ -287,6 +287,7 @@ my @barmark;
 if ($opt{markers} and $size > 0) {
 	for my $markspec (split /\h/, $opt{markers}) {
 		my ($char, $func) = split //, $markspec, 2;
+		my $increment = $func =~ s/[+]\z//;
 		my @pos = eval {
 			if ($func eq 'avg') {
 				return sum(@order) / @order;
@@ -321,7 +322,8 @@ if ($opt{markers} and $size > 0) {
 			$pos -= $minval;
 			$pos &&= log $pos if $opt{log};
 			$pos >= 0 or next;
-			color(36) for $barmark[$pos / $range * $size] = $char;
+			$increment ||= $minval && !$pos;
+			color(36) for $barmark[$pos / $range * $size + $increment] = $char;
 		}
 	}
 
