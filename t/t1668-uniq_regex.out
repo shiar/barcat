@@ -1,5 +1,5 @@
 barcat -c -f'prefix\ ' input/duplicolumns.txt
 3 prefix 1 1 -------------------+
 2 random 2 2 --------------
-4 prefix 3 1 -------------------+--->---
+4 prefix 3 1 -------------------+>------
 3 prefix 2 1 -------------------+

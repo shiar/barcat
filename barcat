@@ -423,7 +423,13 @@ sub calc {
 			"percentile $1 out of bounds\n"
 		);
 		my $index = $#order * $1 / 100;
-		return ($order[$index] + $order[$index + .5]) / 2;
+		my $f = $index - int $index;
+		my $val = $order[$index];
+		if ($f) {
+			my $next = $order[$index + 1];
+			$val -= $f * ($val - $next);
+		}
+		return $val;
 	}
 	elsif ($func =~ /\A-?[0-9.]+\z/) {
 		return $func;
@@ -638,10 +644,13 @@ For example C<:/1> for a grid at every integer.
 
 =item I<percentage>B<v>
 
-Ranked value at the given percentile.
-The default shows C<+> at C<50v> for the mean or median;
-the middle value or average between middle values.
-One standard deviation right of the mean is at about C<68.3v>.
+Ranked value at the given percentile,
+or score at or below which a percentage falls
+in its frequency distribution (inclusive).
+
+The default shows C<+> at C<50v> for the mean or median:
+the middle value or interpolation between two values.
+One standard deviation below the median is at about C<68v>.
 The default includes C<< >31.73v <68.27v >>
 to encompass all I<normal> results, or 68% of all entries, by I<< <--> >>.
 

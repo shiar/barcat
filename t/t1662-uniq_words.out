@@ -1,8 +1,8 @@
 barcat --count input/duplicates.txt
- 3 thrice      --+->=--
- 2 twice       --+->
+ 3 thrice      --+>-=--
+ 2 twice       --+>-
  1 once        --+
-10 most        --+->=-------------------
+10 most        --+>-=-------------------
  1             --+
  1  indented   --+
  1 different   --+
