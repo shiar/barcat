@@ -1,7 +1,7 @@
 barcat --markers='atest 09998 b200v c15000 0test' input/intsine.txt
-Unknown marker a: test
+Invalid marker a: test unknown
 Invalid marker b: percentile 200 out of bounds
-Unknown marker 0: test
+Invalid marker 0: test unknown
  998 ---
 1987 -------
 2955 ----------

@@ -289,20 +289,7 @@ if ($opt{markers} and $size > 0) {
 		my ($char, $func) = split //, $markspec, 2;
 		my $increment = $func =~ s/[+]\z//;
 		my @pos = eval {
-			if ($func eq 'avg') {
-				return sum(@order) / @order;
-			}
-			elsif ($func =~ /\A([0-9.]+)v\z/) {
-				$1 <= 100 or die(
-					"Invalid marker $char: percentile $1 out of bounds\n"
-				);
-				my $index = $#order * $1 / 100;
-				return ($order[$index] + $order[$index + .5]) / 2;
-			}
-			elsif ($func =~ /\A-?[0-9.]+\z/) {
-				return $func;
-			}
-			elsif ($func =~ /\A\/($float)\z/) {
+			if ($func =~ /\A\/($float)\z/) {
 				my @range = my $multiple = my $next = $1;
 				while ($next < $maxval) {
 					$multiple *= 10 if $opt{log};
@@ -310,12 +297,9 @@ if ($opt{markers} and $size > 0) {
 				}
 				return @range;
 			}
-			else {
-				die "Unknown marker $char: $func\n";
-			}
-		};
-		@pos or do {
-			warn $@ if $@;
+			return calc($func);
+		} or do {
+			warn "Invalid marker $char: $@" if $@;
 			next;
 		};
 		for my $pos (@pos) {
@@ -404,6 +388,7 @@ say $opt{palette} ? color(0) : '' if $opt{spark};
 
 sub show_stat {
 	my %vars = (
+		partsum => undef,
 		count => int @order,
 		lines => int @lines,
 	);
@@ -425,12 +410,35 @@ sub show_stat {
 	return 1;
 }
 
+sub calc {
+	my ($func) = @_;
+	if ($func eq 'avg') {
+		return sum(@order) / @order;
+	}
+	elsif ($func eq 'sum') {
+		return sum(@order);
+	}
+	elsif ($func =~ /\A([0-9.]+)v\z/) {
+		$1 <= 100 or die(
+			"percentile $1 out of bounds\n"
+		);
+		my $index = $#order * $1 / 100;
+		return ($order[$index] + $order[$index + .5]) / 2;
+	}
+	elsif ($func =~ /\A-?[0-9.]+\z/) {
+		return $func;
+	}
+	else {
+		die "$func unknown\n";
+	}
+}
+
 sub varfmt {
 	my ($fmt, $vars) = @_;
 	$fmt =~ s[\$\{ \h*+ ((?: [^{}]++ | \{(?1)\} )+) \}]{
 		my ($name, $op, $cmd) = split /\s*([;:])/, $1, 2;
 		my $format = $name =~ s/\+// || $name !~ s/\#// && $opt{reformat};
-		local $_ = $vars->{$name};
+		local $_ = exists $vars->{$name} ? $vars->{$name} : calc($name);
 		defined && do {
 			$_ = $opt{'value-format'}->($_) if $format;
 			if ($cmd and $op eq ':') {
@@ -639,7 +647,7 @@ to encompass all I<normal> results, or 68% of all entries, by I<< <--> >>.
 
 =item B<avg>
 
-Matches the average;
+Matches the average (arithmetic mean);
 the sum of all values divided by the number of counted lines.
 Indicated by default as C<=>.
 
