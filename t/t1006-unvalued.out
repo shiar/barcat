@@ -2,8 +2,8 @@ barcat input/unvalued.txt
 nan
  -1 negative  -------
  -2 negativer 
-  0 zero      ------------=|-
- .0 zeroer    ------------=|-
--00 zeroest   ------------=|-
+  0 zero      ------------=-|
+ .0 zeroer    ------------=-|
+-00 zeroest   ------------=-|
 
-1.5 positive  ------------=|------------
+1.5 positive  ------------=-|-----------

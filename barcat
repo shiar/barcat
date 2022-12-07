@@ -323,7 +323,7 @@ if ($opt{markers} and $size > 0) {
 			$pos &&= log $pos if $opt{log};
 			$pos >= 0 or next;
 			$increment ||= $minval && !$pos;
-			color(36) for $barmark[$pos / $range * $size + $increment] = $char;
+			color(36) for $barmark[$pos / $range * $size + $increment + .5] = $char;
 		}
 	}
 
