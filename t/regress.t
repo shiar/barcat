@@ -69,6 +69,7 @@ for my $candidate (@params) {
 	if ($error != $wantexit) {
 		fail($name);
 		diag("unexpected exit status $error");
+		diag(color(31), '> ', color(0), $_) for @lines;
 		diag("command: $script");
 		next;
 	}
