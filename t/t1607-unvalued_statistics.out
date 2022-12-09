@@ -1,0 +1,3 @@
+echo | barcat -s
+
+0 values over 1 lines

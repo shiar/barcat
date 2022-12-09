@@ -448,7 +448,7 @@ sub varfmt {
 		defined && do {
 			$_ = $opt{'value-format'}->($_) if $format;
 			if ($cmd and $op eq ':') {
-				$_ = varfmt($cmd, $vars);
+				$_ = !!$_ && varfmt($cmd, $vars);
 			}
 			elsif ($cmd) {
 				eval $cmd;
