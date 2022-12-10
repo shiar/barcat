@@ -152,9 +152,9 @@ $opt{report} //= join('',
 	'${count#} values',
 	'${lines#; $_ = $_ != @order && " over $_ lines"}',
 	sprintf('${count: (%s)}', join ', ',
-		'${min; color(31)} min',
+		'${0v; color(31)} min',
 		'${avg; $opt{reformat} or $_ = sprintf "%0.2f", $_; color(36)} avg',
-		'${max; color(32)} max',
+		'${100v; color(32)} max',
 	),
 );
 $opt{palette} //= $opt{color} && [31, 90, 32];
@@ -399,10 +399,6 @@ sub show_stat {
 	if (@order) {
 		$vars{partsum} = sum(0, grep {length} @values[$linemin .. $linemax])
 			if $linemin <= $linemax and ($opt{hidemin} or $opt{hidemax});
-		%vars = (%vars,
-			min => $order[-1],
-			max => $order[0],
-		);
 	}
 	say varfmt($opt{report}, \%vars);
 	return 1;
