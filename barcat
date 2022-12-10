@@ -400,11 +400,9 @@ sub show_stat {
 		$vars{partsum} = sum(0, grep {length} @values[$linemin .. $linemax])
 			if $linemin <= $linemax and ($opt{hidemin} or $opt{hidemax});
 		%vars = (%vars,
-			sum => sum(@order),
 			min => $order[-1],
 			max => $order[0],
 		);
-		$vars{avg} = $vars{sum} / @order;
 	}
 	say varfmt($opt{report}, \%vars);
 	return 1;
@@ -413,10 +411,16 @@ sub show_stat {
 sub calc {
 	my ($func) = @_;
 	if ($func eq 'avg') {
-		return sum(@order) / @order;
+		return calc('sum') / @order;
 	}
 	elsif ($func eq 'sum') {
-		return sum(@order);
+		state $cache;         # avoid recount
+		state $cachednr = 0;  # if unchanged
+		unless (@order == $cachednr) {
+			$cache = sum(@order);
+			$cachednr = @order;
+		}
+		return $cache;
 	}
 	elsif ($func =~ /\A([0-9.]+)v\z/) {
 		$1 <= 100 or die(
