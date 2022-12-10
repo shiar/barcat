@@ -145,7 +145,7 @@ $opt{units}   = [split //, ' kMGTPEZYRQqryzafpn'.($opt{ascii} ? 'u' : 'μ').'m']
 $opt{'value-length'} = 4 if $opt{units};
 $opt{'value-length'} = 1 if $opt{unmodified};
 $opt{'signal-stat'} //= exists $SIG{INFO} ? 'INFO' : 'QUIT';
-$opt{markers} //= '=avg >31.73v <68.27v +50v |0';
+$opt{markers} //= '=avg <31.73v >68.27v +50v |0';
 $opt{report} //= join('',
 	'${partsum+; $_ .= " of "}',
 	'${sum+; color(1); $_ .= " total in "}',
@@ -204,7 +204,7 @@ if (defined $opt{interval}) {
 
 	eval {
 		require Tie::Array::Sorted;
-		tie @order, 'Tie::Array::Sorted', sub { $_[1] <=> $_[0] };
+		tie @order, 'Tie::Array::Sorted', sub { $_[0] <=> $_[1] };
 	} or warn $@, "Expect slowdown with large datasets!\n"
 		unless $opt{count};
 }
@@ -268,12 +268,12 @@ if ($opt{count}) {
 	@order = @values;
 }
 
-@order = sort { $b <=> $a } @order unless tied @order;
+@order = sort { $a <=> $b } @order unless tied @order;
 my $maxval = $opt{maxval} // (
 	$opt{hidemax} ? max grep { length } @values[$nr .. $limit] :
-	$order[0]
+	$order[-1]
 ) // 0;
-my $minval = $opt{minval} // min $order[-1] // (), 0;
+my $minval = $opt{minval} // min $order[0] // (), 0;
 my $range = $maxval - $minval;
 $range &&= log $range if $opt{log};
 my $lenval = $opt{'value-length'} // max map { length } @order;
@@ -342,13 +342,13 @@ while ($nr <= $limit) {
 		$rel = min(1, $rel / $range) if $range; # 0..1
 	}
 	my $color = !length $val || !$opt{palette} ? undef :
-		$val == $order[0] ? $opt{palette}->[-1] : # max
-		$val == $order[-1] ? $opt{palette}->[0] : # min
+		$val == $order[-1] ? $opt{palette}->[-1] : # max
+		$val == $order[0] ? $opt{palette}->[0] : # min
 		$opt{palette}->[ $rel * ($#{$opt{palette}} - 1) + 1 ];
 	my $indicator = $opt{indicators} && $opt{indicators}->[
 		!length($val) || !$#{$opt{indicators}} ? 0 : # blank
 		$#{$opt{indicators}} < 2 ? 1 :
-		$val >= $order[0] ? -1 :
+		$val >= $order[-1] ? -1 :
 		$rel * ($#{$opt{indicators}} - 1e-14) + 1
 	];
 
@@ -654,8 +654,8 @@ in its frequency distribution (inclusive).
 
 The default shows C<+> at C<50v> for the mean or median:
 the middle value or interpolation between two values.
-One standard deviation below the median is at about C<68v>.
-The default includes C<< >31.73v <68.27v >>
+One standard deviation above the median is at about C<68v>.
+The default includes C<< <31.73v >68.27v >>
 to encompass all I<normal> results, or 68% of all entries, by I<< <--> >>.
 
 =item B<avg>
