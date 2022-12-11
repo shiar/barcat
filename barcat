@@ -315,11 +315,12 @@ if ($opt{markers} and $size > 0) {
 	if ($maxval > $lastmax) {
 		print ' ' x ($lenval + $len);
 		print color(90);
+		my $lastbar = int(($lastmax - $minval) * $size / $range + .5);
 		printf '%-*s',
-			($lastmax - $minval) * $size / $range + .5,
-			'-' x (($values[$nr - 1] - $minval) * $size / $range);
+			$lastbar,
+			'-' x (($values[$nr - 1] - $minval) * $size / $range + .5);
 		print color(92);
-		say '+' x (($range - $lastmax) * $size / $range + .5);
+		say '+' x ($size - $lastbar);
 		print color(0);
 		$lastmax = $maxval;
 	}

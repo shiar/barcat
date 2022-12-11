@@ -1,4 +1,4 @@
-barcat -t-1 input/float.txt # TODO wtf no
+barcat -t-1 input/float.txt
 -3 
 -2.449 ---------<------+----->----------
        ------------------+++++++++++++++
