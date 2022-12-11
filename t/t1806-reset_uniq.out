@@ -1,4 +1,4 @@
-barcat -ct-7 input/duplicates.txt
+barcat -t-7 -c input/duplicates.txt
 3 thrice ---------<-----+-=-->----------
 2 twice  ---------<-----+-=-->
 1 once   ---------<
