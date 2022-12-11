@@ -1,4 +1,4 @@
-barcat -t-2 1 0 3 2 5 4 7 6 9 8 # TODO inline values treated as a single line
+barcat -t-2 1 0 3 2 5 4 7 6 9 8
 1 -----------<------+------>------------
 0 
                +++++++++++++++++++++++++

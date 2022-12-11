@@ -161,8 +161,7 @@ $opt{palette} //= $opt{color} && [31, 90, 32];
 $opt{indicators} = [split //, $opt{indicators} ||
 	($opt{ascii} ? ' .oO' : $opt{spark} ? ' ▁▂▃▄▅▆▇█' : ' ▏▎▍▌▋▊▉█')
 ] if defined $opt{indicators} or $opt{spark};
-$opt{input} = (@ARGV && $ARGV[0] =~ m/\A[-0-9]/) ? \@ARGV : undef
-	and undef $opt{interval};
+$opt{input} = (@ARGV && $ARGV[0] =~ m/\A[-0-9]/) ? \@ARGV : undef;
 
 $opt{'calc-format'} = sub { sprintf '%*.*f', 0, 2, $_[0] };
 $opt{'value-format'} = $opt{sexagesimal} ? sub {
@@ -244,8 +243,9 @@ while (defined ($_ = $opt{input} ? shift @{ $opt{input} } : readline)) {
 	push @lines, $_;
 }
 continue {
+	state $nr = 0; # $. for any input
 	show_lines() if defined $opt{interval} and $opt{interval} < 0
-		and $. % $opt{interval} == 0;
+		and ++$nr % $opt{interval} == 0;
 }
 
 $SIG{INT} = 'DEFAULT';
