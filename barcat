@@ -6,7 +6,7 @@ use List::Util qw( min max sum );
 use open qw( :std :utf8 );
 use re '/msx';
 
-our $VERSION = '1.09';
+our $VERSION = '1.10';
 
 my %opt;
 if (@ARGV) {
