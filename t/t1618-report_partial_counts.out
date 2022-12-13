@@ -1,0 +1,2 @@
+barcat -L-4 --report='${count@}/${count} values | ${lines@}/${lines} lines | ${sum@+}/${sum+} total' input/zeroes.txt | tail -n1
+2/10 values | 4/15 lines | 1.9/16.9 total

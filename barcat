@@ -148,8 +148,8 @@ $opt{'signal-stat'} //= exists $SIG{INFO} ? 'INFO' : 'QUIT';
 $opt{markers} //= '=avg <31.73v >68.27v +50v |0';
 $opt{stat} //= 1 if defined $opt{report};
 $opt{report} //= join('',
-	'${partsum+; $_ .= " of "}',
-	'${sum+; color(1); $_ .= " total in "}',
+	'${lines@:${sum@+} of }',
+	'${count:${sum+; color(1)} total in }',
 	'${count#} values',
 	'${lines#; $_ = $_ != @order && " over $_ lines"}',
 	sprintf('${count: (%s)}', join ', ',
@@ -396,42 +396,33 @@ say $opt{palette} ? color(0) : '' if $opt{spark};
 }
 
 sub show_stat {
-	my %vars = (
-		partsum => undef,
-	);
-	my $linemin = $opt{start} // 0;
-	my $linemax = $opt{end} // -1;
-	if (@order) {
-		$vars{partsum} = sum(0, grep {length} @values[$linemin .. $linemax])
-			if $linemin <= $linemax and ($opt{hidemin} or $opt{hidemax});
-	}
-	say varfmt($opt{report}, \%vars);
+	say varfmt($opt{report});
 	return 1;
 }
 
 sub _calc {
-	my ($func) = @_;
+	my ($func, $order) = @_;
 	if ($func eq 'count') {
-		return int @order;
+		return int @{$order};
 	}
 	elsif ($func eq 'lines') {
 		return int @lines;
 	}
 	elsif ($func eq 'sum') {
-		return sum(@order);
+		return sum(0, @{$order});
 	}
 	elsif ($func eq 'avg') {
-		return calc('sum') / @order;
+		return calc('sum') / @{$order};
 	}
 	elsif ($func =~ /\A([0-9.]+)v\z/) {
 		$1 <= 100 or die(
 			"percentile $1 out of bounds\n"
 		);
-		my $index = $#order * $1 / 100;
+		my $index = $#{$order} * $1 / 100;
 		my $f = $index - int $index;
-		my $val = $order[$index];
+		my $val = $order->[$index];
 		if ($f) {
-			my $next = $order[$index + 1];
+			my $next = $order->[$index + 1];
 			$val -= $f * ($val - $next);
 		}
 		return $val;
@@ -450,24 +441,37 @@ sub calc {
 	unless ($cache->{count} == @order) {
 		$cache = {count => int @order};  # flush after change
 	}
+	$cache->{'lines@'} //= $opt{start} || $opt{hidemax} ?
+		max(0, $opt{end} - $opt{start} + 1) : '';
 
-	return $cache->{$func} //= _calc($func);
+	my $request = $func;
+	my $vals = \@order;
+	if ($func =~ s/\@\z// and ($opt{hidemin} or $opt{hidemax})) {
+		my $linemin = $opt{start} // 0;
+		my $linemax = $opt{end} // -1;
+		$vals = $cache->{part} //=
+			[grep {length} @values[$linemin .. $linemax]];
+	}
+
+	return $cache->{$request} //= _calc($func, $vals);
 }
 
 sub varfmt {
-	my ($fmt, $vars) = @_;
+	my ($fmt) = @_;
 	$fmt =~ s[\$\{ \h*+ ((?: [^{}]++ | \{(?1)\} )+) \}]{
 		my ($name, $op, $cmd) = split /\s*([;:])/, $1, 2;
 		my $format = $name =~ s/\+// || $name !~ s/\#// && $opt{reformat};
-		local $_ = exists $vars->{$name} ? $vars->{$name} : calc($name);
+		local $_ = calc($name);
 		defined && do {
-			$_ = $opt{'value-format'}->($_) if $format;
 			if ($cmd and $op eq ':') {
-				$_ = !!$_ && varfmt($cmd, $vars);
+				$_ = !!$_ && varfmt($cmd);
 			}
-			elsif ($cmd) {
-				eval $cmd;
-				warn "Error in \$$name report: $@" if $@;
+			else {
+				$_ = $opt{'value-format'}->($_) if $format;
+				if ($cmd) {
+					eval $cmd;
+					warn "Error in \$$name report: $@" if $@;
+				}
 			}
 			$_;
 		}
