@@ -409,7 +409,7 @@ sub show_stat {
 	return 1;
 }
 
-sub calc {
+sub _calc {
 	my ($func) = @_;
 	if ($func eq 'count') {
 		return int @order;
@@ -418,13 +418,7 @@ sub calc {
 		return int @lines;
 	}
 	elsif ($func eq 'sum') {
-		state $cache;         # avoid recount
-		state $cachednr = 0;  # if unchanged
-		unless (@order == $cachednr) {
-			$cache = sum(@order);
-			$cachednr = @order;
-		}
-		return $cache;
+		return sum(@order);
 	}
 	elsif ($func eq 'avg') {
 		return calc('sum') / @order;
@@ -448,6 +442,16 @@ sub calc {
 	else {
 		die "$func unknown\n";
 	}
+}
+
+sub calc {
+	my ($func) = @_;
+	state $cache = {count => 0};
+	unless ($cache->{count} == @order) {
+		$cache = {count => int @order};  # flush after change
+	}
+
+	return $cache->{$func} //= _calc($func);
 }
 
 sub varfmt {
