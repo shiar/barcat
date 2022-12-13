@@ -259,10 +259,11 @@ sub color {
 
 sub show_lines {
 
-state $nr = $opt{hidemin} ? $opt{hidemin}->($#lines) : 0;
+state $nr = $opt{start} = $opt{hidemin} ? $opt{hidemin}->($#lines) : 0;
 @lines > $nr or return;
 
-my $limit = $opt{hidemax} ? $opt{hidemax}->($#lines, $nr) : $#lines;
+my $limit = $opt{end} =
+	$opt{hidemax} ? $opt{hidemax}->($#lines, $nr) : $#lines;
 
 if ($opt{count}) {
 	$_ = $uniq{$_} for @values[$nr .. $limit];
@@ -398,10 +399,8 @@ sub show_stat {
 	my %vars = (
 		partsum => undef,
 	);
-	my $linemin = !$opt{hidemin} ? 0 :
-		($vars{start} = $opt{hidemin}->($#lines));
-	my $linemax = !$opt{hidemax} ? $#lines :
-		($vars{end} = $opt{hidemax}->($#lines, $vars{start}));
+	my $linemin = $opt{start} // 0;
+	my $linemax = $opt{end} // -1;
 	if (@order) {
 		$vars{partsum} = sum(0, grep {length} @values[$linemin .. $linemax])
 			if $linemin <= $linemax and ($opt{hidemin} or $opt{hidemax});
