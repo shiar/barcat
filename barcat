@@ -146,6 +146,7 @@ $opt{'value-length'} = 4 if $opt{units};
 $opt{'value-length'} = 1 if $opt{unmodified};
 $opt{'signal-stat'} //= exists $SIG{INFO} ? 'INFO' : 'QUIT';
 $opt{markers} //= '=avg <31.73v >68.27v +50v |0';
+$opt{stat} //= 1 if defined $opt{report};
 $opt{report} //= join('',
 	'${partsum+; $_ .= " of "}',
 	'${sum+; color(1); $_ .= " total in "}',
@@ -507,6 +508,7 @@ Options:
   -_, --spark              Replace lines by sparklines
       --indicators[=CHARS] Prefix a unicode character corresponding to each
                            value
+      --report=FORMAT      Custom footer description
   -s, --stat               Total statistics after all data
   -u, --unmodified         Do not reformat values, keeping leading whitespace
       --value-length=SIZE  Reserved space for numbers
@@ -729,6 +731,41 @@ Prefix a unicode character corresponding to each value.
 The first specified character will be used for non-values,
 the remaining sequence will be distributed over the range of values.
 Unspecified, block fill glyphs U+2581-2588 will be used.
+
+=item B<--report>=I<format>
+
+Custom footer description,
+a string printed after all data.
+Variables start with a C<$> symbol and are enclosed by C<{}> braces.
+Within is a I<position> name, with optional trailing suffixes:
+
+=over 2
+
+=item B<#>
+
+Prevent any B<human> or B<sexagesimal> formatting.
+
+=item B<+>
+
+Force number formatting, either specified or float.
+
+=item B<@>
+
+Filter over visible lines only.
+
+=item B<;>I<code>
+
+Perl code to post-process value in C<$_>.
+
+=item B<:>I<format>
+
+Recurse the following subformat
+only if the resulting value is not empty or zero.
+
+=back
+
+C<< ${sum@+} of ${sum+} total in ${count#} values over ${$lines#} lines >>
+C<< ${count: (${0%} min, ${avg; color(36)} avg, ${100%} max)} >>
 
 =item B<-s>, B<--stat>
 

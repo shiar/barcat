@@ -1,0 +1,2 @@
+barcat -L -H --report '${2.15v} ${8.87v} ${25v} ${50v#} ${75v+} ${91.13v} ${97.85v}' input/magnitude.txt
+ 88p 2.1n 4.6μ 0.6  51k  72M 1.3G
