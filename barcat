@@ -397,8 +397,6 @@ say $opt{palette} ? color(0) : '' if $opt{spark};
 sub show_stat {
 	my %vars = (
 		partsum => undef,
-		count => int @order,
-		lines => int @lines,
 	);
 	my $linemin = !$opt{hidemin} ? 0 :
 		($vars{start} = $opt{hidemin}->($#lines));
@@ -414,8 +412,11 @@ sub show_stat {
 
 sub calc {
 	my ($func) = @_;
-	if ($func eq 'avg') {
-		return calc('sum') / @order;
+	if ($func eq 'count') {
+		return int @order;
+	}
+	elsif ($func eq 'lines') {
+		return int @lines;
 	}
 	elsif ($func eq 'sum') {
 		state $cache;         # avoid recount
@@ -425,6 +426,9 @@ sub calc {
 			$cachednr = @order;
 		}
 		return $cache;
+	}
+	elsif ($func eq 'avg') {
+		return calc('sum') / @order;
 	}
 	elsif ($func =~ /\A([0-9.]+)v\z/) {
 		$1 <= 100 or die(
