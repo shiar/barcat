@@ -620,7 +620,7 @@ An update can also be forced by sending a I<SIGALRM> alarm signal.
 =item B<-l>, B<--length>=[B<->]I<size>[B<%>]
 
 Trim line contents (between number and bars)
-to a maximum number of characters.
+to a maximum number of characters or percentage of screen B<width>.
 The exceeding part is replaced by an abbreviation sign,
 unless B<--length=0>.
 
