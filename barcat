@@ -1,5 +1,5 @@
 #!/usr/bin/perl -CA
-use 5.018;  # my sub
+use 5.014;
 use warnings;
 use utf8;
 use List::Util qw( min max sum );
@@ -276,7 +276,7 @@ my $maxval = $opt{maxval} // (
 	$order[-1]
 ) // 0;
 my $minval = $opt{minval} // min $order[0] // (), 0;
-my $range = $maxval - $minval;  # rel($maxval)
+my $range = $maxval - $minval;  # $relval->($maxval)
 my $lenval = $opt{'value-length'} // max map { length } @order;
 my $len    = defined $opt{trim} && $opt{trim} <= 0 ? -$opt{trim} + 1 :
 	max(map { length $values[$_] && length $lines[$_] } $nr .. $limit)
@@ -285,13 +285,13 @@ my $size   = defined $opt{width} && $range &&
 	($opt{width} - $lenval - $len - !!$opt{indicators});  # bar multiplication
 $range &&= log $range if $opt{log};
 
-my sub rel {
+my $relval = sub {
 	my $val = shift;
 	$val -= $minval;
 	$val &&= log $val if $opt{log};
 	$val /= $range if $range;
 	return $val;
-}
+};
 
 my @barmark;
 if ($opt{markers} and $size > 0) {
@@ -313,7 +313,7 @@ if ($opt{markers} and $size > 0) {
 			next;
 		};
 		for my $pos (@pos) {
-			$pos = rel($pos);
+			$pos = $relval->($pos);
 			$pos >= 0 or next;
 			$increment ||= $minval && !$pos;
 			color(36) for $barmark[$pos * $size + $increment + .5] = $char;
@@ -324,10 +324,10 @@ if ($opt{markers} and $size > 0) {
 	if ($maxval > $lastmax) {
 		print ' ' x ($lenval + $len);
 		print color(90);
-		my $lastbar = int(rel($lastmax) * $size + .5);
+		my $lastbar = int($relval->($lastmax) * $size + .5);
 		printf '%-*s',
 			$lastbar,
-			'-' x (rel($values[$nr - 1]) * $size + .5);
+			'-' x ($relval->($values[$nr - 1]) * $size + .5);
 		print color(92);
 		say '+' x ($size - $lastbar);
 		print color(0);
@@ -347,7 +347,7 @@ while ($nr <= $limit) {
 	my $val = $values[$nr];
 	my $rel;
 	if (length $val) {
-		$rel = rel($val);
+		$rel = $relval->($val);
 		$rel = min(1, $rel) if $range; # 0..1
 	}
 	my $color = !length $val || !$opt{palette} ? undef :
