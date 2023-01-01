@@ -41,8 +41,9 @@ GetOptions(\%opt,
 		$opt{trim} = $optval;
 	},
 	'value-length=i',
-	'minval=f',
-	'maxval=f',
+	'minval=s',
+	'O|origin!' => sub { $opt{minval} = '0v@' },
+	'maxval=s',
 	'limit|L:s' => sub {
 		my ($optname, $optval) = @_;
 		$optval ||= 0;
@@ -271,11 +272,8 @@ if ($opt{count}) {
 }
 
 @order = sort { $a <=> $b } @order unless tied @order;
-my $maxval = $opt{maxval} // (
-	$opt{hidemax} ? max grep { length } @values[$nr .. $limit] :
-	$order[-1]
-) // 0;
-my $minval = $opt{minval} // min $order[0] // (), 0;
+my $maxval = calc($opt{maxval} // '100v@') // 0;
+my $minval = calc($opt{minval} // 'low');
 my $range = $maxval - $minval;  # $relval->($maxval)
 my $lenval = $opt{'value-length'} // max map { length } @order;
 my $len    = defined $opt{trim} && $opt{trim} <= 0 ? -$opt{trim} + 1 :
@@ -420,6 +418,9 @@ sub _calc {
 		my $median = calc('50v');
 		return sqrt(abs($avg**2 - $median**2)) / 2;
 	}
+	elsif ($func eq 'low') {
+		return min($order->[0] // (), 0);
+	}
 	elsif ($func =~ /\A([0-9.]+)v\z/) {
 		$1 <= 100 or die(
 			"percentile $1 out of bounds\n"
@@ -454,9 +455,10 @@ sub calc {
 	my $vals = \@order;
 	if ($func =~ s/\@\z// and ($opt{hidemin} or $opt{hidemax})) {
 		my $linemin = $opt{start} // 0;
-		my $linemax = $opt{end} // -1;
+		my $linemax = $opt{end} // -1; #TODO $#?
 		$vals = $cache->{part} //=
-			[grep {length} @values[$linemin .. $linemax]];
+			[sort {$a <=> $b} #TODO optional
+				grep {length} @values[$linemin .. $linemax]];
 	}
 
 	return $cache->{$request} //= _calc($func, $vals);
@@ -519,7 +521,7 @@ Options:
   -e, --log                Logarithmic (exponential) scale instead of linear
       --graph-format=CHAR  Glyph to repeat for the graph line
   -m, --markers=FORMAT     Statistical positions to indicate on bars
-      --min=N, --max=N     Bars extend from 0 or the minimum value if lower
+      --min=N, --max=N     Bar axis range, otherwise scaled automatically
       --palette=(PRESET|COLORS)
                            Override colors of parsed numbers
   -_, --spark              Replace lines by sparklines
@@ -682,11 +684,14 @@ markers can also be repeated at multiples of a number
 prepended by B</>.
 For example C<:/1> for a grid at every integer.
 
-=item B<--min>=I<number>, B<--max>=I<number>
+=item B<--min>=I<position>, B<--max>=I<position>
 
-Bars extend from 0 or the minimum value if lower,
-to the largest value encountered.
-These options can be set to customize this range.
+Bar axis range, otherwise scaled automatically
+from C<low> (the lowest negative value or 0)
+to C<100v@> (the largest visible value).
+
+A shorthand B<-O> will set the minimum to C<0v@>
+for an unanchored graph.
 
 =item B<--palette>=(I<preset> | I<color>...)
 
@@ -819,8 +824,9 @@ Version information.
 
 =head2 Position variables
 
-The following variable names are recognised
-within format syntax of B<markers> and B<stat>:
+In some options including B<min> and B<max>,
+and within format syntax of B<markers> and B<stat>,
+the following values are recognised:
 
 =over 2
 
@@ -836,6 +842,11 @@ in its frequency distribution (inclusive).
 
 The median value is at C<50v>, the minimum at C<0v>,
 and one standard deviation above the median at C<68.3v>.
+
+=item B<low>
+
+The default axis origin:
+zero (C<0>) or the lowest value C<0v> if negative.
 
 =item B<avg>
 

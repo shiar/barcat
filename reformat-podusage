@@ -19,7 +19,7 @@ $pod =~ s{
 $pod =~ s/^=item\ \K(?=--)/____/g;  # align long options
 # abbreviate <variable> indicators
 $pod =~ s/\Q>.../s>/g;
-$pod =~ s/I<(?:number|count|seconds)>/N/g;
+$pod =~ s/I<(?:number|count|seconds|position)>/N/g;
 $pod =~ s/I<character(s?)>/\Uchar$1/g;
 $pod =~ s/\Q | /|/g;
 $pod =~ s/I<([a-z]+)> (?![.,])/\U$1/g;  # uppercase
