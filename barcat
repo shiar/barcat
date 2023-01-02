@@ -146,7 +146,11 @@ $opt{units}   = [split //, ' kMGTPEZYRQqryzafpn'.($opt{ascii} ? 'u' : 'μ').'m']
 $opt{'value-length'} = 4 if $opt{units};
 $opt{'value-length'} = 1 if $opt{unmodified};
 $opt{'signal-stat'} //= exists $SIG{INFO} ? 'INFO' : 'QUIT';
-$opt{markers} //= '=avg <31.73% >68.27% +50% |0';
+$opt{markers} //= join(' ',
+	'=avg',
+	$opt{ascii} // 1 ? '<31.73% >68.27%' : '⊢31.73% ⊣68.27%',
+	'+50% |0',
+);
 $opt{stat} //= 1 if defined $opt{report};
 $opt{report} //= join('',
 	'${lines@:${sum@+} of }',
