@@ -9,7 +9,7 @@ our $VERSION = '1.01';
 
 local $/ = undef;  # slurp
 my $source = readline;
-my $pod = $source;
+my $pod = $source =~ s/^=head2 .*//r;
 $pod =~ s/^=over\K/ 25/;  # indent options list
 $pod =~ s/[BC]<([^>]+)>/$1/g;  # unbolden
 $pod =~ s{

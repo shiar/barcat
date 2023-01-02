@@ -652,41 +652,35 @@ Defaults to a dash C<->.
 =item B<-m>, B<--markers>=I<format>
 
 Statistical positions to indicate on bars.
-A single indicator glyph precedes each position:
+A single indicator glyph precedes each I<position>.
+By default this includes the following definitions:
 
-=over 2
+=over 5
 
-=item I<number>
+=item B<|>I<0>
 
-Exact value to match on the axis.
-A vertical bar at the zero crossing is displayed by C<|0>
-for negative values.
-For example C<π3.14> would locate pi.
+A vertical bar at the zero crossing for negative values.
 
-=item B</>I<interval>
+=item B<=>I<avg>
 
-Repeated at every multiple of a number.
-For example C<:/1> for a grid at every integer.
+Indicates the average (arithmetic mean).
 
-=item I<percentage>B<v>
+=item B<+>I<50v>
 
-Ranked value at the given percentile,
-or score at or below which a percentage falls
-in its frequency distribution (inclusive).
-
-The default shows C<+> at C<50v> for the mean or median:
+The mean or median value:
 the middle value or interpolation between two values.
-One standard deviation above the median is at about C<68v>.
-The default includes C<< <31.73v >68.27v >>
+
+=item B<E<lt>>I<31.73v> B<E<gt>>I<68.27v>
+
+One standard deviation below and above the median
 to encompass all I<normal> results, or 68% of all entries, by I<< <--> >>.
 
-=item B<avg>
-
-Matches the average (arithmetic mean);
-the sum of all values divided by the number of counted lines.
-Indicated by default as C<=>.
-
 =back
+
+Besides common functions described later,
+markers can also be repeated at multiples of a number
+prepended by B</>.
+For example C<:/1> for a grid at every integer.
 
 =item B<--min>=I<number>, B<--max>=I<number>
 
@@ -820,6 +814,46 @@ as rendered by perldoc.
 =item B<-V>, B<--version>
 
 Version information.
+
+=back
+
+=head2 Position variables
+
+The following variable names are recognised
+within format syntax of B<markers> and B<stat>:
+
+=over 2
+
+=item I<number>
+
+Any literal value.
+
+=item I<percentage>B<v>
+
+Ranked value at the given percentile,
+or score at or below which a percentage falls
+in its frequency distribution (inclusive).
+
+The median value is at C<50v>, the minimum at C<0v>,
+and one standard deviation above the median at C<68.3v>.
+
+=item B<avg>
+
+Calculated average (arithmetic mean);
+the B<sum> of all values divided by the number of counted lines.
+
+=item B<sum>
+
+The total value of all numbers added together.
+
+=item B<count>
+
+Returns the number of lines containing numeric values.
+
+=item B<lines>
+
+Newline count:
+the number of input lines including empty or uncounted values.
 
 =back
 
