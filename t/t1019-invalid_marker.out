@@ -1,4 +1,4 @@
-barcat --markers='atest 09998 b200v c15000 0test' input/intsine.txt
+barcat --markers='atest 09998 b200% c15000 0test' input/intsine.txt
 Invalid marker a: test unknown
 Invalid marker b: percentile 200 out of bounds
 Invalid marker 0: test unknown

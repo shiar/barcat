@@ -1,4 +1,4 @@
-barcat --graph-format=─ --markers='550v 11v 00v 999v 0100v' input/ascii.txt
+barcat --graph-format=─ --markers='550% 11% 00% 999% 0100%' input/ascii.txt
 123e-6 micro     0─────────────5───────
     .1 long line 0─────────────5───────0
     -1           0─────────────5

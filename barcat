@@ -42,7 +42,7 @@ GetOptions(\%opt,
 	},
 	'value-length=i',
 	'minval=s',
-	'O|origin!' => sub { $opt{minval} = '0v@' },
+	'O|origin!' => sub { $opt{minval} = '0%@' },
 	'maxval=s',
 	'limit|L:s' => sub {
 		my ($optname, $optval) = @_;
@@ -146,7 +146,7 @@ $opt{units}   = [split //, ' kMGTPEZYRQqryzafpn'.($opt{ascii} ? 'u' : 'μ').'m']
 $opt{'value-length'} = 4 if $opt{units};
 $opt{'value-length'} = 1 if $opt{unmodified};
 $opt{'signal-stat'} //= exists $SIG{INFO} ? 'INFO' : 'QUIT';
-$opt{markers} //= '=avg <31.73v >68.27v +50v |0';
+$opt{markers} //= '=avg <31.73% >68.27% +50% |0';
 $opt{stat} //= 1 if defined $opt{report};
 $opt{report} //= join('',
 	'${lines@:${sum@+} of }',
@@ -154,9 +154,9 @@ $opt{report} //= join('',
 	'${count#} values',
 	'${lines#; $_ = $_ != @order && " over $_ lines"}',
 	sprintf('${count: (%s)}', join ', ',
-		'${0v; color(31)} min',
+		'${0%; color(31)} min',
 		'${avg; $opt{reformat} or $_ = sprintf "%0.2f", $_; color(36)} avg',
-		'${100v; color(32)} max',
+		'${100%; color(32)} max',
 	),
 );
 $opt{palette} //= $opt{color} && [31, 90, 32];
@@ -272,7 +272,7 @@ if ($opt{count}) {
 }
 
 @order = sort { $a <=> $b } @order unless tied @order;
-my $maxval = calc($opt{maxval} // '100v@') // 0;
+my $maxval = calc($opt{maxval} // '100%@') // 0;
 my $minval = calc($opt{minval} // 'low');
 my $range = $maxval - $minval;  # $relval->($maxval)
 my $lenval = $opt{'value-length'} // max map { length } @order;
@@ -415,13 +415,13 @@ sub _calc {
 	elsif ($func eq 'mdev') {
 		#TODO square each value?
 		my $avg = calc('avg');
-		my $median = calc('50v');
+		my $median = calc('50%');
 		return sqrt(abs($avg**2 - $median**2)) / 2;
 	}
 	elsif ($func eq 'low') {
 		return min($order->[0] // (), 0);
 	}
-	elsif ($func =~ /\A([0-9.]+)v\z/) {
+	elsif ($func =~ /\A([0-9.]+)%\z/) {
 		$1 <= 100 or die(
 			"percentile $1 out of bounds\n"
 		);
@@ -667,12 +667,12 @@ A vertical bar at the zero crossing for negative values.
 
 Indicates the average (arithmetic mean).
 
-=item B<+>I<50v>
+=item B<+>I<50%>
 
 The mean or median value:
 the middle value or interpolation between two values.
 
-=item B<E<lt>>I<31.73v> B<E<gt>>I<68.27v>
+=item B<E<lt>>I<31.73%> B<E<gt>>I<68.27%>
 
 One standard deviation below and above the median
 to encompass all I<normal> results, or 68% of all entries, by I<< <--> >>.
@@ -688,9 +688,9 @@ For example C<:/1> for a grid at every integer.
 
 Bar axis range, otherwise scaled automatically
 from C<low> (the lowest negative value or 0)
-to C<100v@> (the largest visible value).
+to C<100%@> (the largest visible value).
 
-A shorthand B<-O> will set the minimum to C<0v@>
+A shorthand B<-O> will set the minimum to C<0%@>
 for an unanchored graph.
 
 =item B<--palette>=(I<preset> | I<color>...)
@@ -834,19 +834,19 @@ the following values are recognised:
 
 Any literal value.
 
-=item I<percentage>B<v>
+=item I<percentage>B<%>
 
 Ranked value at the given percentile,
 or score at or below which a percentage falls
 in its frequency distribution (inclusive).
 
-The median value is at C<50v>, the minimum at C<0v>,
-and one standard deviation above the median at C<68.3v>.
+The median value is at C<50%>, the minimum at C<0%>,
+and one standard deviation above the median at C<68.3%>.
 
 =item B<low>
 
 The default axis origin:
-zero (C<0>) or the lowest value C<0v> if negative.
+zero (C<0>) or the lowest value C<0%> if negative.
 
 =item B<avg>
 
