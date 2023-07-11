@@ -10,7 +10,7 @@ test:
 	t/regress.t
 tests:
 	mkdir -p sample/out
-	prove -f
+	COLUMNS=80 prove -f
 
 install: barcat
 	$(INSTALL) -d '$(bindir)'
