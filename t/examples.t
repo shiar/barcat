@@ -14,7 +14,7 @@ plan skip_all => "IPC::Run required to test commands" if $@;
 
 my %CMDARGS = (
 	ping => '-c 1 ',
-	'cat \Khttpd/' => '/var/log/apache2/',
+	' \Khttpd/' => 'sample/data/',
 	' \K\*(?=\h*\|)' => 'sample/media/*.*',
 	find => 'sample/media -name \*.\* ',
 );
@@ -68,6 +68,7 @@ SKIP: {
 		s/'(\S+)[^']*'/$1/g;  # quoted arguments
 		s/\h*\|.*//;          # subsequent pipes
 		s/^cat\ (?:\S+\/)?//; # local file
+		s/\S*\///g;           # preceding paths
 	} for my $name = $cmd;
 
 	# prepare shell command to execute
@@ -89,10 +90,13 @@ SKIP: {
 	defined $output or next;
 
 	# record output for review
+	my $outname = "sample/out/";
+	-w $outname or next;
 	my $numprefix = sprintf '%02d', Test::More->builder->current_test;
-	if (open my $record, '>', "sample/out/t$numprefix-$name.txt") {
-		print {$record} $output;
-	}
+	$outname .= "t$numprefix-$name.txt";
+	open my $record, '>', $outname
+		or diag("output not saved in $outname: $!"), next;
+	print {$record} $output;
 }}
 
 sub runres {
