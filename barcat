@@ -168,6 +168,7 @@ $opt{indicators} = [split //, $opt{indicators} ||
 	($opt{ascii} ? ' .oO' : $opt{spark} ? ' ▁▂▃▄▅▆▇█' : ' ▏▎▍▌▋▊▉█')
 ] if defined $opt{indicators} or $opt{spark};
 $opt{input} = (@ARGV && $ARGV[0] =~ m/\A[-0-9]/) ? \@ARGV : undef;
+$opt{end} = 0;
 
 $opt{'calc-format'} = sub { sprintf '%*.*f', 0, 2, $_[0] };
 $opt{'value-format'} = $opt{sexagesimal} ? sub {

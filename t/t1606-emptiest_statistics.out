@@ -1,0 +1,2 @@
+barcat -L -s input/empty_input.txt
+0 of 0 values
