@@ -17,6 +17,7 @@ my %CMDARGS = (
 	' \Khttpd/' => 'sample/data/',
 	' \K\*(?=\h*\|)' => 'sample/media/*.*',
 	find => 'sample/media -name \*.\* ',
+	barcat => '-C -l40 ',
 );
 
 my $filename = 'barcat';
