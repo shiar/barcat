@@ -291,7 +291,7 @@ $range &&= log $range if $opt{log};
 my $relval = sub {
 	my $val = shift;
 	$val -= $minval;
-	$val &&= log $val if $opt{log};
+	$val = log $val if $opt{log} and $val > 0;
 	$val /= $range if $range;
 	return $val;
 };
