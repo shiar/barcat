@@ -15,7 +15,7 @@ jobs:
     - uses: actions/checkout@v4
 
     - name: Run regression test
-      run: make test
+      run: PATH=..:$PATH make test
 
     - name: Render documentation
       run: ln -s barcat README.pod
