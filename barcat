@@ -289,8 +289,13 @@ my $lenval = $opt{'value-length'} // max map { length } @order;
 my $len    = defined $opt{trim} && $opt{trim} <= 0 ? -$opt{trim} + 1 :
 	max(map { length $values[$_] && length $lines[$_] } $nr .. $limit)
 	// 0;  # left padding
-my $size   = defined $opt{width} && $range &&
-	($opt{width} - $lenval - $len - !!$opt{indicators});  # bar multiplication
+$len += $opt{trim} ? 2 : max(map { length $values[$_] } $nr .. $limit) - 1 if $opt{unmodified};
+my $size = $range && $opt{width} || 0;  # bar multiplication
+if ($size) {
+	$size -= $len;
+	$size -= $lenval unless $opt{unmodified};
+	$size-- if $opt{indicators};
+}
 $range &&= log $range if $opt{log};
 
 my $relval = sub {
@@ -376,19 +381,22 @@ while ($nr <= $limit) {
 	}
 	print $indicator if defined $indicator;
 
+	my $vallen = $len;
 	if (length $val) {
-		$val = sprintf("%*s", $lenval,
+		$val = sprintf("%*s", $opt{unmodified} ? 1 : $lenval,
 			$opt{reformat} ? $opt{'value-format'}->($val) : $val
 		);
+		$vallen -= length($val) if $opt{unmodified};
 		color($color) for $val;
+		$vallen += length($val);
 	}
 	my $line = $lines[$nr] =~ s/\n/$val/r;
 	if (not length $val) {
 		say $line;
 		next;
 	}
-	printf '%-*s', $len + length($val), $line;
-	if ($rel and $size) {
+	printf '%-*s', $vallen, $line;
+	if ($rel and $size > 0) {
 		print $barmark[$_] // $opt{'graph-format'}
 			for 1 .. $rel * $size + .5;
 	}
