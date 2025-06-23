@@ -64,4 +64,4 @@ barcat -Hes input/megametric.txt
 3.0e30 +----------->-------------------=
  30e31 +----------->-------------------=-
 300e32 +----------->-------------------=--
-333e32 total in 65 values ( 30e-34 min, 5.1e30 avg, 300e32 max)
+333e32 total in 65 values (30e-34 min, 5.1e30 avg, 300e32 max)

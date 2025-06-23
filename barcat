@@ -153,14 +153,14 @@ $opt{markers} //= join(' ',
 );
 $opt{stat} //= 1 if defined $opt{report};
 $opt{report} //= join('',
-	'${lines@:${sum@+} of }',
-	'${count:${sum+; color(1)} total in }',
+	'${lines@:${sum@+; trim} of }',
+	'${count:${sum+; trim; color(1)} total in }',
 	'${count#} values',
 	'${lines#; $_ = $_ != @order && " over $_ lines"}',
 	sprintf('${count: (%s)}', join ', ',
-		'${0%; color(31)} min',
-		'${avg; $opt{reformat} or $_ = sprintf "%0.2f", $_; color(36)} avg',
-		'${100%; color(32)} max',
+		'${0%; trim; color(31)} min',
+		'${avg; trim; $opt{reformat} or $_ = sprintf "%0.2f", $_; color(36)} avg',
+		'${100%; trim; color(32)} max',
 	),
 );
 $opt{palette} //= $opt{color} && [31, 90, 32];
@@ -261,6 +261,11 @@ sub color {
 	$opt{color} and defined $_[0] or return '';
 	return "\e[$_[0]m" if defined wantarray;
 	$_ = color(@_) . $_ . color(0) if defined;
+}
+
+sub trim {
+	s/^\h+//;
+	s/\h+$//;
 }
 
 sub show_lines {

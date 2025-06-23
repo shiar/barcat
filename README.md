@@ -39,6 +39,6 @@ Reformat values and add statistics:
 	4.1k sample            ---------------------------<-+
 	152k t/input           ---------------------------<-+----->----=--
 	464k t                 ---------------------------<-+----->----=------
-	654k total in 8 values ( 27  min,  82k avg, 464k max)
+	654k total in 8 values (27 min, 82k avg, 464k max)
 
 Many more sample commands in the documentation.
