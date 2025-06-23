@@ -506,6 +506,7 @@ sub show_exit {
 
 show_exit();
 
+# Run reformat-podusage to autogenerate usage data between end and pod:
 __END__
 Usage:                                               /\_/\
   barcat [OPTIONS] [FILES|NUMBERS]                  (=•.•=)
