@@ -3,4 +3,4 @@ barcat --graph-format=─ --markers='550% 11% 00% 999% 0100%' input/ascii.txt
     .1 long line 0─────────────5───────0
     -1           0─────────────5
     -2           0──────
-    -3           
+    -3

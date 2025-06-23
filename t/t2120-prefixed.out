@@ -1,7 +1,7 @@
 barcat --indicators= input/unvalued.txt
  nan
 ▍ -1 negative  -------
-▏ -2 negativer 
+▏ -2 negativer
 ▋  0 zero      ----------<-=|
 ▋ .0 zeroer    ----------<-=|
 ▋-00 zeroest   ----------<-=|

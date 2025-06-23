@@ -4,6 +4,6 @@ numeric 1   2 3                ------=-+
 -1      -  2-3                 ------=-+
 more numeric 1 with text   2 3 ------=-+
 
-0   0 0 0 0                    
+0   0 0 0 0
 non-numeric text column
 111 2e0...                     ------=-+

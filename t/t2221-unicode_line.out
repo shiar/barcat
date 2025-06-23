@@ -3,4 +3,4 @@ barcat --graph-format=─ input/ascii.txt
     .1 long line ────────<────=+────>─|─
     -1           ────────<────=+
     -2           ───────
-    -3           
+    -3

@@ -395,10 +395,12 @@ while ($nr <= $limit) {
 		say $line;
 		next;
 	}
-	printf '%-*s', $vallen, $line;
 	if ($rel and $size > 0) {
+		printf '%-*s', $vallen, $line;
 		print $barmark[$_] // $opt{'graph-format'}
 			for 1 .. $rel * $size + .5;
+	} else {
+		print $line;
 	}
 	say '';
 }

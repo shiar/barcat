@@ -1,5 +1,5 @@
 barcat -e --markers=+/1 input/powers_of_ten.txt
-     1 
+     1
     10 -----+
    100 -----+----+
   1000 -----+----+-----+
